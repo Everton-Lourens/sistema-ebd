@@ -10,62 +10,50 @@ import {
 } from 'react-native';
 
 const initialClasses = [
-  'Professores',
+  'Cordeirinhos de Cristo',
+  'Shalom',
+  'Filhos de Asáfe',
+  'Mensageiros de Cristo',
+  'Rosa de Saron',
+  'Filhos de Sião',
 ].map((name, index) => ({
   id: index.toString(),
   name,
-  teachers: [], // { name: string, presence: 'P' | 'F' | null }
+  students: [], // { name: string, presence: 'P' | 'F' | null }
 }));
 
 export default function App() {
   const [classes, setClasses] = useState(initialClasses);
   const [selectedClassId, setSelectedClassId] = useState(null);
-  const [newTeacherName, setNewTeacherName] = useState('');
+  const [newStudentName, setNewStudentName] = useState('');
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
 
-  useState(() => {
-    // storage.setItem('classes', JSON.stringify(classes));
-    // @ts-ignore
-  }, [classes]);
-
-  const handleAddTeacher = () => {
-    if (!newTeacherName.trim()) return;
+  const handleAddStudent = () => {
+    if (!newStudentName.trim()) return;
     const updated = classes.map(c => {
       if (c.id === selectedClassId) {
         return {
           ...c,
-          teachers: [
-            ...c.teachers,
-            { name: newTeacherName.trim(), presence: 'P' },
+          students: [
+            ...c.students,
+            { name: newStudentName.trim(), presence: null },
+            { name: 'Everton', presence: true },
           ],
         };
       }
       return c;
     });
-    setClasses(
-      // @ts-ignore
-      updated);
-    setNewTeacherName('');
+    setClasses(updated);
+    setNewStudentName('');
   };
 
-  const handleTogglePresence = (teacherIndex: number, type: string) => {
+  const handleTogglePresence = (studentIndex, type) => {
     const updated = classes.map(c => {
       if (c.id === selectedClassId) {
-        const teachers = [...c.teachers];
-        // @ts-ignore
-        teachers[teacherIndex].presence = type;
-        return { ...c, teachers };
-      }
-      return c;
-    });
-    setClasses(updated);
-  };
-  const handleToggleDelete = (teacherIndex: number) => {
-    const updated = classes.map(c => {
-      if (c.id === selectedClassId) {
-        const teachers = c.teachers.filter((_, i) => i !== teacherIndex);
-        return { ...c, teachers };
+        const students = [...c.students];
+        students[studentIndex].presence = type;
+        return { ...c, students };
       }
       return c;
     });
@@ -78,26 +66,18 @@ export default function App() {
 
       {!selectedClassId ? (
         <>
-          <Text style={styles.subtitle}>Chamada dos Professores:</Text>
+          <Text style={styles.subtitle}>Selecione uma Classe:</Text>
           <FlatList
             data={classes}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.classItem}
-                onPress={() => setSelectedClassId(
-                  // @ts-ignore
-                  item.id)}
+                onPress={() => setSelectedClassId(item.id)}
               >
                 <Text style={styles.className}>{item.name}</Text>
-                <Text style={styles.teacherCount}>
-                  {item.teachers.length} Cadastrado(s) / {
-                    classes
-                      .filter(c => c.id === item.id)
-                      // @ts-ignore
-                      .map(c => c.teachers.filter(teacher => teacher.presence === 'P').length)
-                      .reduce((acc, count) => acc + count, 0)
-                  } Presente(s)
+                <Text style={styles.studentCount}>
+                  {item.students.length} aluno(s)
                 </Text>
               </TouchableOpacity>
             )}
@@ -108,32 +88,26 @@ export default function App() {
           <TouchableOpacity onPress={() => setSelectedClassId(null)}>
             <Text style={styles.back}>← Voltar</Text>
           </TouchableOpacity>
-          <Text style={styles.subtitle}>{// @ts-ignore
-          selectedClass.name}</Text>
+          <Text style={styles.subtitle}>Alunos da turma: {selectedClass.name}</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Nome do Professor"
-            value={newTeacherName}
-            onChangeText={setNewTeacherName}
+            placeholder="Nome do aluno"
+            value={newStudentName}
+            onChangeText={setNewStudentName}
           />
-          <Button title="Adicionar" onPress={handleAddTeacher} />
+          <Button title="Adicionar aluno" onPress={handleAddStudent} />
 
           <FlatList
-            data={
-              // @ts-ignore
-              selectedClass.teachers}
+            data={selectedClass.students}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index }) => (
-              <View style={styles.teacherItem}>
-                <Text style={styles.teacherName}>{
-                // @ts-ignore
-                item.name}</Text>
+              <View style={styles.studentItem}>
+                <Text style={styles.studentName}>{item.name}</Text>
                 <View style={styles.buttons}>
                   <TouchableOpacity
                     style={[
                       styles.presenceButton,
-                      // @ts-ignore
                       item.presence === 'P' && styles.present,
                     ]}
                     onPress={() => handleTogglePresence(index, 'P')}
@@ -143,26 +117,11 @@ export default function App() {
                   <TouchableOpacity
                     style={[
                       styles.presenceButton,
-        // @ts-ignore
                       item.presence === 'F' && styles.absent,
                     ]}
                     onPress={() => handleTogglePresence(index, 'F')}
                   >
                     <Text style={styles.buttonText}>Falta</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.presenceButton,
-                      styles.absent,
-                      {
-                        alignSelf: 'flex-end',
-                        position: 'absolute',
-                        right: 0,
-                      },
-                    ]}
-                    onPress={() => handleToggleDelete(index)}
-                  >
-                    <Text style={styles.buttonText}>Remover</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -175,11 +134,11 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', padding: 20, paddingTop: 50 },
+  container: { flex: 1, padding: 20, paddingTop: 50 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   subtitle: { fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 },
   input: {
-    borderWidth: 1, backgroundColor: 'white', borderColor: '#aaa', borderRadius: 5,
+    borderWidth: 1, borderColor: '#aaa', borderRadius: 5,
     padding: 10, marginBottom: 10,
   },
   classItem: {
@@ -187,14 +146,14 @@ const styles = StyleSheet.create({
     borderRadius: 5, marginBottom: 10,
   },
   className: { fontSize: 16, fontWeight: 'bold' },
-  teacherCount: { fontSize: 12, color: '#555' },
+  studentCount: { fontSize: 12, color: '#555' },
   back: {
     color: '#007AFF', marginBottom: 10, fontSize: 16,
   },
-  teacherItem: {
+  studentItem: {
     padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc',
   },
-  teacherName: { fontSize: 16, marginBottom: 5 },
+  studentName: { fontSize: 16, marginBottom: 5 },
   buttons: { flexDirection: 'row', gap: 10 },
   presenceButton: {
     padding: 6, paddingHorizontal: 12,
