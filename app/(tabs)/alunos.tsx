@@ -2,6 +2,7 @@ import { NewCall } from '@/classes/newCall';
 import { formatToCurrency } from '@/helper/format';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Button,
   FlatList,
   StyleSheet,
@@ -21,109 +22,167 @@ const initialClasses = [
 ].map((name, index) => ({
   id: index.toString(),
   name,
-  students: [], // { name: string, presence: 'P' | 'F' | null }
+  className: name,
+  studentNumber: '',
+  presenceNumber: '',
+  bibleNumber: '',
+  magazineNumber: '',
+  guestNumber: '',
+  offersNumber: '',
 }));
 
 export default function App() {
   const [classes, setClasses] = useState(initialClasses);
+  const [allCall, setAllCall] = useState({
+    studentNumber: '',
+    presenceNumber: '',
+    magazineNumber: '',
+    bibleNumber: '',
+    guestNumber: '',
+    offersNumber: '',
+  });
   const [selectedClassId, setSelectedClassId] = useState(null);
-  const [newStudentName, setNewStudentName] = useState('');
-  const [numberPresence, setNumberPresence] = useState(0);
+  const [newCallAlert, setNewCallAlert] = useState(false);
+  const [presenceNumber, setPresenceNumber] = useState('');
+  const [studentNumber, setStudentNumber] = useState('');
   const [bibleNumber, setBibleNumber] = useState('');
   const [magazineNumber, setMagazineNumber] = useState('');
   const [guestNumber, setGuestNumber] = useState('');
   const [offersNumber, setOffersNumber] = useState('');
-  const [callStudents, setCallStudents] = useState({});
-  const [callStudents2, setCallStudents2] = useState({});
+  const [initLoad, setInitLoad] = useState(true);
+  const [totalCall, setTotalCall] = useState({
+    totalStudent: 0,
+    totalPresence: 0,
+    totalBibleNumber: 0,
+    totalMagazineNumber: 0,
+    totalGuestNumber: 0,
+    totalOffersNumber: 0,
+  });
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
 
-
-
   useEffect(() => {
-    const getCall = async () => {
-      const newCall = new NewCall();
-      const call1 = await newCall.getCall('Cordeirinhos de Cristo');
-      const call2 = await newCall.getCall('Shalom');
-      const call3 = await newCall.getCall('Filhos de Asáfe');
-      const call4 = await newCall.getCall('Mensageiros de Cristo');
-      const call5 = await newCall.getCall('Rosa de Saron');
-      const call6 = await newCall.getCall('Filhos de Sião');
-      setCallStudents2({
-        'Cordeirinhos': call1,
-        'Shalom': call2,
-        'Filhos de Asáfe': call3,
-        'Mensageiros de Cristo': call4,
-        'Rosa de Saron': call5,
-        'Filhos de Sião': call6,
-      });
-    };
-    getCall();
-  }, [callStudents]);
+    updateAllClasses()
+    const newCall = new NewCall();
+    newCall.className = 'TOTAL_GERAL';
+    newCall.studentNumber = totalCall.totalStudent.toString();
+    newCall.presenceNumber = totalCall.totalPresence.toString();
+    newCall.bibleNumber = totalCall.totalBibleNumber.toString();
+    newCall.magazineNumber = totalCall.totalMagazineNumber.toString();
+    newCall.guestNumber = totalCall.totalGuestNumber.toString();
+    newCall.offersNumber = totalCall.totalOffersNumber.toString();
+    newCall.save();
+  }, [allCall]);
 
-  const handleAddStudent = () => {
-    if (!newStudentName.trim()) return;
-    const updated = classes.map(c => {
-      if (c.id === selectedClassId) {
-        return {
-          ...c,
-          students: [
-            ...c.students,
-            { name: newStudentName.trim(), presence: 'P' },
-          ],
-        };
-      }
-      return c;
+  function updateAllClasses() {
+    let totalStudent = 0;
+    let totalPresence = 0;
+    let totalBibleNumber = 0;
+    let totalMagazineNumber = 0;
+    let totalGuestNumber = 0;
+    let totalOffersNumber = 0;
+    const newCall = new NewCall();
+    initialClasses.forEach(({ name }) => {
+      newCall.getCall(name).then(data => {
+        if (data) {
+          checkDate(data?.callDate)
+          totalStudent += Number(data?.studentNumber) || 0;
+          totalPresence += Number(data?.presenceNumber) || 0;
+          totalBibleNumber += Number(data?.bibleNumber) || 0;
+          totalMagazineNumber += Number(data?.magazineNumber) || 0;
+          totalGuestNumber += Number(data?.guestNumber) || 0;
+          totalOffersNumber += Number(data?.offersNumber?.replace(/[^\d]/g, '')) || 0;
+          setTotalCall({
+            totalStudent,
+            totalPresence,
+            totalBibleNumber,
+            totalMagazineNumber,
+            totalGuestNumber,
+            totalOffersNumber,
+          })
+          setAllCall(prev => {
+            return {
+              ...prev,
+              [name]: {
+                ...data,
+                className: data?.className || '',
+                studentNumber: data?.studentNumber || '',
+                presenceNumber: data?.presenceNumber || '',
+                bibleNumber: data?.bibleNumber || '',
+                magazineNumber: data?.magazineNumber || '',
+                guestNumber: data?.guestNumber || '',
+                offersNumber: data?.offersNumber || '',
+              }
+            }
+          });
+        }
+      })
     });
-    setClasses(updated);
-    setNewStudentName('');
-  };
-  const handleNewCall = () => {
-    const newCall = new NewCall(
-      'Cordeirinhos de Cristo',
-      Number(numberPresence),
-      Number(bibleNumber),
-      Number(magazineNumber),
-      Number(guestNumber),
-      Number(offersNumber)
-    )
-    newCall.save('Cordeirinhos de Cristo')
-    console.log(newCall.getCall('Cordeirinhos de Cristo'))
-    setCallStudents(newCall)
-  };
-  const handleTogglePresence = (studentIndex, type) => {
-    const updated = classes.map(c => {
-      if (c.id === selectedClassId) {
-        const students = [...c.students];
-        students[studentIndex].presence = type;
-        return { ...c, students };
-      }
-      return c;
-    });
-    setClasses(updated);
-  };
-  const handleToggleDelete = (studentIndex) => {
-    const updated = classes.map(c => {
-      if (c.id === selectedClassId) {
-        const students = c.students.filter((_, i) => i !== studentIndex);
-        return { ...c, students };
-      }
-      return c;
-    });
-    setClasses(updated);
-  };
 
-  const getNumberPresence = (item) => {
-    const allPresence = classes
-      .filter(c => c.id === item.id)
-      .map(c => c.students.filter(student => student.presence === 'P').length)
-      .reduce((acc, count) => acc + count, 0)
-    setNumberPresence(allPresence)
-    return allPresence
   }
-  const getPercentage = (presence: number = 0, allStudents: number = 0): number => {
-    if (allStudents === 0 || presence === 0) return 0;
-    return parseFloat(((presence / allStudents) * 100).toFixed(2));
+
+  function checkDate(oldDate: string) {
+    if (initLoad) {
+      setInitLoad(false)
+      const date1 = new Date().toISOString();
+      const date2 = new Date(oldDate).toISOString();
+      function getDateOnly(isoString: string) {
+        return isoString.split('T')[0];
+      }
+      const sameDate = getDateOnly(date1) === getDateOnly(date2);
+      if (sameDate) {
+        setStudentNumber('');
+        setPresenceNumber('');
+        setBibleNumber('');
+        setMagazineNumber('');
+        setGuestNumber('');
+        setOffersNumber('');
+        return true
+      }
+      return false
+    }
+  }
+
+  const handleNewCall = (className = '') => {
+    if (!className) return
+    const newCall = new NewCall();
+    newCall.setCall({
+      className,
+      studentNumber,
+      presenceNumber,
+      bibleNumber,
+      magazineNumber,
+      guestNumber,
+      offersNumber,
+    });
+    newCall.save()
+    updateAllClasses()
+    Alert.alert('Salvo com sucesso', '', [
+      {
+        text: 'OK',
+        onPress: () => { },
+      },
+    ]);
+  };
+
+  const getPercentage = (presence: string = '', allStudents: string = ''): number => {
+    if (!allStudents || !presence) return 0;
+    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
+  }
+
+  const isCalled = (className: string = ''): boolean => {
+    if (className === '') throw new Error('O nome da turma é obrigatório');
+    if (
+      !allCall[className]?.studentNumber ||
+      !allCall[className]?.presenceNumber ||
+      !allCall[className]?.magazineNumber ||
+      !allCall[className]?.bibleNumber ||
+      !allCall[className]?.guestNumber ||
+      !allCall[className]?.offersNumber
+    ) {
+      return false
+    }
+    return true
   }
   return (
     <View style={styles.container}>
@@ -131,24 +190,25 @@ export default function App() {
 
       {!selectedClassId ? (
         <>
-          <Text style={styles.subtitle}>Chamada dos Alunos: {JSON.stringify(callStudents2[0] || [])}</Text>
+          <Text style={styles.subtitle}>Chamada dos Alunos</Text>
           <FlatList
             data={classes}
             keyExtractor={item => item.id}
+            extraData={allCall}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.classItem}
+                style={isCalled(item.name) ? styles.classItem : styles.classItemNotCalled}
                 onPress={() => setSelectedClassId(item.id)}
               >
                 <Text style={styles.className}>{item.name}</Text>
                 <Text style={styles.studentCount}>
-                  {`${item.students.length} Cadastrado(s)  /  `}
-                  {`${getNumberPresence(item)} Presente(s)  /  `}
-                  {`${Number(magazineNumber)} Revista(s)  /  `}
-                  {`${Number(bibleNumber)} Bíblia(s)  /  `}
-                  {`${Number(guestNumber)} Convidado(s)  /  `}
-                  {`${offersNumber} Oferta(s)  /  `}
-                  {`${getPercentage(getNumberPresence(item), item.students.length) || 0.00}%`}
+                  {`${allCall[item.name]?.studentNumber || '--'} Cadastrado(s)  /  `}
+                  {`${allCall[item.name]?.presenceNumber || '--'} Presente(s)  /  `}
+                  {`${allCall[item.name]?.magazineNumber || '--'} Revista(s)  /  `}
+                  {`${allCall[item.name]?.bibleNumber || '--'} Bíblia(s)  /  `}
+                  {`${allCall[item.name]?.guestNumber || '--'} Convidado(s)  /  `}
+                  {`${allCall[item.name]?.offersNumber || '--'} Oferta(s)  /  `}
+                  {`${getPercentage(allCall[item.name]?.presenceNumber, allCall[item.name]?.studentNumber) || '--'}%`}
                 </Text>
               </TouchableOpacity>
             )}
@@ -156,63 +216,39 @@ export default function App() {
         </>
       ) : (
         <>
-          <TouchableOpacity onPress={() => setSelectedClassId(null)}>
+          <TouchableOpacity onPress={() => {
+            setSelectedClassId(null)
+            setStudentNumber('')
+            setPresenceNumber('')
+            setBibleNumber('')
+            setMagazineNumber('')
+            setGuestNumber('')
+            setOffersNumber('')
+          }}>
             <Text style={styles.back}>← Voltar</Text>
           </TouchableOpacity>
           <Text style={styles.subtitle}>Alunos da turma: {selectedClass.name}</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Nome do Aluno"
-            value={newStudentName}
-            onChangeText={setNewStudentName}
+            placeholder="Quantidade de Alunos"
+            value={studentNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setStudentNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
           />
-          <Button title="Adicionar" onPress={handleAddStudent} />
 
-          <FlatList
-            data={
-              // @ts-ignore
-              selectedClass.students}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <View style={styles.studentItem}>
-                <Text style={styles.studentName}>{item.name}</Text>
-                <View style={styles.buttons}>
-                  <TouchableOpacity
-                    style={[
-                      styles.presenceButton,
-                      item.presence === 'P' && styles.present,
-                    ]}
-                    onPress={() => handleTogglePresence(index, 'P')}
-                  >
-                    <Text style={styles.buttonText}>Presente</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.presenceButton,
-                      item.presence === 'F' && styles.absent,
-                    ]}
-                    onPress={() => handleTogglePresence(index, 'F')}
-                  >
-                    <Text style={styles.buttonText}>Falta</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.presenceButton,
-                      styles.absent,
-                      {
-                        alignSelf: 'flex-end',
-                        position: 'absolute',
-                        right: 0,
-                      },
-                    ]}
-                    onPress={() => handleToggleDelete(index)}
-                  >
-                    <Text style={styles.buttonText}>Remover</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
+          <TextInput
+            style={styles.input}
+            placeholder="Quantidade de Presenças"
+            value={presenceNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setPresenceNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
           />
 
           <TextInput
@@ -264,7 +300,10 @@ export default function App() {
             }}
             keyboardType="numeric"
           />
-          <Button title="Enviar" onPress={handleNewCall} />
+          <Button
+            title="Enviar"
+            onPress={() => handleNewCall(selectedClass?.name)}
+          />
         </>
       )}
     </View>
@@ -280,8 +319,12 @@ const styles = StyleSheet.create({
     padding: 10, marginBottom: 10,
   },
   classItem: {
-    borderWidth: 1, backgroundColor: 'white', borderColor: '#ccc', padding: 10,
-    borderRadius: 5, marginBottom: 10,
+    borderWidth: 1, padding: 10,
+    borderRadius: 5, marginBottom: 10, backgroundColor: '#c8facc', borderColor: '#38a169'
+  },
+  classItemNotCalled: {
+    borderWidth: 1, padding: 10,
+    borderRadius: 5, marginBottom: 10, backgroundColor: '#fcdada', borderColor: '#e53e3e'
   },
   className: { fontSize: 16, fontWeight: 'bold' },
   studentCount: { fontSize: 12, color: '#555' },
