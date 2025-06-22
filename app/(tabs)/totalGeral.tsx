@@ -31,16 +31,18 @@ const initialClasses = [
   offersNumber: '',
 }));
 
+const allCallInit = {
+  studentNumber: '',
+  presenceNumber: '',
+  magazineNumber: '',
+  bibleNumber: '',
+  guestNumber: '',
+  offersNumber: '',
+}
+
 export default function App() {
   const [classes, setClasses] = useState(initialClasses);
-  const [allCall, setAllCall] = useState({
-    studentNumber: '',
-    presenceNumber: '',
-    magazineNumber: '',
-    bibleNumber: '',
-    guestNumber: '',
-    offersNumber: '',
-  });
+  const [allCall, setAllCall] = useState(allCallInit);
   const [selectedClassId, setSelectedClassId] = useState(null);
   const [newCallAlert, setNewCallAlert] = useState(false);
   const [presenceNumber, setPresenceNumber] = useState('');
@@ -63,7 +65,8 @@ export default function App() {
 
   useEffect(() => {
     updateAllClasses()
-  }, []);
+  }, [allCall]);
+
   function updateAllClasses() {
     let totalStudent = 0;
     let totalPresence = 0;
@@ -108,7 +111,14 @@ export default function App() {
         }
       })
     });
-
+    newCall.className = 'TOTAL_GERAL';
+    newCall.studentNumber = totalCall.totalStudent.toString();
+    newCall.presenceNumber = totalCall.totalPresence.toString();
+    newCall.bibleNumber = totalCall.totalBibleNumber.toString();
+    newCall.magazineNumber = totalCall.totalMagazineNumber.toString();
+    newCall.guestNumber = totalCall.totalGuestNumber.toString();
+    newCall.offersNumber = totalCall.totalOffersNumber.toString();
+    newCall.save();
   }
 
   function checkDate(oldDate: string) {
@@ -153,6 +163,7 @@ export default function App() {
         onPress: () => { },
       },
     ]);
+    updateAllClasses()
   };
 
   const getPercentage = (presence: string = '', allStudents: string = ''): number => {
@@ -222,6 +233,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Quantidade de Alunos"
+            placeholderTextColor="gray"
             value={studentNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -233,6 +245,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Quantidade de Presenças"
+            placeholderTextColor="gray"
             value={presenceNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -244,6 +257,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Bílias"
+            placeholderTextColor="gray"
             value={bibleNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -262,6 +276,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Revistas"
+            placeholderTextColor="gray"
             value={magazineNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -272,6 +287,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Visitantes"
+            placeholderTextColor="gray"
             value={guestNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -282,6 +298,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Ofertas"
+            placeholderTextColor="gray"
             value={offersNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
