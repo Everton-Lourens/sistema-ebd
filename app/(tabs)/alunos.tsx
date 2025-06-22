@@ -232,6 +232,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Quantidade de Alunos"
+            placeholderTextColor="gray"
             value={studentNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -243,6 +244,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Quantidade de Presenças"
+            placeholderTextColor="gray"
             value={presenceNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -254,6 +256,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Bílias"
+            placeholderTextColor="gray"
             value={bibleNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -272,6 +275,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Revistas"
+            placeholderTextColor="gray"
             value={magazineNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -282,6 +286,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Visitantes"
+            placeholderTextColor="gray"
             value={guestNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
@@ -292,6 +297,7 @@ export default function App() {
           <TextInput
             style={styles.input}
             placeholder="Ofertas"
+            placeholderTextColor="gray"
             value={offersNumber}
             onChangeText={(text) => {
               const onlyNumbers = text.replace(/[^0-9]/g, '');
