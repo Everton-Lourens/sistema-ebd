@@ -1,4 +1,5 @@
 import { NewCall } from '@/classes/newCall';
+import { initialClasses } from '@/constants/ClassName';
 import { formatToCurrency } from '@/helper/format';
 import React, { useEffect, useState } from 'react';
 import {
@@ -11,25 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-const initialClasses = [
-  'Cordeirinhos de Cristo',
-  'Shalom',
-  'Filhos de Asáfe',
-  'Mensageiros de Cristo',
-  'Rosa de Saron',
-  'Filhos de Sião',
-].map((name, index) => ({
-  id: index.toString(),
-  name,
-  className: name,
-  studentNumber: '',
-  presenceNumber: '',
-  bibleNumber: '',
-  magazineNumber: '',
-  guestNumber: '',
-  offersNumber: '',
-}));
 
 export default function App() {
   const [classes, setClasses] = useState(initialClasses);
