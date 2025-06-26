@@ -16,16 +16,16 @@ const resumoInit = {
   offersNumber: 0,
 };
 
-  type DataItem = {
-    title: string;
-    className: string;
-    studentNumber: string;
-    presenceNumber: string;
-    bibleNumber: string;
-    magazineNumber: string;
-    guestNumber: string;
-    offersNumber: string;
-  };
+type DataItem = {
+  title: string;
+  className: string;
+  studentNumber: string;
+  presenceNumber: string;
+  bibleNumber: string;
+  magazineNumber: string;
+  guestNumber: string;
+  offersNumber: string;
+};
 
 export default function Resumo() {
   const [resumo, setResumo] = useState(resumoInit);
@@ -45,6 +45,7 @@ export default function Resumo() {
   const [guestNumber, setGuestNumber] = useState('');
   const [offersNumber, setOffersNumber] = useState('');
   const [initLoad, setInitLoad] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [data, setData] = useState<DataItem[]>([]);
   const [totalCall, setTotalCall] = useState({
@@ -57,18 +58,31 @@ export default function Resumo() {
   });
 
   useEffect(() => {
+    console.log('🌀 isLoading mudou para:', isLoading);
+    setData([]);
     updateAllClasses()
-    const newCall = new NewCall();
-    newCall.className = 'TOTAL_GERAL';
-    newCall.studentNumber = totalCall.totalStudent.toString();
-    newCall.presenceNumber = totalCall.totalPresence.toString();
-    newCall.bibleNumber = totalCall.totalBibleNumber.toString();
-    newCall.magazineNumber = totalCall.totalMagazineNumber.toString();
-    newCall.guestNumber = totalCall.totalGuestNumber.toString();
-    newCall.offersNumber = totalCall.totalOffersNumber.toString();
-    newCall.save();
+  }, [isLoading]);
 
-  }, [allCall]);
+  useFocusEffect(
+    useCallback(() => {
+      setData([]);
+      console.log('🟢 Entrou na tela');
+      setIsLoading(true);
+
+      getTotalGeral();
+
+      updateAllClasses()
+        .finally(() => {
+          setIsLoading(false);
+        });
+
+      return () => {
+        console.log('🔴 Saiu da tela');
+        setIsLoading(true);
+      };
+    }, [])
+  );
+
 
   function updateAllClasses() {
     let totalStudent = 0;
@@ -78,16 +92,19 @@ export default function Resumo() {
     let totalGuestNumber = 0;
     let totalOffersNumber = 0;
     const newCall = new NewCall();
-    initialClasses.forEach(({ name }) => {
-      newCall.getCall(name).then(data => {
+
+    const promises = initialClasses.map(({ name }) => {
+      return newCall.getCall(name).then(data => {
         if (data) {
-          checkDate(data?.callDate)
+          checkDate(data?.callDate);
+
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
           totalBibleNumber += Number(data?.bibleNumber) || 0;
           totalMagazineNumber += Number(data?.magazineNumber) || 0;
           totalGuestNumber += Number(data?.guestNumber) || 0;
           totalOffersNumber += Number(data?.offersNumber?.replace(/[^\d]/g, '')) || 0;
+
           setTotalCall({
             totalStudent,
             totalPresence,
@@ -95,22 +112,22 @@ export default function Resumo() {
             totalMagazineNumber,
             totalGuestNumber,
             totalOffersNumber,
-          })
-          setAllCall(prev => {
-            return {
-              ...prev,
-              [name]: {
-                ...data,
-                className: data?.className || '',
-                studentNumber: data?.studentNumber || '',
-                presenceNumber: data?.presenceNumber || '',
-                bibleNumber: data?.bibleNumber || '',
-                magazineNumber: data?.magazineNumber || '',
-                guestNumber: data?.guestNumber || '',
-                offersNumber: data?.offersNumber || '',
-              }
-            }
           });
+
+          setAllCall(prev => ({
+            ...prev,
+            [name]: {
+              ...data,
+              className: data?.className || '',
+              studentNumber: data?.studentNumber || '',
+              presenceNumber: data?.presenceNumber || '',
+              bibleNumber: data?.bibleNumber || '',
+              magazineNumber: data?.magazineNumber || '',
+              guestNumber: data?.guestNumber || '',
+              offersNumber: data?.offersNumber || '',
+            }
+          }));
+
           setData(prev => {
             const newData = [
               ...prev,
@@ -126,16 +143,27 @@ export default function Resumo() {
               }
             ];
 
-            // remove duplicate objects
-            const uniqueData = newData.filter((item, index) => newData.findIndex(i => i.className === item.className) === index);
+            // remove duplicados
+            const uniqueData = newData.filter((item, index) =>
+              newData.findIndex(i => i.className === item.className) === index
+            );
 
             return uniqueData;
           });
-
         }
-      })
+      });
     });
 
+    return Promise.all(promises).then(() => {
+      newCall.className = 'TOTAL_GERAL';
+      newCall.studentNumber = totalStudent.toString();
+      newCall.presenceNumber = totalPresence.toString();
+      newCall.bibleNumber = totalBibleNumber.toString();
+      newCall.magazineNumber = totalMagazineNumber.toString();
+      newCall.guestNumber = totalGuestNumber.toString();
+      newCall.offersNumber = totalOffersNumber.toString();
+      newCall.save();
+    });
   }
 
   function checkDate(oldDate: string) {
@@ -177,12 +205,6 @@ export default function Resumo() {
     })
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      getTotalGeral();
-    }, [])
-  );
-
   const copiarResumoGeral = (item) => {
     const texto = `
 Resumo ${item.title} - *${new Date().toLocaleDateString('pt-BR')}*
@@ -203,55 +225,55 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
   return (
     <>
       <View style={styles.container}>
-    <FlatList
-      data={data}
-      style={styles.container}
-      extraData={allCall}
-      renderItem={({ item }) => (
-        <>
-          <Text style={styles.title}>{item?.title}</Text>
-          <View style={styles.item}>
-            <Text style={styles.label}>Matriculados:</Text>
-            <Text style={styles.value}>{item?.studentNumber || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Presentes:</Text>
-            <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Ausentes:</Text>
-            <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Bíblias:</Text>
-            <Text style={styles.value}>{item?.bibleNumber || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Revistas:</Text>
-            <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Visitantes:</Text>
-            <Text style={styles.value}>{item?.guestNumber || 0}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Ofertas:</Text>
-            <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.label}>Porcentagem:</Text>
-            <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
-            <Text style={styles.buttonText}>Copiar {item?.title}</Text>
-          </TouchableOpacity>
-          <Text style={styles.buttonText}>========================================</Text>
-          <Text style={styles.buttonText}>========================================</Text>
-        </>
-      )}
-      keyExtractor={(item) => item?.title}
-    />
-    </View>
+        <FlatList
+          data={data}
+          style={styles.container}
+          extraData={[data, allCall, isLoading]}
+          renderItem={({ item }) => (
+            <>
+              <Text style={styles.title}>{item?.title}</Text>
+              <View style={styles.item}>
+                <Text style={styles.label}>Matriculados:</Text>
+                <Text style={styles.value}>{item?.studentNumber || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Presentes:</Text>
+                <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Ausentes:</Text>
+                <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Bíblias:</Text>
+                <Text style={styles.value}>{item?.bibleNumber || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Revistas:</Text>
+                <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Visitantes:</Text>
+                <Text style={styles.value}>{item?.guestNumber || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Ofertas:</Text>
+                <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Porcentagem:</Text>
+                <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
+              </View>
+              <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
+                <Text style={styles.buttonText}>Copiar {item?.title}</Text>
+              </TouchableOpacity>
+              <Text style={styles.buttonText}>========================================</Text>
+              <Text style={styles.buttonText}>========================================</Text>
+            </>
+          )}
+          keyExtractor={(item) => item?.title}
+        />
+      </View>
     </>
   );
 }

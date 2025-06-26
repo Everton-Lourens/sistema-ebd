@@ -4,7 +4,7 @@ import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const resumoInit = {
@@ -53,6 +53,11 @@ export default function Resumo() {
   const [topVisitantes, setTopVisitantes] = useState([]);
   const [data, setData] = useState<DataItem[]>([]);
   const [initLoad, setInitLoad] = useState(true);
+  const [empatePresenca, setEmpatePresenca] = useState(false);
+  const [empateOfertas, setEmpateOfertas] = useState(false);
+  const [empateBiblias, setEmpateBiblias] = useState(false);
+  const [empateRevistas, setEmpateRevistas] = useState(false);
+  const [empateVisitantes, setEmpateVisitantes] = useState(false);
   const [totalCall, setTotalCall] = useState({
     totalStudent: 0,
     totalPresence: 0,
@@ -61,26 +66,89 @@ export default function Resumo() {
     totalGuestNumber: 0,
     totalOffersNumber: 0,
   });
+  const getTotalGeral = () => {
+    const newCall = new NewCall();
+    newCall.getCall('TOTAL_GERAL').then((result: any) => {
+      if (result) {
+        const sameDate = compareDate(result.callDate);
+        if (sameDate) setResumo(result);
+        else setResumo(resumoInit);
+      }
+    })
+  }
 
-  useFocusEffect(
-    useCallback(() => {
-      updateAllClasses()
-      const newCall = new NewCall();
-      newCall.className = 'TOTAL_GERAL';
-      newCall.studentNumber = totalCall.totalStudent.toString();
-      newCall.presenceNumber = totalCall.totalPresence.toString();
-      newCall.bibleNumber = totalCall.totalBibleNumber.toString();
-      newCall.magazineNumber = totalCall.totalMagazineNumber.toString();
-      newCall.guestNumber = totalCall.totalGuestNumber.toString();
-      newCall.offersNumber = totalCall.totalOffersNumber.toString();
-      newCall.save();
-      console.log('@@@@@@@@@@@@@@@ 2 @@@@@@@@@@@@@');
-    }, [])
-  );
   const getPercentage = (presence: string = '', allStudents: string = ''): number => {
     if (!allStudents || !presence) return 0;
     return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      getTotalGeral();
+      setData([]);
+      updateAllClasses().finally(() => {
+        console.log('Atualização finalizada');
+      });
+    }, [])
+  );
+
+  useEffect(() => {
+    // Cálculo dos rankings
+    const dataComPorcentagem = data.map((item) => ({
+      ...item,
+      porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber),
+      ofertas: Number(item?.offersNumber?.replace(/[^\d]/g, '') || 0),
+    }));
+
+    const gerarTop3 = (data: any[], campo: string) => {
+      return [...data]
+        .sort((a, b) => (b[campo] ?? 0) - (a[campo] ?? 0))
+        .slice(0, 3)
+        .map((item, index) => ({
+          ...item,
+          colocacao:
+            index === 0
+              ? '1º Lugar'
+              : index === 1
+                ? '2º Lugar'
+                : '3º Lugar',
+        }));
+    };
+    setTopPresencas(gerarTop3(dataComPorcentagem, 'porcentagem'));
+    setTopOfertas(gerarTop3(dataComPorcentagem, 'ofertas'));
+    setTopBiblias(gerarTop3(dataComPorcentagem, 'bibleNumber'));
+    setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
+    setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
+  }, [data]);
+
+  useEffect(() => {
+    setEmpatePresenca(
+      topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem ||
+      topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem ||
+      topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem
+    );
+    setEmpateVisitantes(
+      topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber ||
+      topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber ||
+      topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber
+    );
+    setEmpateBiblias(
+      topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber ||
+      topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber ||
+      topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber
+    );
+    setEmpateRevistas(
+      topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber ||
+      topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber ||
+      topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber
+    );
+    setEmpateOfertas(
+      topOfertas[0]?.ofertas === topOfertas[1]?.ofertas ||
+      topOfertas[0]?.ofertas === topOfertas[2]?.ofertas ||
+      topOfertas[1]?.ofertas === topOfertas[2]?.ofertas
+    );
+  }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes]);
+
   function updateAllClasses() {
     let totalStudent = 0;
     let totalPresence = 0;
@@ -89,16 +157,19 @@ export default function Resumo() {
     let totalGuestNumber = 0;
     let totalOffersNumber = 0;
     const newCall = new NewCall();
-    initialClasses.forEach(({ name }) => {
-      newCall.getCall(name).then(data => {
+
+    const promises = initialClasses.map(({ name }) => {
+      return newCall.getCall(name).then(data => {
         if (data) {
-          checkDate(data?.callDate)
+          checkDate(data?.callDate);
+
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
           totalBibleNumber += Number(data?.bibleNumber) || 0;
           totalMagazineNumber += Number(data?.magazineNumber) || 0;
           totalGuestNumber += Number(data?.guestNumber) || 0;
           totalOffersNumber += Number(data?.offersNumber?.replace(/[^\d]/g, '')) || 0;
+
           setTotalCall({
             totalStudent,
             totalPresence,
@@ -106,22 +177,22 @@ export default function Resumo() {
             totalMagazineNumber,
             totalGuestNumber,
             totalOffersNumber,
-          })
-          setAllCall(prev => {
-            return {
-              ...prev,
-              [name]: {
-                ...data,
-                className: data?.className || '',
-                studentNumber: data?.studentNumber || '',
-                presenceNumber: data?.presenceNumber || '',
-                bibleNumber: data?.bibleNumber || '',
-                magazineNumber: data?.magazineNumber || '',
-                guestNumber: data?.guestNumber || '',
-                offersNumber: data?.offersNumber || '',
-              }
-            }
           });
+
+          setAllCall(prev => ({
+            ...prev,
+            [name]: {
+              ...data,
+              className: data?.className || '',
+              studentNumber: data?.studentNumber || '',
+              presenceNumber: data?.presenceNumber || '',
+              bibleNumber: data?.bibleNumber || '',
+              magazineNumber: data?.magazineNumber || '',
+              guestNumber: data?.guestNumber || '',
+              offersNumber: data?.offersNumber || '',
+            }
+          }));
+
           setData(prev => {
             const newData = [
               ...prev,
@@ -137,95 +208,64 @@ export default function Resumo() {
               }
             ];
 
-            // remove duplicate objects
-            const uniqueData = newData.filter((item, index) => newData.findIndex(i => i.className === item.className) === index);
+            // remove duplicados
+            const uniqueData = newData.filter((item, index) =>
+              newData.findIndex(i => i.className === item.className) === index
+            );
 
             return uniqueData;
           });
+        } else {
+          checkDate();
         }
-      })
+      });
     });
 
+    return Promise.all(promises).then(() => {
+      newCall.className = 'TOTAL_GERAL';
+      newCall.studentNumber = totalStudent.toString();
+      newCall.presenceNumber = totalPresence.toString();
+      newCall.bibleNumber = totalBibleNumber.toString();
+      newCall.magazineNumber = totalMagazineNumber.toString();
+      newCall.guestNumber = totalGuestNumber.toString();
+      newCall.offersNumber = totalOffersNumber.toString();
+      newCall.save();
+      console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
+    });
   }
 
-  function checkDate(oldDate: string) {
-    if (initLoad) {
-      setInitLoad(false)
-      const date1 = new Date().toISOString();
-      const date2 = new Date(oldDate).toISOString();
-      function getDateOnly(isoString: string) {
-        return isoString.split('T')[0];
+  function checkDate(oldDate = '') {
+    let sameDate = false;
+    if (!oldDate)
+
+      if (initLoad) {
+        setInitLoad(false)
+        const date1 = new Date().toISOString();
+        const date2 = new Date(oldDate).toISOString();
+        function getDateOnly(isoString: string) {
+          return isoString.split('T')[0];
+        }
+        sameDate = getDateOnly(date1) === getDateOnly(date2);
       }
-      const sameDate = getDateOnly(date1) === getDateOnly(date2);
-      if (sameDate) {
-        setStudentNumber('');
-        setPresenceNumber('');
-        setBibleNumber('');
-        setMagazineNumber('');
-        setGuestNumber('');
-        setOffersNumber('');
-        return true
-      }
-      return false
+    if (sameDate) {
+      setStudentNumber('');
+      setPresenceNumber('');
+      setBibleNumber('');
+      setMagazineNumber('');
+      setGuestNumber('');
+      setOffersNumber('');
+      return true
     }
+    return sameDate;
   }
-
-  const getTotalGeral = () => {
-    const newCall = new NewCall();
-    newCall.getCall('TOTAL_GERAL').then((result: any) => {
-      if (result) {
-        const sameDate = compareDate(result.callDate);
-        if (sameDate) setResumo(result);
-        else setResumo(resumoInit);
-      }
-    })
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      getTotalGeral();
-      // Cálculo dos rankings
-      const dataComPorcentagem = data.map((item) => ({
-        ...item,
-        porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber),
-        ofertas: Number(item?.offersNumber?.replace(/[^\d]/g, '') || 0),
-      }));
-
-      const gerarTop3 = (data: any[], campo: string) => {
-        return [...data]
-          .sort((a, b) => (b[campo] ?? 0) - (a[campo] ?? 0))
-          .slice(0, 3)
-          .map((item, index) => ({
-            ...item,
-            colocacao:
-              index === 0
-                ? '1º Lugar'
-                : index === 1
-                  ? '2º Lugar'
-                  : '3º Lugar',
-          }));
-      };
-      setTopPresencas(gerarTop3(dataComPorcentagem, 'porcentagem'));
-      setTopOfertas(gerarTop3(dataComPorcentagem, 'ofertas'));
-      setTopBiblias(gerarTop3(dataComPorcentagem, 'bibleNumber'));
-      setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
-      setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
-
-      console.log(JSON.stringify(topPresencas, null, 2));
-      console.log(topPresencas.map((item) => `\n${item.colocacao} - ${item.title} - Presenças: ${item.porcentagem}%`).join('\n'));
-      console.log(topOfertas.map((item) => `\n${item.colocacao} - ${item.title} - Ofertas: ${item.ofertas.toLocaleString('pt-BR')}`).join('\n'));
-      console.log(topBiblias.map((item) => `\n${item.colocacao} - ${item.title} - Bíblias: ${item.bibleNumber}`).join('\n'));
-      console.log(topRevistas.map((item) => `\n${item.colocacao} - ${item.title} - Revistas: ${item.magazineNumber}`).join('\n'));
-      console.log(topVisitantes.map((item) => `\n${item.colocacao} - ${item.title} - Visitantes: ${item.guestNumber}`).join('\n'));
-
-    }, [])
-  );
 
 
   const copiarResumoGeral = () => {
     const texto = `
-Resumo Geral - *${new Date().toLocaleDateString('pt-BR')}*
+Resumo - *${new Date().toLocaleDateString('pt-BR')}*
 
+*=======================*
+Total Geral:
 Total de Alunos: *${resumo.studentNumber}*
 Presentes: *${resumo.presenceNumber}*
 Ausentes: *${resumo.studentNumber - resumo.presenceNumber}*
@@ -234,6 +274,36 @@ Revistas: *${resumo.magazineNumber}*
 Visitantes: *${resumo.guestNumber}*
 Ofertas: *${formatToCurrency(resumo.offersNumber)}*
 Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
+*=======================*
+
+Vencedores em Presença: ${empatePresenca ? '\n*HOUVE EMPATE*' : ''}
+1° - *${topPresencas[0]?.title}*: *${topPresencas[0]?.porcentagem || 0}%*
+2° - *${topPresencas[1]?.title}*: *${topPresencas[1]?.porcentagem || 0}%*
+3° - *${topPresencas[2]?.title}*: *${topPresencas[2]?.porcentagem || 0}%*
+*=======================*
+
+Vencedores em Ofertas: ${empateOfertas ? '\n*HOUVE EMPATE*' : ''}
+1° - *${topOfertas[0]?.title}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
+2° - *${topOfertas[1]?.title}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
+3° - *${topOfertas[2]?.title}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
+*=======================*
+
+Vencedores em Bíblias: ${empateBiblias ? '\n*HOUVE EMPATE*' : ''}
+1° - *${topBiblias[0]?.title}*: *${topBiblias[0]?.bibleNumber}*
+2° - *${topBiblias[1]?.title}*: *${topBiblias[1]?.bibleNumber}*
+3° - *${topBiblias[2]?.title}*: *${topBiblias[2]?.bibleNumber}*
+*=======================*
+
+Vencedores em Revistas: ${empateRevistas ? '\n*HOUVE EMPATE*' : ''}
+1° - *${topRevistas[0]?.title}*: *${topRevistas[0]?.magazineNumber}*
+2° - *${topRevistas[1]?.title}*: *${topRevistas[1]?.magazineNumber}*
+3° - *${topRevistas[2]?.title}*: *${topRevistas[2]?.magazineNumber}*
+*=======================*
+
+Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
+1° - *${topVisitantes[0]?.title}*: *${topVisitantes[0]?.guestNumber}*
+2° - *${topVisitantes[1]?.title}*: *${topVisitantes[1]?.guestNumber}*
+3° - *${topVisitantes[2]?.title}*: *${topVisitantes[2]?.guestNumber}*
   `.trim();
 
     Clipboard.setStringAsync(texto);
@@ -249,12 +319,12 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
       <FlatList
         data={dataGeral}
         style={styles.container}
-        extraData={allCall}
+        extraData={[allCall, data]}
         renderItem={({ item }) => (
           <>
-                <TouchableOpacity style={[{ marginTop: 50 }, styles.button]} onPress={updateAllClasses}>
-        <Text style={styles.buttonText}>Atualizar</Text>
-      </TouchableOpacity>
+            <TouchableOpacity style={[{ marginTop: 50 }, styles.button]} onPress={updateAllClasses}>
+              <Text style={styles.buttonText}>Atualizar</Text>
+            </TouchableOpacity>
             <Text style={styles.title}>{item?.title}</Text>
             <View style={styles.item}>
               <Text style={styles.label}>Total de Alunos:</Text>
@@ -295,9 +365,7 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
             <Text style={styles.buttonText}>============================================</Text>
             <Text style={styles.title}>Vencedores em Presença</Text>
             {(
-              topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem ||
-              topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem ||
-              topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem
+              empatePresenca
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                 Houve Empate
@@ -305,22 +373,20 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
             ) : null}
             <View style={styles.item}>
               <Text style={styles.label}>1° - {topPresencas[0]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[0]?.porcentagem}%</Text>
+              <Text style={styles.value}>{topPresencas[0]?.porcentagem || 0}%</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>2° - {topPresencas[1]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[1]?.porcentagem}%</Text>
+              <Text style={styles.value}>{topPresencas[1]?.porcentagem || 0}%</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>3° - {topPresencas[2]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[2]?.porcentagem}%</Text>
+              <Text style={styles.value}>{topPresencas[2]?.porcentagem || 0}%</Text>
             </View>
             <Text style={styles.buttonText}>============================================</Text>
             <Text style={styles.title}>Vencedores em Ofertas</Text>
             {(
-              topOfertas[0]?.ofertas === topOfertas[1]?.ofertas ||
-              topOfertas[0]?.ofertas === topOfertas[2]?.ofertas ||
-              topOfertas[1]?.ofertas === topOfertas[2]?.ofertas
+              empateOfertas
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                 Houve Empate
@@ -341,9 +407,7 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
             <Text style={styles.buttonText}>============================================</Text>
             <Text style={styles.title}>Vencedores em Bíblias</Text>
             {(
-              topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber ||
-              topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber ||
-              topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber
+              empateBiblias
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                 Houve Empate
@@ -364,9 +428,7 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
             <Text style={styles.buttonText}>============================================</Text>
             <Text style={styles.title}>Vencedores em Revistas</Text>
             {(
-              topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber ||
-              topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber ||
-              topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber
+              empateRevistas
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                 Houve Empate
@@ -387,9 +449,7 @@ Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber)
             <Text style={styles.buttonText}>============================================</Text>
             <Text style={styles.title}>Vencedores em Visitantes</Text>
             {(
-              topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber ||
-              topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber ||
-              topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber
+              empateVisitantes
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                 Houve Empate

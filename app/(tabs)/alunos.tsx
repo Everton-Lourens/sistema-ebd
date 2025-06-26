@@ -1,11 +1,13 @@
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
 import { formatToCurrency } from '@/helper/format';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Button,
   FlatList,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -43,18 +45,21 @@ export default function App() {
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
 
-  useEffect(() => {
-    updateAllClasses()
-    const newCall = new NewCall();
-    newCall.className = 'TOTAL_GERAL';
-    newCall.studentNumber = totalCall.totalStudent.toString();
-    newCall.presenceNumber = totalCall.totalPresence.toString();
-    newCall.bibleNumber = totalCall.totalBibleNumber.toString();
-    newCall.magazineNumber = totalCall.totalMagazineNumber.toString();
-    newCall.guestNumber = totalCall.totalGuestNumber.toString();
-    newCall.offersNumber = totalCall.totalOffersNumber.toString();
-    newCall.save();
-  }, [allCall]);
+  const showAlertIfSupported = (message: string) => {
+    if (Platform.OS !== 'web') {
+      Alert.alert(message, '', [{ text: 'OK' }]);
+    } else {
+      window.alert(message);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      updateAllClasses().finally(() => {
+        console.log('Atualização finalizada');
+      });
+    }, [])
+  );
 
   function updateAllClasses() {
     let totalStudent = 0;
@@ -64,16 +69,19 @@ export default function App() {
     let totalGuestNumber = 0;
     let totalOffersNumber = 0;
     const newCall = new NewCall();
-    initialClasses.forEach(({ name }) => {
-      newCall.getCall(name).then(data => {
+
+    const promises = initialClasses.map(({ name }) => {
+      return newCall.getCall(name).then(data => {
         if (data) {
-          checkDate(data?.callDate)
+          checkDate(data?.callDate);
+
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
           totalBibleNumber += Number(data?.bibleNumber) || 0;
           totalMagazineNumber += Number(data?.magazineNumber) || 0;
           totalGuestNumber += Number(data?.guestNumber) || 0;
           totalOffersNumber += Number(data?.offersNumber?.replace(/[^\d]/g, '')) || 0;
+
           setTotalCall({
             totalStudent,
             totalPresence,
@@ -81,26 +89,38 @@ export default function App() {
             totalMagazineNumber,
             totalGuestNumber,
             totalOffersNumber,
-          })
-          setAllCall(prev => {
-            return {
-              ...prev,
-              [name]: {
-                ...data,
-                className: data?.className || '',
-                studentNumber: data?.studentNumber || '',
-                presenceNumber: data?.presenceNumber || '',
-                bibleNumber: data?.bibleNumber || '',
-                magazineNumber: data?.magazineNumber || '',
-                guestNumber: data?.guestNumber || '',
-                offersNumber: data?.offersNumber || '',
-              }
-            }
           });
+
+          setAllCall(prev => ({
+            ...prev,
+            [name]: {
+              ...data,
+              className: data?.className || '',
+              studentNumber: data?.studentNumber || '',
+              presenceNumber: data?.presenceNumber || '',
+              bibleNumber: data?.bibleNumber || '',
+              magazineNumber: data?.magazineNumber || '',
+              guestNumber: data?.guestNumber || '',
+              offersNumber: data?.offersNumber || '',
+            }
+          }));
+
         }
-      })
+      });
     });
 
+    return Promise.all(promises).then(() => {
+      newCall.className = 'TOTAL_GERAL';
+      newCall.studentNumber = totalStudent.toString();
+      newCall.presenceNumber = totalPresence.toString();
+      newCall.bibleNumber = totalBibleNumber.toString();
+      newCall.magazineNumber = totalMagazineNumber.toString();
+      newCall.guestNumber = totalGuestNumber.toString();
+      newCall.offersNumber = totalOffersNumber.toString();
+      newCall.save();
+
+      console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
+    });
   }
 
   function checkDate(oldDate: string) {
@@ -125,8 +145,25 @@ export default function App() {
     }
   }
 
+  useEffect(() => {
+    const totalPresence = Number(presenceNumber) + Number(guestNumber);
+    const checkBibleNumber = Number(bibleNumber) > totalPresence;
+    const checkMagazineNumber = Number(magazineNumber) > totalPresence;
+    console.log(totalPresence);
+    console.log(bibleNumber);
+    console.log(magazineNumber);
+    console.log(magazineNumber);
+
+    if (checkBibleNumber || checkMagazineNumber) {
+      if (checkBibleNumber) setBibleNumber('');
+      if (checkMagazineNumber) setMagazineNumber('');
+      showAlertIfSupported('A quantidade de revistas ou bíblias não pode ser maior que a quantidade de presenças + convidados');
+    }
+  }, [presenceNumber, studentNumber, bibleNumber, magazineNumber, guestNumber, offersNumber]);
+
   const handleNewCall = (className = '') => {
-    if (!className) return
+    if (!className || !studentNumber || !presenceNumber || !bibleNumber || !magazineNumber || !guestNumber || !offersNumber)
+      return showAlertIfSupported('Preencha todos os campos');
     const newCall = new NewCall();
     newCall.setCall({
       className,
@@ -139,18 +176,8 @@ export default function App() {
     });
     newCall.save()
     updateAllClasses()
-    Alert.alert('Salvo com sucesso', '', [
-      {
-        text: 'OK',
-        onPress: () => { },
-      },
-    ]);
+    showAlertIfSupported('Salvo com sucesso');
   };
-
-  const getPercentage = (presence: string = '', allStudents: string = ''): number => {
-    if (!allStudents || !presence) return 0;
-    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
-  }
 
   const isCalled = (className: string = ''): boolean => {
     if (className === '') throw new Error('O nome da turma é obrigatório');
@@ -184,13 +211,7 @@ export default function App() {
               >
                 <Text style={styles.className}>{item.name}</Text>
                 <Text style={styles.studentCount}>
-                  {`${allCall[item.name]?.studentNumber || '--'} Cadastrado(s)  /  `}
-                  {`${allCall[item.name]?.presenceNumber || '--'} Presente(s)  /  `}
-                  {`${allCall[item.name]?.magazineNumber || '--'} Revista(s)  /  `}
-                  {`${allCall[item.name]?.bibleNumber || '--'} Bíblia(s)  /  `}
-                  {`${allCall[item.name]?.guestNumber || '--'} Convidado(s)  /  `}
-                  {`${allCall[item.name]?.offersNumber || '--'} Oferta(s)  /  `}
-                  {`${getPercentage(allCall[item.name]?.presenceNumber, allCall[item.name]?.studentNumber) || '--'}%`}
+                  {`${allCall[item.name]?.studentNumber || '--'} Cadastrado(s)`}
                 </Text>
               </TouchableOpacity>
             )}
