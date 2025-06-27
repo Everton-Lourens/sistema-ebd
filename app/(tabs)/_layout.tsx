@@ -30,21 +30,27 @@ export default function TabLayout() {
         name="alunos"
         options={{
           title: 'Alunos',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="person.3.fill" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
           title: 'Total Geral',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="chart.bar.fill" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="totalParcial"
         options={{
           title: 'Total Parcial',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />
+          ),
         }}
       />
     </Tabs>

@@ -104,7 +104,7 @@ export class NewCall {
         }
     }
     getCall(className: string) {
-        if (!className) throw new Error("O nome da turma é obrigatório");
+        if (!className || !this.className) throw new Error("O nome da turma é obrigatório");
         if (Platform.OS === 'web') {
             try {
                 const date = new Date().toISOString();

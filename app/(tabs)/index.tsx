@@ -57,6 +57,8 @@ export default function Resumo() {
   const [empateBiblias, setEmpateBiblias] = useState(false);
   const [empateRevistas, setEmpateRevistas] = useState(false);
   const [empateVisitantes, setEmpateVisitantes] = useState(false);
+  const [dataGeral, setDataGeral] = useState<DataItem[]>([]);
+  const [isToday, setIsToday] = useState(true);
   const [totalCall, setTotalCall] = useState({
     totalStudent: 0,
     totalPresence: 0,
@@ -159,10 +161,12 @@ export default function Resumo() {
     const newCall = new NewCall();
 
     const promises = initialClasses.map(({ name }) => {
+      newCall.className = name;
       return newCall.getCall(name).then(data => {
         if (data) {
-          const isToday = checkDate(data?.callDate);
-          if (!isToday) return;
+          const isTodayCheck = checkDate(data?.callDate);
+          setIsToday(isTodayCheck);
+          if (!isTodayCheck || !isToday) return;
 
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
@@ -231,6 +235,15 @@ export default function Resumo() {
       newCall.guestNumber = totalGuestNumber.toString();
       newCall.offersNumber = totalOffersNumber.toString();
       newCall.save();
+      setDataGeral([{
+        title: 'Total Geral',
+        studentNumber: totalStudent.toString(),
+        presenceNumber: totalPresence.toString(),
+        bibleNumber: totalBibleNumber.toString(),
+        magazineNumber: totalMagazineNumber.toString(),
+        guestNumber: totalGuestNumber.toString(),
+        offersNumber: totalOffersNumber.toString(),
+      }]);
       console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
     });
   }
@@ -241,7 +254,7 @@ export default function Resumo() {
       console.log('Sem data, limpando dados');
       sameDate = false;
       clearData();
-      return false;
+      return false; 
     }
 
     const date1 = new Date().toISOString();
@@ -319,11 +332,6 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
 
     Clipboard.setStringAsync(texto);
   };
-
-
-  const dataGeral = [
-    { title: 'Geral', ...resumo },
-  ];
 
   return (
     <>
