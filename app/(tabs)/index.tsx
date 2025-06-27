@@ -330,7 +330,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
       <FlatList
         data={dataGeral}
         style={styles.container}
-        extraData={[allCall, data]}
+        extraData={[allCall, data, dataGeral]}
         renderItem={({ item }) => (
           <>
             <TouchableOpacity style={[{ marginTop: 50 }, styles.button]} onPress={updateAllClasses}>
