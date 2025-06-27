@@ -1,34 +1,21 @@
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
-import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
-import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Button,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-const resumoInit = {
-  studentNumber: 0,
-  presenceNumber: 0,
-  bibleNumber: 0,
-  magazineNumber: 0,
-  guestNumber: 0,
-  offersNumber: 0,
-};
-
-type DataItem = {
-  title: string;
-  className: string;
-  studentNumber: string;
-  presenceNumber: string;
-  bibleNumber: string;
-  magazineNumber: string;
-  guestNumber: string;
-  offersNumber: string;
-};
-
-export default function Resumo() {
-  const [resumo, setResumo] = useState(resumoInit);
+export default function App() {
   const [classes, setClasses] = useState(initialClasses);
   const [allCall, setAllCall] = useState({
     studentNumber: '',
@@ -46,19 +33,7 @@ export default function Resumo() {
   const [magazineNumber, setMagazineNumber] = useState('');
   const [guestNumber, setGuestNumber] = useState('');
   const [offersNumber, setOffersNumber] = useState('');
-  const [topPresencas, setTopPresencas] = useState([]);
-  const [topOfertas, setTopOfertas] = useState([]);
-  const [topBiblias, setTopBiblias] = useState([]);
-  const [topRevistas, setTopRevistas] = useState([]);
-  const [topVisitantes, setTopVisitantes] = useState([]);
-  const [data, setData] = useState<DataItem[]>([]);
-  const [empatePresenca, setEmpatePresenca] = useState(false);
-  const [empateOfertas, setEmpateOfertas] = useState(false);
-  const [empateBiblias, setEmpateBiblias] = useState(false);
-  const [empateRevistas, setEmpateRevistas] = useState(false);
-  const [empateVisitantes, setEmpateVisitantes] = useState(false);
-  const [dataGeral, setDataGeral] = useState<DataItem[]>([]);
-  const [isToday, setIsToday] = useState(true);
+  const [initLoad, setInitLoad] = useState(true);
   const [totalCall, setTotalCall] = useState({
     totalStudent: 0,
     totalPresence: 0,
@@ -67,89 +42,24 @@ export default function Resumo() {
     totalGuestNumber: 0,
     totalOffersNumber: 0,
   });
-  const getTotalGeral = () => {
-    const newCall = new NewCall();
-    newCall.className = 'TOTAL_GERAL';
-    newCall.getCall('TOTAL_GERAL').then((result: any) => {
-      if (result) {
-        const sameDate = compareDate(result.callDate);
-        if (sameDate) setResumo(result);
-        else setResumo(resumoInit);
-      }
-    })
-  }
 
-  const getPercentage = (presence: string = '', allStudents: string = ''): number => {
-    if (!allStudents || !presence) return 0;
-    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
-  }
+  const selectedClass = classes.find(c => c.id === selectedClassId);
+
+  const showAlertIfSupported = (message: string) => {
+    if (Platform.OS !== 'web') {
+      Alert.alert(message, '', [{ text: 'OK' }]);
+    } else {
+      window.alert(message);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      getTotalGeral();
-      setData([]);
       updateAllClasses().finally(() => {
         console.log('Atualização finalizada');
       });
     }, [])
   );
-
-  useEffect(() => {
-    // Cálculo dos rankings
-    const dataComPorcentagem = data.map((item) => ({
-      ...item,
-      porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber),
-      ofertas: Number(item?.offersNumber?.replace(/[^\d]/g, '') || 0),
-    }));
-
-    const gerarTop3 = (data: any[], campo: string) => {
-      return [...data]
-        .sort((a, b) => (b[campo] ?? 0) - (a[campo] ?? 0))
-        .slice(0, 3)
-        .map((item, index) => ({
-          ...item,
-          colocacao:
-            index === 0
-              ? '1º Lugar'
-              : index === 1
-                ? '2º Lugar'
-                : '3º Lugar',
-        }));
-    };
-    setTopPresencas(gerarTop3(dataComPorcentagem, 'porcentagem'));
-    setTopOfertas(gerarTop3(dataComPorcentagem, 'ofertas'));
-    setTopBiblias(gerarTop3(dataComPorcentagem, 'bibleNumber'));
-    setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
-    setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
-  }, [data]);
-
-  useEffect(() => {
-    setEmpatePresenca(
-      topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem ||
-      topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem ||
-      topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem
-    );
-    setEmpateVisitantes(
-      topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber ||
-      topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber ||
-      topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber
-    );
-    setEmpateBiblias(
-      topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber ||
-      topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber ||
-      topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber
-    );
-    setEmpateRevistas(
-      topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber ||
-      topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber ||
-      topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber
-    );
-    setEmpateOfertas(
-      topOfertas[0]?.ofertas === topOfertas[1]?.ofertas ||
-      topOfertas[0]?.ofertas === topOfertas[2]?.ofertas ||
-      topOfertas[1]?.ofertas === topOfertas[2]?.ofertas
-    );
-  }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes]);
 
   function updateAllClasses() {
     let totalStudent = 0;
@@ -164,9 +74,7 @@ export default function Resumo() {
       newCall.className = name;
       return newCall.getCall(name).then(data => {
         if (data) {
-          const isTodayCheck = checkDate(data?.callDate);
-          setIsToday(isTodayCheck);
-          if (!isTodayCheck || !isToday) return;
+          checkDate(data?.callDate);
 
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
@@ -198,30 +106,6 @@ export default function Resumo() {
             }
           }));
 
-          setData(prev => {
-            const newData = [
-              ...prev,
-              {
-                title: data?.className || '',
-                className: data?.className || '',
-                studentNumber: data?.studentNumber || '',
-                presenceNumber: data?.presenceNumber || '',
-                bibleNumber: data?.bibleNumber || '',
-                magazineNumber: data?.magazineNumber || '',
-                guestNumber: data?.guestNumber || '',
-                offersNumber: data?.offersNumber || '',
-              }
-            ];
-
-            // remove duplicados
-            const uniqueData = newData.filter((item, index) =>
-              newData.findIndex(i => i.className === item.className) === index
-            );
-
-            return uniqueData;
-          });
-        } else {
-          checkDate();
         }
       });
     });
@@ -235,310 +119,233 @@ export default function Resumo() {
       newCall.guestNumber = totalGuestNumber.toString();
       newCall.offersNumber = totalOffersNumber.toString();
       newCall.save();
-      setDataGeral([{
-        title: 'Total Geral',
-        studentNumber: totalStudent.toString(),
-        presenceNumber: totalPresence.toString(),
-        bibleNumber: totalBibleNumber.toString(),
-        magazineNumber: totalMagazineNumber.toString(),
-        guestNumber: totalGuestNumber.toString(),
-        offersNumber: totalOffersNumber.toString(),
-      }]);
+
       console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
     });
   }
 
-  function checkDate(oldDate = '') {
-    let sameDate = false;
-    if (!oldDate) {
-      console.log('Sem data, limpando dados');
-      sameDate = false;
-      clearData();
-      return false; 
-    }
-
-    const date1 = new Date().toISOString();
-    const date2 = new Date(oldDate).toISOString();
-    function getDateOnly(isoString: string) {
-      return isoString.split('T')[0];
-    }
-    sameDate = getDateOnly(date1) === getDateOnly(date2);
-
-    function clearData() {
-      if (!sameDate) {
-        setTopPresencas([]);
-        setTopOfertas([]);
-        setTopBiblias([]);
-        setTopRevistas([]);
-        setTopVisitantes([]);
-        setData([]);
-        setEmpatePresenca(false);
-        setEmpateOfertas(false);
-        setEmpateBiblias(false);
-        setEmpateRevistas(false);
-        setEmpateVisitantes(false);
-        return false
+  function checkDate(oldDate: string) {
+    if (initLoad) {
+      setInitLoad(false)
+      const date1 = new Date().toISOString();
+      const date2 = new Date(oldDate).toISOString();
+      function getDateOnly(isoString: string) {
+        return isoString.split('T')[0];
       }
+      const sameDate = getDateOnly(date1) === getDateOnly(date2);
+      if (sameDate) {
+        setStudentNumber('');
+        setPresenceNumber('');
+        setBibleNumber('');
+        setMagazineNumber('');
+        setGuestNumber('');
+        setOffersNumber('');
+        return true
+      }
+      return false
     }
-    return sameDate;
   }
 
+  useEffect(() => {
+    const totalPresence = Number(presenceNumber) + Number(guestNumber);
+    const checkBibleNumber = Number(bibleNumber) > totalPresence;
+    const checkMagazineNumber = Number(magazineNumber) > totalPresence;
 
-  const copiarResumoGeral = () => {
-    const texto = `
-Resumo - *${new Date().toLocaleDateString('pt-BR')}*
+    if (checkBibleNumber || checkMagazineNumber) {
+      if (checkBibleNumber) setBibleNumber('');
+      if (checkMagazineNumber) setMagazineNumber('');
+      showAlertIfSupported('A quantidade de revistas ou bíblias não pode ser maior que a quantidade de presenças + convidados');
+    }
+  }, [presenceNumber, studentNumber, bibleNumber, magazineNumber, guestNumber, offersNumber]);
 
-*=======================*
-Total Geral:
-Total de Alunos: *${resumo.studentNumber}*
-Presentes: *${resumo.presenceNumber}*
-Ausentes: *${resumo.studentNumber - resumo.presenceNumber}*
-Bíblias: *${resumo.bibleNumber}*
-Revistas: *${resumo.magazineNumber}*
-Visitantes: *${resumo.guestNumber}*
-Ofertas: *${formatToCurrency(resumo.offersNumber)}*
-Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
-*=======================*
-
-Vencedores em Presença: ${empatePresenca ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topPresencas[0]?.title}*: *${topPresencas[0]?.porcentagem || 0}%*
-2° - *${topPresencas[1]?.title}*: *${topPresencas[1]?.porcentagem || 0}%*
-3° - *${topPresencas[2]?.title}*: *${topPresencas[2]?.porcentagem || 0}%*
-*=======================*
-
-Vencedores em Ofertas: ${empateOfertas ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topOfertas[0]?.title}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
-2° - *${topOfertas[1]?.title}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
-3° - *${topOfertas[2]?.title}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
-*=======================*
-
-Vencedores em Bíblias: ${empateBiblias ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topBiblias[0]?.title}*: *${topBiblias[0]?.bibleNumber}*
-2° - *${topBiblias[1]?.title}*: *${topBiblias[1]?.bibleNumber}*
-3° - *${topBiblias[2]?.title}*: *${topBiblias[2]?.bibleNumber}*
-*=======================*
-
-Vencedores em Revistas: ${empateRevistas ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topRevistas[0]?.title}*: *${topRevistas[0]?.magazineNumber}*
-2° - *${topRevistas[1]?.title}*: *${topRevistas[1]?.magazineNumber}*
-3° - *${topRevistas[2]?.title}*: *${topRevistas[2]?.magazineNumber}*
-*=======================*
-
-Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topVisitantes[0]?.title}*: *${topVisitantes[0]?.guestNumber}*
-2° - *${topVisitantes[1]?.title}*: *${topVisitantes[1]?.guestNumber}*
-3° - *${topVisitantes[2]?.title}*: *${topVisitantes[2]?.guestNumber}*
-  `.trim();
-
-    Clipboard.setStringAsync(texto);
+  const handleNewCall = (className = '') => {
+    if (!className || !studentNumber || !presenceNumber || !bibleNumber || !magazineNumber || !guestNumber || !offersNumber)
+      return showAlertIfSupported('Preencha todos os campos');
+    const newCall = new NewCall();
+    newCall.setCall({
+      className,
+      studentNumber,
+      presenceNumber,
+      bibleNumber,
+      magazineNumber,
+      guestNumber,
+      offersNumber,
+    });
+    newCall.save()
+    updateAllClasses()
+    showAlertIfSupported('Salvo com sucesso');
   };
 
+  const isCalled = (className: string = ''): boolean => {
+    if (className === '') throw new Error('O nome da turma é obrigatório');
+    if (
+      !allCall[className]?.studentNumber ||
+      !allCall[className]?.presenceNumber ||
+      !allCall[className]?.magazineNumber ||
+      !allCall[className]?.bibleNumber ||
+      !allCall[className]?.guestNumber ||
+      !allCall[className]?.offersNumber
+    ) {
+      return false
+    }
+    return true
+  }
   return (
-    <>
-      <FlatList
-        data={dataGeral}
-        style={styles.container}
-        extraData={[allCall, data, dataGeral]}
-        renderItem={({ item }) => (
-          <>
-            <TouchableOpacity style={[{ marginTop: 50 }, styles.button]} onPress={updateAllClasses}>
-              <Text style={styles.buttonText}>Atualizar</Text>
-            </TouchableOpacity>
-            <Text style={styles.title}>{item?.title}</Text>
-            <View style={styles.item}>
-              <Text style={styles.label}>Total de Alunos:</Text>
-              <Text style={styles.value}>{item?.studentNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Presentes:</Text>
-              <Text style={styles.value}>{item?.presenceNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Bíblias:</Text>
-              <Text style={styles.value}>{item?.bibleNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Revistas:</Text>
-              <Text style={styles.value}>{item?.magazineNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.guestNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Ofertas:</Text>
-              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
-              <Text style={styles.buttonText}>Copiar Resumo {item?.title}</Text>
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Presença</Text>
-            {(
-              empatePresenca
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topPresencas[0]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[0]?.porcentagem || 0}%</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topPresencas[1]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[1]?.porcentagem || 0}%</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topPresencas[2]?.title}:</Text>
-              <Text style={styles.value}>{topPresencas[2]?.porcentagem || 0}%</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Ofertas</Text>
-            {(
-              empateOfertas
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topOfertas[0]?.title}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[0]?.ofertas || 0)}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topOfertas[1]?.title}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[1]?.ofertas || 0)}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topOfertas[2]?.title}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[2]?.ofertas || 0)}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Bíblias</Text>
-            {(
-              empateBiblias
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topBiblias[0]?.title}:</Text>
-              <Text style={styles.value}>{topBiblias[0]?.bibleNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topBiblias[1]?.title}:</Text>
-              <Text style={styles.value}>{topBiblias[1]?.bibleNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topBiblias[2]?.title}:</Text>
-              <Text style={styles.value}>{topBiblias[2]?.bibleNumber}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Revistas</Text>
-            {(
-              empateRevistas
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topRevistas[0]?.title}:</Text>
-              <Text style={styles.value}>{topRevistas[0]?.magazineNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topRevistas[1]?.title}:</Text>
-              <Text style={styles.value}>{topRevistas[1]?.magazineNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topRevistas[2]?.title}:</Text>
-              <Text style={styles.value}>{topRevistas[2]?.magazineNumber}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Visitantes</Text>
-            {(
-              empateVisitantes
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topVisitantes[0]?.title}:</Text>
-              <Text style={styles.value}>{topVisitantes[0]?.guestNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topVisitantes[1]?.title}:</Text>
-              <Text style={styles.value}>{topVisitantes[1]?.guestNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topVisitantes[2]?.title}:</Text>
-              <Text style={styles.value}>{topVisitantes[2]?.guestNumber}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.buttonText}>============================================</Text>
-          </>
+    <View style={styles.container}>
+      <Text style={styles.title}>Controle de Presença</Text>
 
-        )}
-        keyExtractor={(item) => item?.title}
-      />
-    </>
+      {!selectedClassId ? (
+        <>
+          <Text style={styles.subtitle}>Chamada dos Alunos</Text>
+          <FlatList
+            data={classes}
+            keyExtractor={item => item.id}
+            extraData={allCall}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={isCalled(item.name) ? styles.classItem : styles.classItemNotCalled}
+                onPress={() => setSelectedClassId(item.id)}
+              >
+                <Text style={styles.className}>{item.name}</Text>
+                <Text style={styles.studentCount}>
+                  {`${allCall[item.name]?.studentNumber || '--'} Cadastrado(s)`}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      ) : (
+        <>
+          <TouchableOpacity onPress={() => {
+            setSelectedClassId(null)
+            setStudentNumber('')
+            setPresenceNumber('')
+            setBibleNumber('')
+            setMagazineNumber('')
+            setGuestNumber('')
+            setOffersNumber('')
+          }}>
+            <Text style={styles.back}>← Voltar</Text>
+          </TouchableOpacity>
+          <Text style={styles.subtitle}>Alunos da turma: {selectedClass.name}</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Quantidade de Alunos"
+            placeholderTextColor="gray"
+            value={studentNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setStudentNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Quantidade de Presenças"
+            placeholderTextColor="gray"
+            value={presenceNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setPresenceNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Bílias"
+            placeholderTextColor="gray"
+            value={bibleNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setBibleNumber(onlyNumbers);
+              /*
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              const presences = getNumberPresence(selectedClass)
+              if (Number(onlyNumbers) <= presences)
+                setBibleNumber(onlyNumbers);
+              else
+                setBibleNumber('');
+              */
+            }}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Revistas"
+            placeholderTextColor="gray"
+            value={magazineNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setMagazineNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Visitantes"
+            placeholderTextColor="gray"
+            value={guestNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setGuestNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Ofertas"
+            placeholderTextColor="gray"
+            value={offersNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              const formatted = formatToCurrency(onlyNumbers)
+              setOffersNumber(formatted);
+            }}
+            keyboardType="numeric"
+          />
+          <Button
+            title="Enviar"
+            onPress={() => handleNewCall(selectedClass?.name)}
+          />
+        </>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#f2f2f2',
-    marginTop: 50,
-    marginBottom: 50,
-    flex: 1,
+  container: { flex: 1, backgroundColor: 'white', padding: 20, paddingTop: 50 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  subtitle: { fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 },
+  input: {
+    borderWidth: 1, backgroundColor: 'white', borderColor: '#aaa', borderRadius: 5,
+    padding: 10, marginBottom: 10,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 16,
-    color: '#333',
-    alignSelf: 'center'
+  classItem: {
+    borderWidth: 1, padding: 10,
+    borderRadius: 5, marginBottom: 10, backgroundColor: '#c8facc', borderColor: '#38a169'
   },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
+  classItemNotCalled: {
+    borderWidth: 1, padding: 10,
+    borderRadius: 5, marginBottom: 10, backgroundColor: '#fcdada', borderColor: '#e53e3e'
   },
-  label: {
-    fontSize: 18,
-    color: '#444',
+  className: { fontSize: 16, fontWeight: 'bold' },
+  studentCount: { fontSize: 12, color: '#555' },
+  back: {
+    color: '#007AFF', marginBottom: 10, fontSize: 16,
   },
-  value: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+  studentItem: {
+    padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc',
   },
-  button2: { flexDirection: 'row', gap: 10 },
-  button: {
-    padding: 6,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    marginTop: 10,
-    borderRadius: 5,
-    backgroundColor: '#C0C0C0',
-    borderColor: 'gray',
-    alignSelf: 'center'
+  studentName: { fontSize: 16, marginBottom: 5 },
+  buttons: { flexDirection: 'row', gap: 10 },
+  presenceButton: {
+    padding: 6, paddingHorizontal: 12,
+    borderWidth: 1, borderRadius: 5,
+    borderColor: '#aaa',
   },
   present: { backgroundColor: '#c8facc', borderColor: '#38a169' },
   absent: { backgroundColor: '#fcdada', borderColor: '#e53e3e' },

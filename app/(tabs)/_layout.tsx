@@ -27,7 +27,7 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="alunos"
+        name="index"
         options={{
           title: 'Alunos',
           tabBarIcon: ({ color }) => (
@@ -36,7 +36,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="totalGeral"
         options={{
           title: 'Total Geral',
           tabBarIcon: ({ color }) => (
