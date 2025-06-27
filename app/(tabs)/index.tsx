@@ -119,7 +119,6 @@ export default function App() {
       newCall.guestNumber = totalGuestNumber.toString();
       newCall.offersNumber = totalOffersNumber.toString();
       newCall.save();
-
       console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
     });
   }
@@ -154,7 +153,7 @@ export default function App() {
     if (checkBibleNumber || checkMagazineNumber) {
       if (checkBibleNumber) setBibleNumber('');
       if (checkMagazineNumber) setMagazineNumber('');
-      showAlertIfSupported('A quantidade de revistas ou bíblias não pode ser maior que a quantidade de presenças + convidados');
+      showAlertIfSupported('Erro: Bíblias ou revistas maior que o número de presenças');
     }
   }, [presenceNumber, studentNumber, bibleNumber, magazineNumber, guestNumber, offersNumber]);
 

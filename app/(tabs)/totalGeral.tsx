@@ -103,7 +103,6 @@ export default function Resumo() {
     const checkDataEmpate = Object.values(allCall).filter(item => Object.values(item).some(value => value !== ""));
     if (checkDataEmpate.length === 0) return;
     // Cálculo dos rankings
-    console.log(checkDataEmpate);
     const dataComPorcentagem = checkDataEmpate.map((item: any) => ({
       ...item,
       porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber),
@@ -296,44 +295,44 @@ Resumo - *${new Date().toLocaleDateString('pt-BR')}*
 
 *=======================*
 Total Geral:
-Total de Alunos: *${resumo.studentNumber}*
-Presentes: *${resumo.presenceNumber}*
-Ausentes: *${resumo.studentNumber - resumo.presenceNumber}*
-Bíblias: *${resumo.bibleNumber}*
-Revistas: *${resumo.magazineNumber}*
-Visitantes: *${resumo.guestNumber}*
+Total de Alunos: *${resumo.studentNumber || ''}*
+Presentes: *${resumo.presenceNumber || ''}*
+Ausentes: *${resumo.studentNumber - resumo.presenceNumber || ''}*
+Bíblias: *${resumo.bibleNumber || ''}*
+Revistas: *${resumo.magazineNumber || ''}*
+Visitantes: *${resumo.guestNumber || ''}*
 Ofertas: *${formatToCurrency(resumo.offersNumber)}*
 Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
 *=======================*
 
 Vencedores em Presença: ${empatePresenca ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topPresencas[0]?.className}*: *${topPresencas[0]?.porcentagem || 0}%*
-2° - *${topPresencas[1]?.className}*: *${topPresencas[1]?.porcentagem || 0}%*
-3° - *${topPresencas[2]?.className}*: *${topPresencas[2]?.porcentagem || 0}%*
+1° - *${topPresencas[0]?.className || ''}*: *${topPresencas[0]?.porcentagem || 0}%*
+2° - *${topPresencas[1]?.className || ''}*: *${topPresencas[1]?.porcentagem || 0}%*
+3° - *${topPresencas[2]?.className || ''}*: *${topPresencas[2]?.porcentagem || 0}%*
 *=======================*
 
 Vencedores em Ofertas: ${empateOfertas ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topOfertas[0]?.className}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
-2° - *${topOfertas[1]?.className}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
-3° - *${topOfertas[2]?.className}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
+1° - *${topOfertas[0]?.className || ''}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
+2° - *${topOfertas[1]?.className || ''}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
+3° - *${topOfertas[2]?.className || ''}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
 *=======================*
 
 Vencedores em Bíblias: ${empateBiblias ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topBiblias[0]?.className}*: *${topBiblias[0]?.bibleNumber}*
-2° - *${topBiblias[1]?.className}*: *${topBiblias[1]?.bibleNumber}*
-3° - *${topBiblias[2]?.className}*: *${topBiblias[2]?.bibleNumber}*
+1° - *${topBiblias[0]?.className || ''}*: *${topBiblias[0]?.bibleNumber || ''}*
+2° - *${topBiblias[1]?.className || ''}*: *${topBiblias[1]?.bibleNumber || ''}*
+3° - *${topBiblias[2]?.className || ''}*: *${topBiblias[2]?.bibleNumber || ''}*
 *=======================*
 
 Vencedores em Revistas: ${empateRevistas ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topRevistas[0]?.className}*: *${topRevistas[0]?.magazineNumber}*
-2° - *${topRevistas[1]?.className}*: *${topRevistas[1]?.magazineNumber}*
-3° - *${topRevistas[2]?.className}*: *${topRevistas[2]?.magazineNumber}*
+1° - *${topRevistas[0]?.className || ''}*: *${topRevistas[0]?.magazineNumber || ''}*
+2° - *${topRevistas[1]?.className || ''}*: *${topRevistas[1]?.magazineNumber || ''}*
+3° - *${topRevistas[2]?.className || ''}*: *${topRevistas[2]?.magazineNumber || ''}*
 *=======================*
 
 Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
-1° - *${topVisitantes[0]?.className}*: *${topVisitantes[0]?.guestNumber}*
-2° - *${topVisitantes[1]?.className}*: *${topVisitantes[1]?.guestNumber}*
-3° - *${topVisitantes[2]?.className}*: *${topVisitantes[2]?.guestNumber}*
+1° - *${topVisitantes[0]?.className || ''}*: *${topVisitantes[0]?.guestNumber || ''}*
+2° - *${topVisitantes[1]?.className || ''}*: *${topVisitantes[1]?.guestNumber || ''}*
+3° - *${topVisitantes[2]?.className || ''}*: *${topVisitantes[2]?.guestNumber || ''}*
   `.trim();
 
     Clipboard.setStringAsync(texto);
