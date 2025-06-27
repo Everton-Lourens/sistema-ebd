@@ -4,6 +4,7 @@ import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
+import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -222,59 +223,66 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
     Clipboard.setStringAsync(texto);
   };
 
-  return (
-    <>
-      <View style={styles.container}>
-        <FlatList
-          data={data}
-          style={styles.container}
-          extraData={[data, allCall, isLoading]}
-          renderItem={({ item }) => (
-            <>
-              <Text style={styles.title}>{item?.title}</Text>
-              <View style={styles.item}>
-                <Text style={styles.label}>Matriculados:</Text>
-                <Text style={styles.value}>{item?.studentNumber || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Presentes:</Text>
-                <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Ausentes:</Text>
-                <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Bíblias:</Text>
-                <Text style={styles.value}>{item?.bibleNumber || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Revistas:</Text>
-                <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Visitantes:</Text>
-                <Text style={styles.value}>{item?.guestNumber || 0}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Ofertas:</Text>
-                <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
-              </View>
-              <View style={styles.item}>
-                <Text style={styles.label}>Porcentagem:</Text>
-                <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
-              </View>
-              <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
-                <Text style={styles.buttonText}>Copiar {item?.title}</Text>
-              </TouchableOpacity>
-              <Text style={styles.buttonText}>========================================</Text>
-              <Text style={styles.buttonText}>========================================</Text>
-            </>
-          )}
-          keyExtractor={(item) => item?.title}
-        />
-      </View>
-    </>
+  return data.length > 0 ? (
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        style={styles.container}
+        extraData={[data, allCall, isLoading]}
+        renderItem={({ item }) => (
+          <>
+            <Text style={styles.title}>{item?.title}</Text>
+            <View style={styles.item}>
+              <Text style={styles.label}>Matriculados:</Text>
+              <Text style={styles.value}>{item?.studentNumber || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Presentes:</Text>
+              <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Ausentes:</Text>
+              <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Bíblias:</Text>
+              <Text style={styles.value}>{item?.bibleNumber || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Revistas:</Text>
+              <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Visitantes:</Text>
+              <Text style={styles.value}>{item?.guestNumber || 0}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Ofertas:</Text>
+              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Porcentagem:</Text>
+              <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
+              <Text style={styles.buttonText}>Copiar {item?.title}</Text>
+            </TouchableOpacity>
+            <Text style={styles.buttonText}>========================================</Text>
+            <Text style={styles.buttonText}>========================================</Text>
+          </>
+        )}
+        keyExtractor={(item) => item?.title}
+      />
+    </View>
+  ) : (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
+        Preencha alguma classe para ver o histórico de chamadas
+      </Text>
+      <TouchableOpacity style={styles.button} onPress={() => navigate('/alunos')}>
+        <Text style={styles.buttonText}>Fazer Chamada</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 

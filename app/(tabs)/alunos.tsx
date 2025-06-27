@@ -149,10 +149,6 @@ export default function App() {
     const totalPresence = Number(presenceNumber) + Number(guestNumber);
     const checkBibleNumber = Number(bibleNumber) > totalPresence;
     const checkMagazineNumber = Number(magazineNumber) > totalPresence;
-    console.log(totalPresence);
-    console.log(bibleNumber);
-    console.log(magazineNumber);
-    console.log(magazineNumber);
 
     if (checkBibleNumber || checkMagazineNumber) {
       if (checkBibleNumber) setBibleNumber('');
