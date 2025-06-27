@@ -71,6 +71,7 @@ export default function App() {
     const newCall = new NewCall();
 
     const promises = initialClasses.map(({ name }) => {
+      newCall.className = name;
       return newCall.getCall(name).then(data => {
         if (data) {
           checkDate(data?.callDate);

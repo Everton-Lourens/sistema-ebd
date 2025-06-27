@@ -95,9 +95,11 @@ export default function Resumo() {
     const newCall = new NewCall();
 
     const promises = initialClasses.map(({ name }) => {
+      newCall.className = name;
       return newCall.getCall(name).then(data => {
         if (data) {
-          checkDate(data?.callDate);
+          const isToday = checkDate(data?.callDate);
+          if (!isToday) return console.log(`Data não é hoje: ${data?.callDate}`);
 
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
@@ -167,26 +169,39 @@ export default function Resumo() {
     });
   }
 
-  function checkDate(oldDate: string) {
-    if (initLoad) {
-      setInitLoad(false)
-      const date1 = new Date().toISOString();
-      const date2 = new Date(oldDate).toISOString();
-      function getDateOnly(isoString: string) {
-        return isoString.split('T')[0];
-      }
-      const sameDate = getDateOnly(date1) === getDateOnly(date2);
-      if (sameDate) {
-        setStudentNumber('');
-        setPresenceNumber('');
-        setBibleNumber('');
-        setMagazineNumber('');
-        setGuestNumber('');
-        setOffersNumber('');
-        return true
-      }
-      return false
+  function checkDate(oldDate = '') {
+    let sameDate = false;
+    if (!oldDate) {
+      console.log('Sem data, limpando dados');
+      sameDate = false;
+      clearData();
+      return false;
     }
+
+    const date1 = new Date().toISOString();
+    const date2 = new Date(oldDate).toISOString();
+    function getDateOnly(isoString: string) {
+      return isoString.split('T')[0];
+    }
+    sameDate = getDateOnly(date1) === getDateOnly(date2);
+
+    function clearData() {
+      if (!sameDate) {
+        setTopPresencas([]);
+        setTopOfertas([]);
+        setTopBiblias([]);
+        setTopRevistas([]);
+        setTopVisitantes([]);
+        setData([]);
+        setEmpatePresenca(false);
+        setEmpateOfertas(false);
+        setEmpateBiblias(false);
+        setEmpateRevistas(false);
+        setEmpateVisitantes(false);
+        return false
+      }
+    }
+    return sameDate;
   }
 
   const getPercentage = (presence: string = '', allStudents: string = ''): number => {
@@ -197,6 +212,7 @@ export default function Resumo() {
 
   const getTotalGeral = () => {
     const newCall = new NewCall();
+    newCall.className = 'TOTAL_GERAL';
     newCall.getCall('TOTAL_GERAL').then((result: any) => {
       if (result) {
         const sameDate = compareDate(result.callDate);
@@ -275,9 +291,9 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
       />
     </View>
   ) : (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ backgroundColor: '#f2f2f2', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
-        Preencha alguma classe para ver o histórico de chamadas
+        Preencha alguma classe para ver o histórico de chamadas das classes
       </Text>
       <TouchableOpacity style={styles.button} onPress={() => navigate('/alunos')}>
         <Text style={styles.buttonText}>Fazer Chamada</Text>

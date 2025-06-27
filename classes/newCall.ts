@@ -61,7 +61,11 @@ export class NewCall {
         try {
             if (Platform.OS === 'web') {
                 try {
-                    localStorage.setItem(`call_${this.className}`, JSON.stringify(data));
+                    const date = new Date().toISOString();
+                    function getDateOnly(isoString: string) {
+                        return isoString.split('T')[0];
+                    }
+                    localStorage.setItem(`call_${getDateOnly(date)}_${this.className}`, JSON.stringify(data));
                     this.className = '';
                     this.studentNumber = '';
                     this.presenceNumber = '';
@@ -75,7 +79,11 @@ export class NewCall {
                     return Promise.reject(error);
                 }
             } else {
-                return AsyncStorage.setItem(`call_${this.className}`, JSON.stringify(data))
+                const date = new Date().toISOString();
+                function getDateOnly(isoString: string) {
+                    return isoString.split('T')[0];
+                }
+                return AsyncStorage.setItem(`call_${getDateOnly(date)}_${this.className}`, JSON.stringify(data))
                     .then(() => {
                         this.className = '';
                         this.studentNumber = '';
@@ -99,7 +107,11 @@ export class NewCall {
         if (!className) throw new Error("O nome da turma é obrigatório");
         if (Platform.OS === 'web') {
             try {
-                const data = localStorage.getItem(`call_${className}`);
+                const date = new Date().toISOString();
+                function getDateOnly(isoString: string) {
+                    return isoString.split('T')[0];
+                }
+                const data = localStorage.getItem(`call_${getDateOnly(date)}_${this.className}`);
                 if (data !== null) {
                     const parsedData = JSON.parse(data);
                     this.className = parsedData.className;
@@ -119,8 +131,11 @@ export class NewCall {
                 return Promise.reject(error);
             }
         } else {
-
-            return AsyncStorage.getItem(`call_${className}`)
+            const date = new Date().toISOString();
+            function getDateOnly(isoString: string) {
+                return isoString.split('T')[0];
+            }
+            return AsyncStorage.getItem(`call_${getDateOnly(date)}_${this.className}`)
                 .then((data: string | null) => {
                     if (data !== null) {
                         const parsedData = JSON.parse(data);
