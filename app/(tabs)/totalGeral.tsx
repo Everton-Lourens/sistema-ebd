@@ -132,29 +132,29 @@ export default function Resumo() {
 
   useEffect(() => {
     setEmpatePresenca(
-      topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem ||
-      topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem ||
-      topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem
+      (topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem && topPresencas[0]?.porcentagem !== 0) ||
+      (topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem && topPresencas[0]?.porcentagem !== 0) ||
+      (topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem && topPresencas[1]?.porcentagem !== 0)
     );
     setEmpateVisitantes(
-      topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber ||
-      topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber ||
-      topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber
+      (topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber && topVisitantes[0]?.guestNumber !== 0) ||
+      (topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber && topVisitantes[0]?.guestNumber !== 0) ||
+      (topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber && topVisitantes[1]?.guestNumber !== 0)
     );
     setEmpateBiblias(
-      topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber ||
-      topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber ||
-      topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber
+      (topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber && topBiblias[0]?.bibleNumber !== 0) ||
+      (topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber && topBiblias[0]?.bibleNumber !== 0) ||
+      (topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber && topBiblias[1]?.bibleNumber !== 0)
     );
     setEmpateRevistas(
-      topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber ||
-      topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber ||
-      topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber
+      (topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber && topRevistas[0]?.magazineNumber !== 0) ||
+      (topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber && topRevistas[0]?.magazineNumber !== 0) ||
+      (topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber && topRevistas[1]?.magazineNumber !== 0)
     );
     setEmpateOfertas(
-      topOfertas[0]?.ofertas === topOfertas[1]?.ofertas ||
-      topOfertas[0]?.ofertas === topOfertas[2]?.ofertas ||
-      topOfertas[1]?.ofertas === topOfertas[2]?.ofertas
+      (topOfertas[0]?.ofertas === topOfertas[1]?.ofertas && topOfertas[0]?.ofertas !== 0) ||
+      (topOfertas[0]?.ofertas === topOfertas[2]?.ofertas && topOfertas[0]?.ofertas !== 0) ||
+      (topOfertas[1]?.ofertas === topOfertas[2]?.ofertas && topOfertas[1]?.ofertas !== 0)
     );
   }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes]);
 
@@ -305,31 +305,31 @@ Ofertas: *${formatToCurrency(resumo.offersNumber)}*
 Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
 *=======================*
 
-Vencedores em Presença: ${empatePresenca ? '\n*HOUVE EMPATE*' : ''}
+Vencedores em Presença: ${empatePresenca ? '\n*> HOUVE EMPATE <*' : ''}
 1° - *${topPresencas[0]?.className || ''}*: *${topPresencas[0]?.porcentagem || 0}%*
 2° - *${topPresencas[1]?.className || ''}*: *${topPresencas[1]?.porcentagem || 0}%*
 3° - *${topPresencas[2]?.className || ''}*: *${topPresencas[2]?.porcentagem || 0}%*
 *=======================*
 
-Vencedores em Ofertas: ${empateOfertas ? '\n*HOUVE EMPATE*' : ''}
+Vencedores em Ofertas: ${empateOfertas ? '\n*> HOUVE EMPATE <*' : ''}
 1° - *${topOfertas[0]?.className || ''}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
 2° - *${topOfertas[1]?.className || ''}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
 3° - *${topOfertas[2]?.className || ''}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
 *=======================*
 
-Vencedores em Bíblias: ${empateBiblias ? '\n*HOUVE EMPATE*' : ''}
+Vencedores em Bíblias: ${empateBiblias ? '\n*> HOUVE EMPATE <*' : ''}
 1° - *${topBiblias[0]?.className || ''}*: *${topBiblias[0]?.bibleNumber || ''}*
 2° - *${topBiblias[1]?.className || ''}*: *${topBiblias[1]?.bibleNumber || ''}*
 3° - *${topBiblias[2]?.className || ''}*: *${topBiblias[2]?.bibleNumber || ''}*
 *=======================*
 
-Vencedores em Revistas: ${empateRevistas ? '\n*HOUVE EMPATE*' : ''}
+Vencedores em Revistas: ${empateRevistas ? '\n*> HOUVE EMPATE <*' : ''}
 1° - *${topRevistas[0]?.className || ''}*: *${topRevistas[0]?.magazineNumber || ''}*
 2° - *${topRevistas[1]?.className || ''}*: *${topRevistas[1]?.magazineNumber || ''}*
 3° - *${topRevistas[2]?.className || ''}*: *${topRevistas[2]?.magazineNumber || ''}*
 *=======================*
 
-Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
+Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
 1° - *${topVisitantes[0]?.className || ''}*: *${topVisitantes[0]?.guestNumber || ''}*
 2° - *${topVisitantes[1]?.className || ''}*: *${topVisitantes[1]?.guestNumber || ''}*
 3° - *${topVisitantes[2]?.className || ''}*: *${topVisitantes[2]?.guestNumber || ''}*
@@ -346,9 +346,6 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
         extraData={[allCall, data, dataGeral]}
         renderItem={({ item }) => (
           <>
-            <TouchableOpacity style={[{ marginTop: 50 }, styles.button]} onPress={updateAllClasses}>
-              <Text style={styles.buttonText}>Atualizar</Text>
-            </TouchableOpacity>
             <Text style={styles.title}>{item?.className}</Text>
             <View style={styles.item}>
               <Text style={styles.label}>Total de Alunos:</Text>
@@ -392,7 +389,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
               empatePresenca
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
+                {'> Houve Empate <'}
               </Text>
             ) : null}
             <View style={styles.item}>
@@ -413,7 +410,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
               empateOfertas
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
+                {'> Houve Empate <'}
               </Text>
             ) : null}
             <View style={styles.item}>
@@ -434,7 +431,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
               empateBiblias
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
+                {'> Houve Empate <'}
               </Text>
             ) : null}
             <View style={styles.item}>
@@ -455,7 +452,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
               empateRevistas
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
+                {'> Houve Empate <'}
               </Text>
             ) : null}
             <View style={styles.item}>
@@ -476,7 +473,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*HOUVE EMPATE*' : ''}
               empateVisitantes
             ) ? (
               <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                Houve Empate
+                {'> Houve Empate <'}
               </Text>
             ) : null}
             <View style={styles.item}>
