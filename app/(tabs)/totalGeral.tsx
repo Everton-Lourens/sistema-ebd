@@ -29,7 +29,6 @@ type DataItem = {
 
 export default function Resumo() {
   const [resumo, setResumo] = useState(resumoInit);
-  const [classes, setClasses] = useState(initialClasses);
   const [allCall, setAllCall] = useState({
     studentNumber: '',
     presenceNumber: '',
@@ -38,14 +37,7 @@ export default function Resumo() {
     guestNumber: '',
     offersNumber: '',
   });
-  const [selectedClassId, setSelectedClassId] = useState(null);
-  const [newCallAlert, setNewCallAlert] = useState(false);
-  const [presenceNumber, setPresenceNumber] = useState('');
-  const [studentNumber, setStudentNumber] = useState('');
-  const [bibleNumber, setBibleNumber] = useState('');
-  const [magazineNumber, setMagazineNumber] = useState('');
-  const [guestNumber, setGuestNumber] = useState('');
-  const [offersNumber, setOffersNumber] = useState('');
+  const [almostClear, setAlmostClear] = useState(false);
   const [topPresencas, setTopPresencas] = useState([]);
   const [topOfertas, setTopOfertas] = useState([]);
   const [topBiblias, setTopBiblias] = useState([]);
@@ -81,7 +73,7 @@ export default function Resumo() {
 
   const getPercentage = (presence: string = '', allStudents: string = ''): number => {
     if (!allStudents || !presence) return 0;
-    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
+    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2)) || 0;
   }
 
   useFocusEffect(
@@ -105,7 +97,7 @@ export default function Resumo() {
     // Cálculo dos rankings
     const dataComPorcentagem = checkDataEmpate.map((item: any) => ({
       ...item,
-      porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber),
+      porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber) || 0,
       ofertas: Number(item?.offersNumber?.replace(/[^\d]/g, '') || 0),
     }));
 
@@ -129,32 +121,73 @@ export default function Resumo() {
     setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
     setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
   }
-
+console.log(JSON.stringify(topPresencas, null, 2));
   useEffect(() => {
     setEmpatePresenca(
-      (topPresencas[0]?.porcentagem === topPresencas[1]?.porcentagem && topPresencas[0]?.porcentagem !== 0) ||
-      (topPresencas[0]?.porcentagem === topPresencas[2]?.porcentagem && topPresencas[0]?.porcentagem !== 0) ||
-      (topPresencas[1]?.porcentagem === topPresencas[2]?.porcentagem && topPresencas[1]?.porcentagem !== 0)
+      (Number(topPresencas[0]?.porcentagem) > 0 &&
+        Number(topPresencas[1]?.porcentagem) > 0 &&
+        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[1]?.porcentagem)) ||
+      (Number(topPresencas[0]?.porcentagem) > 0 &&
+        Number(topPresencas[2]?.porcentagem) > 0 &&
+        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[2]?.porcentagem)) ||
+      (Number(topPresencas[1]?.porcentagem) > 0 &&
+        Number(topPresencas[2]?.porcentagem) > 0 &&
+        Number(topPresencas[1]?.porcentagem) === Number(topPresencas[2]?.porcentagem))
     );
-    setEmpateVisitantes(
-      (topVisitantes[0]?.guestNumber === topVisitantes[1]?.guestNumber && topVisitantes[0]?.guestNumber !== 0) ||
-      (topVisitantes[0]?.guestNumber === topVisitantes[2]?.guestNumber && topVisitantes[0]?.guestNumber !== 0) ||
-      (topVisitantes[1]?.guestNumber === topVisitantes[2]?.guestNumber && topVisitantes[1]?.guestNumber !== 0)
-    );
-    setEmpateBiblias(
-      (topBiblias[0]?.bibleNumber === topBiblias[1]?.bibleNumber && topBiblias[0]?.bibleNumber !== 0) ||
-      (topBiblias[0]?.bibleNumber === topBiblias[2]?.bibleNumber && topBiblias[0]?.bibleNumber !== 0) ||
-      (topBiblias[1]?.bibleNumber === topBiblias[2]?.bibleNumber && topBiblias[1]?.bibleNumber !== 0)
-    );
-    setEmpateRevistas(
-      (topRevistas[0]?.magazineNumber === topRevistas[1]?.magazineNumber && topRevistas[0]?.magazineNumber !== 0) ||
-      (topRevistas[0]?.magazineNumber === topRevistas[2]?.magazineNumber && topRevistas[0]?.magazineNumber !== 0) ||
-      (topRevistas[1]?.magazineNumber === topRevistas[2]?.magazineNumber && topRevistas[1]?.magazineNumber !== 0)
+    setEmpatePresenca(
+      (Number(topPresencas[0]?.porcentagem) > 0 &&
+        Number(topPresencas[1]?.porcentagem) > 0 &&
+        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[1]?.porcentagem)) ||
+      (Number(topPresencas[0]?.porcentagem) > 0 &&
+        Number(topPresencas[2]?.porcentagem) > 0 &&
+        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[2]?.porcentagem)) ||
+      (Number(topPresencas[1]?.porcentagem) > 0 &&
+        Number(topPresencas[2]?.porcentagem) > 0 &&
+        Number(topPresencas[1]?.porcentagem) === Number(topPresencas[2]?.porcentagem))
     );
     setEmpateOfertas(
-      (topOfertas[0]?.ofertas === topOfertas[1]?.ofertas && topOfertas[0]?.ofertas !== 0) ||
-      (topOfertas[0]?.ofertas === topOfertas[2]?.ofertas && topOfertas[0]?.ofertas !== 0) ||
-      (topOfertas[1]?.ofertas === topOfertas[2]?.ofertas && topOfertas[1]?.ofertas !== 0)
+      (Number(topOfertas[0]?.ofertas) > 0 &&
+        Number(topOfertas[1]?.ofertas) > 0 &&
+        Number(topOfertas[0]?.ofertas) === Number(topOfertas[1]?.ofertas)) ||
+      (Number(topOfertas[0]?.ofertas) > 0 &&
+        Number(topOfertas[2]?.ofertas) > 0 &&
+        Number(topOfertas[0]?.ofertas) === Number(topOfertas[2]?.ofertas)) ||
+      (Number(topOfertas[1]?.ofertas) > 0 &&
+        Number(topOfertas[2]?.ofertas) > 0 &&
+        Number(topOfertas[1]?.ofertas) === Number(topOfertas[2]?.ofertas))
+    );
+    setEmpateBiblias(
+      (Number(topBiblias[0]?.bibleNumber) > 0 &&
+        Number(topBiblias[1]?.bibleNumber) > 0 &&
+        Number(topBiblias[0]?.bibleNumber) === Number(topBiblias[1]?.bibleNumber)) ||
+      (Number(topBiblias[0]?.bibleNumber) > 0 &&
+        Number(topBiblias[2]?.bibleNumber) > 0 &&
+        Number(topBiblias[0]?.bibleNumber) === Number(topBiblias[2]?.bibleNumber)) ||
+      (Number(topBiblias[1]?.bibleNumber) > 0 &&
+        Number(topBiblias[2]?.bibleNumber) > 0 &&
+        Number(topBiblias[1]?.bibleNumber) === Number(topBiblias[2]?.bibleNumber))
+    );
+    setEmpateRevistas(
+      (Number(topRevistas[0]?.magazineNumber) > 0 &&
+        Number(topRevistas[1]?.magazineNumber) > 0 &&
+        Number(topRevistas[0]?.magazineNumber) === Number(topRevistas[1]?.magazineNumber)) ||
+      (Number(topRevistas[0]?.magazineNumber) > 0 &&
+        Number(topRevistas[2]?.magazineNumber) > 0 &&
+        Number(topRevistas[0]?.magazineNumber) === Number(topRevistas[2]?.magazineNumber)) ||
+      (Number(topRevistas[1]?.magazineNumber) > 0 &&
+        Number(topRevistas[2]?.magazineNumber) > 0 &&
+        Number(topRevistas[1]?.magazineNumber) === Number(topRevistas[2]?.magazineNumber))
+    );
+    setEmpateVisitantes(
+      (Number(topVisitantes[0]?.guestNumber) > 0 &&
+        Number(topVisitantes[1]?.guestNumber) > 0 &&
+        Number(topVisitantes[0]?.guestNumber) === Number(topVisitantes[1]?.guestNumber)) ||
+      (Number(topVisitantes[0]?.guestNumber) > 0 &&
+        Number(topVisitantes[2]?.guestNumber) > 0 &&
+        Number(topVisitantes[0]?.guestNumber) === Number(topVisitantes[2]?.guestNumber)) ||
+      (Number(topVisitantes[1]?.guestNumber) > 0 &&
+        Number(topVisitantes[2]?.guestNumber) > 0 &&
+        Number(topVisitantes[1]?.guestNumber) === Number(topVisitantes[2]?.guestNumber))
     );
   }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes]);
 
@@ -256,8 +289,9 @@ export default function Resumo() {
 
   function checkDate(oldDate = '') {
     let sameDate = false;
-    if (!oldDate) {
+    if (!oldDate && !almostClear) {
       sameDate = false;
+      setAlmostClear(true);
       clearData();
       return false;
     }
@@ -312,9 +346,9 @@ Vencedores em Presença: ${empatePresenca ? '\n*> HOUVE EMPATE <*' : ''}
 *=======================*
 
 Vencedores em Ofertas: ${empateOfertas ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topOfertas[0]?.className || ''}*: *${formatToCurrency(topOfertas[0]?.ofertas) || ''}*
-2° - *${topOfertas[1]?.className || ''}*: *${formatToCurrency(topOfertas[1]?.ofertas) || ''}*
-3° - *${topOfertas[2]?.className || ''}*: *${formatToCurrency(topOfertas[2]?.ofertas) || ''}*
+1° - *${topOfertas[0]?.className || ''}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
+2° - *${topOfertas[1]?.className || ''}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
+3° - *${topOfertas[2]?.className || ''}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
 *=======================*
 
 Vencedores em Bíblias: ${empateBiblias ? '\n*> HOUVE EMPATE <*' : ''}
@@ -357,7 +391,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{Number(item?.studentNumber || '') - Number(item?.presenceNumber || '')}</Text>
+              <Text style={styles.value}>{Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
@@ -373,123 +407,129 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>
-              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || '')}</Text>
+              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
               <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
             </View>
-            <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
-              <Text style={styles.buttonText}>Copiar Resumo {item?.className}</Text>
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Presença</Text>
-            {(
-              empatePresenca
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                {'> Houve Empate <'}
-              </Text>
+            {dataGeral.length > 0 ? (
+              <>
+
+
+                <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
+                  <Text style={styles.buttonText}>Copiar Resumo {item?.className}</Text>
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.title}>Vencedores em Presença</Text>
+                {(
+                  empatePresenca
+                ) ? (
+                  <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
+                    {'> Houve Empate <'}
+                  </Text>
+                ) : null}
+                <View style={styles.item}>
+                  <Text style={styles.label}>1° - {topPresencas[0]?.className}:</Text>
+                  <Text style={styles.value}>{topPresencas[0]?.porcentagem || 0}%</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>2° - {topPresencas[1]?.className}:</Text>
+                  <Text style={styles.value}>{topPresencas[1]?.porcentagem || 0}%</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>3° - {topPresencas[2]?.className}:</Text>
+                  <Text style={styles.value}>{topPresencas[2]?.porcentagem || 0}%</Text>
+                </View>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.title}>Vencedores em Ofertas</Text>
+                {(
+                  empateOfertas
+                ) ? (
+                  <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
+                    {'> Houve Empate <'}
+                  </Text>
+                ) : null}
+                <View style={styles.item}>
+                  <Text style={styles.label}>1° - {topOfertas[0]?.className}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(topOfertas[0]?.ofertas || 0)}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>2° - {topOfertas[1]?.className}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(topOfertas[1]?.ofertas || 0)}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>3° - {topOfertas[2]?.className}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(topOfertas[2]?.ofertas || 0)}</Text>
+                </View>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.title}>Vencedores em Bíblias</Text>
+                {(
+                  empateBiblias
+                ) ? (
+                  <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
+                    {'> Houve Empate <'}
+                  </Text>
+                ) : null}
+                <View style={styles.item}>
+                  <Text style={styles.label}>1° - {topBiblias[0]?.className}:</Text>
+                  <Text style={styles.value}>{topBiblias[0]?.bibleNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>2° - {topBiblias[1]?.className}:</Text>
+                  <Text style={styles.value}>{topBiblias[1]?.bibleNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>3° - {topBiblias[2]?.className}:</Text>
+                  <Text style={styles.value}>{topBiblias[2]?.bibleNumber}</Text>
+                </View>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.title}>Vencedores em Revistas</Text>
+                {(
+                  empateRevistas
+                ) ? (
+                  <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
+                    {'> Houve Empate <'}
+                  </Text>
+                ) : null}
+                <View style={styles.item}>
+                  <Text style={styles.label}>1° - {topRevistas[0]?.className}:</Text>
+                  <Text style={styles.value}>{topRevistas[0]?.magazineNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>2° - {topRevistas[1]?.className}:</Text>
+                  <Text style={styles.value}>{topRevistas[1]?.magazineNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>3° - {topRevistas[2]?.className}:</Text>
+                  <Text style={styles.value}>{topRevistas[2]?.magazineNumber}</Text>
+                </View>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.title}>Vencedores em Visitantes</Text>
+                {(
+                  empateVisitantes
+                ) ? (
+                  <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
+                    {'> Houve Empate <'}
+                  </Text>
+                ) : null}
+                <View style={styles.item}>
+                  <Text style={styles.label}>1° - {topVisitantes[0]?.className}:</Text>
+                  <Text style={styles.value}>{topVisitantes[0]?.guestNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>2° - {topVisitantes[1]?.className}:</Text>
+                  <Text style={styles.value}>{topVisitantes[1]?.guestNumber}</Text>
+                </View>
+                <View style={styles.item}>
+                  <Text style={styles.label}>3° - {topVisitantes[2]?.className}:</Text>
+                  <Text style={styles.value}>{topVisitantes[2]?.guestNumber}</Text>
+                </View>
+                <Text style={styles.buttonText}>============================================</Text>
+                <Text style={styles.buttonText}>============================================</Text>
+              </>
             ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topPresencas[0]?.className || ''}:</Text>
-              <Text style={styles.value}>{topPresencas[0]?.porcentagem || 0}%</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topPresencas[1]?.className || ''}:</Text>
-              <Text style={styles.value}>{topPresencas[1]?.porcentagem || 0}%</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topPresencas[2]?.className || ''}:</Text>
-              <Text style={styles.value}>{topPresencas[2]?.porcentagem || 0}%</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Ofertas</Text>
-            {(
-              empateOfertas
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                {'> Houve Empate <'}
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topOfertas[0]?.className || ''}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[0]?.ofertas) || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topOfertas[1]?.className || ''}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[1]?.ofertas) || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topOfertas[2]?.className || ''}:</Text>
-              <Text style={styles.value}>{formatToCurrency(topOfertas[2]?.ofertas) || ''}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Bíblias</Text>
-            {(
-              empateBiblias
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                {'> Houve Empate <'}
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topBiblias[0]?.className || ''}:</Text>
-              <Text style={styles.value}>{topBiblias[0]?.bibleNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topBiblias[1]?.className || ''}:</Text>
-              <Text style={styles.value}>{topBiblias[1]?.bibleNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topBiblias[2]?.className || ''}:</Text>
-              <Text style={styles.value}>{topBiblias[2]?.bibleNumber || ''}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Revistas</Text>
-            {(
-              empateRevistas
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                {'> Houve Empate <'}
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topRevistas[0]?.className || ''}:</Text>
-              <Text style={styles.value}>{topRevistas[0]?.magazineNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topRevistas[1]?.className || ''}:</Text>
-              <Text style={styles.value}>{topRevistas[1]?.magazineNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topRevistas[2]?.className || ''}:</Text>
-              <Text style={styles.value}>{topRevistas[2]?.magazineNumber}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.title}>Vencedores em Visitantes</Text>
-            {(
-              empateVisitantes
-            ) ? (
-              <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                {'> Houve Empate <'}
-              </Text>
-            ) : null}
-            <View style={styles.item}>
-              <Text style={styles.label}>1° - {topVisitantes[0]?.className || ''}:</Text>
-              <Text style={styles.value}>{topVisitantes[0]?.guestNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>2° - {topVisitantes[1]?.className || ''}:</Text>
-              <Text style={styles.value}>{topVisitantes[1]?.guestNumber || ''}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>3° - {topVisitantes[2]?.className || ''}:</Text>
-              <Text style={styles.value}>{topVisitantes[2]?.guestNumber || ''}</Text>
-            </View>
-            <Text style={styles.buttonText}>============================================</Text>
-            <Text style={styles.buttonText}>============================================</Text>
           </>
 
         )}
