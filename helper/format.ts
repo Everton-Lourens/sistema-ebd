@@ -4,7 +4,8 @@ export const formatMoneytoInt = (number: string): number => {
 }
 
 export const formatToCurrency = (stringNumber: string | number) => {
-    const input = String(stringNumber)?.replace(/[^\d]/g, '');
+    if (!stringNumber && stringNumber != '0') return '';
+    const input = String(stringNumber)?.replace(/[^\d]/g, '') || '0';
     if (isNaN(input)) stringNumber = ''
     else {
         const number = parseInt(input, 10) / 100;

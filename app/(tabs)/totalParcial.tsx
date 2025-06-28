@@ -28,35 +28,31 @@ type DataItem = {
   offersNumber: string;
 };
 
-export default function Resumo() {
-  const [resumo, setResumo] = useState(resumoInit);
-  const [classes, setClasses] = useState(initialClasses);
-  const [allCall, setAllCall] = useState({
-    studentNumber: '',
-    presenceNumber: '',
-    magazineNumber: '',
-    bibleNumber: '',
-    guestNumber: '',
-    offersNumber: '',
-  });
-  const [presenceNumber, setPresenceNumber] = useState('');
-  const [studentNumber, setStudentNumber] = useState('');
-  const [bibleNumber, setBibleNumber] = useState('');
-  const [magazineNumber, setMagazineNumber] = useState('');
-  const [guestNumber, setGuestNumber] = useState('');
-  const [offersNumber, setOffersNumber] = useState('');
-  const [initLoad, setInitLoad] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+const initCall = {
+  studentNumber: '',
+  presenceNumber: '',
+  magazineNumber: '',
+  bibleNumber: '',
+  guestNumber: '',
+  offersNumber: '',
+}
 
-  const [data, setData] = useState<DataItem[]>([]);
-  const [totalCall, setTotalCall] = useState({
+const initTotalCall = {
     totalStudent: 0,
     totalPresence: 0,
     totalBibleNumber: 0,
     totalMagazineNumber: 0,
     totalGuestNumber: 0,
     totalOffersNumber: 0,
-  });
+  }
+
+export default function Resumo() {
+  const [resumo, setResumo] = useState(resumoInit);
+  const [allCall, setAllCall] = useState(initCall);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [data, setData] = useState<DataItem[]>([]);
+  const [totalCall, setTotalCall] = useState(initTotalCall);
 
   useEffect(() => {
     console.log('🌀 isLoading mudou para:', isLoading);
@@ -67,7 +63,6 @@ export default function Resumo() {
   useFocusEffect(
     useCallback(() => {
       setData([]);
-      console.log('🟢 Entrou na tela');
       setIsLoading(true);
 
       getTotalGeral();
@@ -78,7 +73,6 @@ export default function Resumo() {
         });
 
       return () => {
-        console.log('🔴 Saiu da tela');
         setIsLoading(true);
       };
     }, [])
@@ -187,17 +181,9 @@ export default function Resumo() {
 
     function clearData() {
       if (!sameDate) {
-        setTopPresencas([]);
-        setTopOfertas([]);
-        setTopBiblias([]);
-        setTopRevistas([]);
-        setTopVisitantes([]);
         setData([]);
-        setEmpatePresenca(false);
-        setEmpateOfertas(false);
-        setEmpateBiblias(false);
-        setEmpateRevistas(false);
-        setEmpateVisitantes(false);
+        setAllCall(initCall);
+        setTotalCall(initTotalCall);
         return false
       }
     }
@@ -293,7 +279,7 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
   ) : (
     <View style={{ backgroundColor: '#f2f2f2', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
-        Preencha alguma classe para ver o histórico de chamadas das classes
+        {'Faça a chamada de alguma classe\npara ver o histórico de chamadas'}
       </Text>
       <TouchableOpacity style={styles.button} onPress={() => navigate('/')}>
         <Text style={styles.buttonText}>Fazer Chamada</Text>
