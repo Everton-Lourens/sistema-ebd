@@ -295,7 +295,7 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
       <Text style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
         Preencha alguma classe para ver o histórico de chamadas das classes
       </Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigate('/alunos')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigate('/')}>
         <Text style={styles.buttonText}>Fazer Chamada</Text>
       </TouchableOpacity>
     </View>
