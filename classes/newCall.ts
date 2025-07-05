@@ -35,6 +35,46 @@ export class NewCall {
         this.guestNumber = guestNumber;
         this.offersNumber = offersNumber;
     }
+    getAllCalls(className = '') {
+        if (!className) throw new Error("O nome da turma é obrigatório");
+        if (Platform.OS === 'web') {
+            try {
+                const date = new Date().toISOString();
+                function getDateOnly(isoString: string) {
+                    return isoString.split('T')[0];
+                }
+                const keys = Object.keys(localStorage);
+                const calls = keys.filter(key => key.startsWith(`call_${getDateOnly(date)}_${clsseName}`))
+                    .map(key => JSON.parse(localStorage.getItem(key) || '{}'));
+                return Promise.resolve(calls);
+            } catch (error) {
+                console.error('Error getting all calls', error);
+                return Promise.reject(error);
+            }
+        } else {
+            return AsyncStorage.getAllKeys()
+                .then(keys => keys.filter(key => key.startsWith(`call_${new Date().toISOString().split('T')[0]}_${clsseName}`)))
+                .then(filteredKeys => AsyncStorage.multiGet(filteredKeys))
+                .then(calls => calls.map(([key, value]) => JSON.parse(value || '{}')))
+                .catch(error => {
+                    console.error('Error getting all calls', error);
+                    throw error;
+                });
+        }
+    }
+    static getAllCalls(className = '') {
+        if (!className) throw new Error("O nome da turma é obrigatório");
+        return AsyncStorage.getItem(`call_${new Date().toISOString().split('T')[0]}_${className}`)
+            .then(value => JSON.parse(value || '{}'))
+            .catch(error => {
+                console.error('Error getting all calls', error);
+                throw error;
+            });
+    }
+    static saveAllCalls(className = '', allCalls = {}) {
+        if (!className || Object.keys(allCalls).length === 0) throw new Error("O nome da turma é obrigatório");
+        return AsyncStorage.setItem(`call_${new Date().toISOString().split('T')[0]}_${className}`, JSON.stringify(allCalls))
+    }
     save() {
         if (!this.className || !this.studentNumber || !this.presenceNumber || !this.bibleNumber || !this.magazineNumber || !this.guestNumber || !this.offersNumber) {
             throw new Error(

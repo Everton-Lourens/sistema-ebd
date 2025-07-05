@@ -1,5 +1,5 @@
 import { NewCall } from '@/classes/newCall';
-import { Student } from '@/classes/newStudent';
+import { Student } from '@/classes/student';
 import { initialClasses } from '@/constants/ClassName';
 import { formatToCurrency } from '@/helper/format';
 import { useFocusEffect } from 'expo-router';

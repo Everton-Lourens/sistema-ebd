@@ -1,5 +1,6 @@
+import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
-import { Student } from '@/classes/newStudent';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { initialClasses } from '@/constants/ClassName';
 import { formatToCurrency } from '@/helper/format';
 import { useFocusEffect } from 'expo-router';
@@ -40,7 +41,8 @@ export default function App() {
   const [initLoad, setInitLoad] = useState(true);
   const [name, setName] = useState('');
   const [popUpNewStudent, setPopUpNewStudent] = useState(false);
-  const [allStudents, setAllStudents] = useState<Student[]>([]);
+  const [allStudents, setAllStudents] = useState<MyClass[]>([]);
+  const [countStudents, setCountStudents] = useState(0);
   const [totalCall, setTotalCall] = useState({
     totalStudent: 0,
     totalPresence: 0,
@@ -60,29 +62,41 @@ export default function App() {
 
       if (field === 'present') {
         const newPresent = !current.present;
-
-        return {
-          ...prev,
-          [id]: {
-            present: newPresent,
-            bible: newPresent ? current.bible : false,
-            magazine: newPresent ? current.magazine : false,
-          },
-        };
+        if (!current.present)
+          return {
+            ...prev,
+            [id]: {
+              present: newPresent,
+              bible: newPresent ? current.bible : false,
+              magazine: newPresent ? current.magazine : false,
+              date: new Date().toISOString().split('T')[0],
+            },
+          };
       }
 
       // Se a presença estiver desmarcada, não altera bíblia nem revista
       if (!current.present) return prev;
 
-      return {
+      const allCalls = {
         ...prev,
         [id]: {
           ...current,
           [field]: !current[field],
         },
       };
+
+      const updatedCalls = Object.fromEntries(
+        Object.entries(allCalls).filter(([_, value]) => value.present)
+      );
+      return updatedCalls;
     });
   };
+
+  useEffect(() => {
+    if (selectedClass?.name) {
+      MyClass.editClassStudents(selectedClass?.name || '', attendance);
+    }
+  }, [attendance]);
 
   const showAlert = (message: string) => {
     if (Platform.OS !== 'web') {
@@ -143,7 +157,7 @@ export default function App() {
 
     return Promise.all(promises).then(() => {
       newCall.className = 'TOTAL_GERAL';
-      newCall.studentNumber = totalStudent.toString();
+      newCall.studentNumber = MyClass.toString();
       newCall.presenceNumber = totalPresence.toString();
       newCall.bibleNumber = totalBibleNumber.toString();
       newCall.magazineNumber = totalMagazineNumber.toString();
@@ -197,15 +211,17 @@ export default function App() {
   const getStudentList = (className = '') => {
     if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
     setAllStudents([]);
-    Student.getStudents(className)
+    MyClass.getStudents(className)
       .then((students: Student[] | JSON) => {
         if (Array.isArray(students) && students.length === 0) return;
         setAllStudents(Array.isArray(students) ? students : Object.values(students));
+        setCountStudents(Object.values(students).length);
       })
   }
   const addNewStudent = () => {
     try {
-      Student.getStudents(selectedClass.name)
+      if (!selectedClass?.name) return showAlert('Selecione uma turma');
+      MyClass.getStudents(selectedClass.name)
         .then((students: Student[] | JSON) => {
           const studentNames = Array.isArray(students) ? students.map((student: Student) => student.name) : Object.values(students).map((student: Student) => student.name);
           if (studentNames.includes(name)) {
@@ -215,9 +231,12 @@ export default function App() {
             const newStudent = {
               id: uuid.v4(),
               name,
+              present: false,
+              bible: false,
+              magazine: false,
               className: selectedClass.name,
             };
-            Student.addStudent(newStudent).then((studentsList: Student[]) => {
+            MyClass.addStudent(newStudent).then((studentsList: Student[]) => {
               showAlert(`Aluno "${name}" adicionado!`);
               setName('');
               setPopUpNewStudent(false);
@@ -269,8 +288,23 @@ export default function App() {
   useEffect(() => {
     if (selectedClassId) {
       getStudentList(selectedClass.name);
+      MyClass.getClassDetail(selectedClass.name).then((detail) => {
+        setGuestNumber(detail?.guestNumber || '');
+        setOffersNumber(detail?.offersNumber || '');
+      });
     }
   }, [selectedClassId, selectedClass]);
+
+  useEffect(() => {
+    if (selectedClass?.name) {
+      MyClass.editClassDetail(selectedClass.name,
+        {
+          guestNumber,
+          offersNumber
+        })
+    }
+  }, [guestNumber, offersNumber]);
+
 
   return (
     <View style={styles.container}>
@@ -326,11 +360,35 @@ export default function App() {
           }}>
             <Text style={styles.back}>← Voltar</Text>
           </TouchableOpacity>
+          <Text style={styles.title}>{selectedClass?.name}</Text>
           <Button
             title="Adicionar Aluno"
             onPress={() => setPopUpNewStudent(true)}
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Qtd. de visitantes"
+            placeholderTextColor="gray"
+            value={guestNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              setGuestNumber(onlyNumbers);
+            }}
+            keyboardType="numeric"
+          />
 
+          <TextInput
+            style={styles.input}
+            placeholder="Ofertas"
+            placeholderTextColor="gray"
+            value={offersNumber}
+            onChangeText={(text) => {
+              const onlyNumbers = text.replace(/[^0-9]/g, '');
+              const formatted = formatToCurrency(onlyNumbers)
+              setOffersNumber(formatted);
+            }}
+            keyboardType="numeric"
+          />
           <FlatList
             data={allStudents}
             keyExtractor={item => item?.id}
@@ -380,7 +438,9 @@ export default function App() {
                         thumbColor={studentData.magazine ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#ccc"
                       />
-
+                        <TouchableOpacity>
+                          <IconSymbol name="minus.circle.fill" size={20} color="red" />
+                        </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -388,86 +448,7 @@ export default function App() {
             }}
           />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Quantidade de Alunos"
-            placeholderTextColor="gray"
-            value={studentNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              setStudentNumber(onlyNumbers);
-            }}
-            keyboardType="numeric"
-          />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Quantidade de Presenças"
-            placeholderTextColor="gray"
-            value={presenceNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              setPresenceNumber(onlyNumbers);
-            }}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Visitantes"
-            placeholderTextColor="gray"
-            value={guestNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              setGuestNumber(onlyNumbers);
-            }}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Bílias"
-            placeholderTextColor="gray"
-            value={bibleNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              setBibleNumber(onlyNumbers);
-              /*
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              const presences = getNumberPresence(selectedClass)
-              if (Number(onlyNumbers) <= presences)
-                setBibleNumber(onlyNumbers);
-              else
-                setBibleNumber('');
-              */
-            }}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Revistas"
-            placeholderTextColor="gray"
-            value={magazineNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              setMagazineNumber(onlyNumbers);
-            }}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Ofertas"
-            placeholderTextColor="gray"
-            value={offersNumber}
-            onChangeText={(text) => {
-              const onlyNumbers = text.replace(/[^0-9]/g, '');
-              const formatted = formatToCurrency(onlyNumbers)
-              setOffersNumber(formatted);
-            }}
-            keyboardType="numeric"
-          />
-          <Button
-            title="Enviar"
-            onPress={() => handleNewCall(selectedClass?.name)}
-          />
         </>
       )}
     </View>
