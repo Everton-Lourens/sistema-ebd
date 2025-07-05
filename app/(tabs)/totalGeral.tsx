@@ -121,7 +121,7 @@ export default function Resumo() {
     setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
     setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
   }
-console.log(JSON.stringify(topPresencas, null, 2));
+  console.log(JSON.stringify(topPresencas, null, 2));
   useEffect(() => {
     setEmpatePresenca(
       (Number(topPresencas[0]?.porcentagem) > 0 &&
@@ -329,12 +329,13 @@ Resumo - *${new Date().toLocaleDateString('pt-BR')}*
 
 *=======================*
 Total Geral:
-Total de Alunos: *${resumo.studentNumber || ''}*
-Presentes: *${resumo.presenceNumber || ''}*
+Matriculados: *${resumo.studentNumber || ''}*
 Ausentes: *${resumo.studentNumber - resumo.presenceNumber || ''}*
+Presentes: *${resumo.presenceNumber || ''}*
+Visitantes: *${resumo.guestNumber || ''}*
+Total: *${resumo.presenceNumber + resumo.guestNumber || ''}*
 Bíblias: *${resumo.bibleNumber || ''}*
 Revistas: *${resumo.magazineNumber || ''}*
-Visitantes: *${resumo.guestNumber || ''}*
 Ofertas: *${formatToCurrency(resumo.offersNumber)}*
 Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
 *=======================*
@@ -382,16 +383,24 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
           <>
             <Text style={styles.title}>{item?.className}</Text>
             <View style={styles.item}>
-              <Text style={styles.label}>Total de Alunos:</Text>
+              <Text style={styles.label}>Matriculados:</Text>
               <Text style={styles.value}>{item?.studentNumber}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Ausentes:</Text>
+              <Text style={styles.value}>{Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Presentes:</Text>
               <Text style={styles.value}>{item?.presenceNumber}</Text>
             </View>
             <View style={styles.item}>
-              <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)}</Text>
+              <Text style={styles.label}>Visitantes:</Text>
+              <Text style={styles.value}>{item?.guestNumber}</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={styles.label}>Total:</Text>
+              <Text style={styles.value}>{(Number(item?.presenceNumber || 0) + Number(item?.guestNumber || 0)) || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
@@ -400,10 +409,6 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
             <View style={styles.item}>
               <Text style={styles.label}>Revistas:</Text>
               <Text style={styles.value}>{item?.magazineNumber}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.guestNumber}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>

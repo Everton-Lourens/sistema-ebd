@@ -212,12 +212,13 @@ export default function Resumo() {
     const texto = `
 Resumo ${item.title} - *${new Date().toLocaleDateString('pt-BR')}*
 
-Total de Alunos: *${allCall[item.title]?.studentNumber || 0}*
-Presentes: *${allCall[item.title]?.presenceNumber || 0}*
+Matriculados: *${allCall[item.title]?.studentNumber || 0}*
 Ausentes: *${allCall[item.title]?.studentNumber - allCall[item.title]?.presenceNumber || 0}*
+Presentes: *${allCall[item.title]?.presenceNumber || 0}*
+Visitantes: *${allCall[item.title]?.guestNumber || 0}*
+Total: *${(allCall[item.title]?.presenceNumber || 0) + (allCall[item.title]?.guestNumber || 0)}*
 Bíblias: *${allCall[item.title]?.bibleNumber || 0}*
 Revistas: *${allCall[item.title]?.magazineNumber || 0}*
-Visitantes: *${allCall[item.title]?.guestNumber || 0}*
 Ofertas: *${formatToCurrency(allCall[item.title]?.offersNumber || 0)}*
 Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall[item.title]?.studentNumber || '') || 0}%*
   `.trim();
@@ -238,13 +239,21 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
               <Text style={styles.label}>Matriculados:</Text>
               <Text style={styles.value}>{item?.studentNumber || 0}</Text>
             </View>
+                        <View style={styles.item}>
+              <Text style={styles.label}>Ausentes:</Text>
+              <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
+            </View>
             <View style={styles.item}>
               <Text style={styles.label}>Presentes:</Text>
               <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
             </View>
+                        <View style={styles.item}>
+              <Text style={styles.label}>Visitantes:</Text>
+              <Text style={styles.value}>{item?.guestNumber || 0}</Text>
+            </View>
             <View style={styles.item}>
-              <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
+              <Text style={styles.label}>Total:</Text>
+              <Text style={styles.value}>{(Number(item?.presenceNumber || 0) + Number(item?.guestNumber || 0)) || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
@@ -253,10 +262,6 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
             <View style={styles.item}>
               <Text style={styles.label}>Revistas:</Text>
               <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.guestNumber || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>

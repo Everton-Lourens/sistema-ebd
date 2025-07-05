@@ -11,7 +11,6 @@ import {
   Modal,
   Platform,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -52,38 +51,6 @@ export default function App() {
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
 
-  const [attendance, setAttendance] = useState({});
-
-  const toggleSwitch = (id: string, field: 'present' | 'bible' | 'magazine') => {
-    setAttendance(prev => {
-      const current = prev[id] || { present: false, bible: false, magazine: false };
-
-      if (field === 'present') {
-        const newPresent = !current.present;
-
-        return {
-          ...prev,
-          [id]: {
-            present: newPresent,
-            bible: newPresent ? current.bible : false,
-            magazine: newPresent ? current.magazine : false,
-          },
-        };
-      }
-
-      // Se a presença estiver desmarcada, não altera bíblia nem revista
-      if (!current.present) return prev;
-
-      return {
-        ...prev,
-        [id]: {
-          ...current,
-          [field]: !current[field],
-        },
-      };
-    });
-  };
-
   const showAlert = (message: string) => {
     if (Platform.OS !== 'web') {
       Alert.alert(message, '', [{ text: 'OK' }]);
@@ -100,7 +67,7 @@ export default function App() {
     let totalGuestNumber = 0;
     let totalOffersNumber = 0;
     const newCall = new NewCall();
-
+    getStudentList();
     const promises = initialClasses.map(({ name }) => {
       newCall.className = name;
       return newCall.getCall(name).then(data => {
@@ -194,13 +161,16 @@ export default function App() {
     showAlert('Salvo com sucesso');
   };
 
-  const getStudentList = (className = '') => {
-    if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
-    setAllStudents([]);
-    Student.getStudents(className)
+  const getStudentList = () => {
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    Student.getStudents(selectedClass.name)
       .then((students: Student[] | JSON) => {
         if (Array.isArray(students) && students.length === 0) return;
         setAllStudents(Array.isArray(students) ? students : Object.values(students));
+        const studentNames = Array.isArray(students) ? students.map((student: Student) => student.name) : Object.values(students).map((student: Student) => student.name);
+        if (studentNames.includes(name)) {
+          return showAlert('Aluno já cadastrado!');
+        }
       })
   }
   const addNewStudent = () => {
@@ -211,18 +181,16 @@ export default function App() {
           if (studentNames.includes(name)) {
             return showAlert('Aluno já cadastrado!');
           } else {
-            setAllStudents([]);
             const newStudent = {
               id: uuid.v4(),
               name,
               className: selectedClass.name,
             };
-            Student.addStudent(newStudent).then((studentsList: Student[]) => {
-              showAlert(`Aluno "${name}" adicionado!`);
-              setName('');
-              setPopUpNewStudent(false);
-              getStudentList(selectedClass.name);
-            });
+            const studentsList = Student.addStudent(newStudent);
+            setAllStudents(Array.isArray(studentsList) ? studentsList : Object.values(studentsList));
+            showAlert(`Aluno "${name}" adicionado a turma "${selectedClass.name}"!`);
+            setName('');
+            setPopUpNewStudent(false);
           }
         })
     } catch (error) {
@@ -266,14 +234,9 @@ export default function App() {
     }, [])
   );
 
-  useEffect(() => {
-    if (selectedClassId) {
-      getStudentList(selectedClass.name);
-    }
-  }, [selectedClassId, selectedClass]);
-
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>{selectedClass.name}</Text>
       {!selectedClassId ? (
         <>
           <Text style={styles.subtitle}>Chamada dos Alunos</Text>
@@ -334,60 +297,31 @@ export default function App() {
           <FlatList
             data={allStudents}
             keyExtractor={item => item?.id}
-            extraData={attendance}
-            renderItem={({ item }) => {
-              const studentData = attendance[item.id] || {
-                present: false,
-                bible: false,
-                magazine: false,
-              };
-
-              return (
-                <View style={styles.studentItem}>
-                  <Text style={styles.studentName}>{item?.name}</Text>
-                  <View style={styles.checkboxGroup}>
-                    <View style={styles.checkboxItem}>
-                      <Text>Presente</Text>
-                      <Switch
-                        value={studentData.present}
-                        onValueChange={() => toggleSwitch(item.id, 'present')}
-                        trackColor={{ false: '#fc9797', true: '#00820b' }}
-                        thumbColor={studentData.present ? '#f4f3f4' : '#f4f3f4'}
-                        ios_backgroundColor="#ccc"
-                      />
-                    </View>
-
-                    <View style={styles.checkboxItem}>
-                      <Text>Bíblia</Text>
-                      <Switch
-                        value={studentData.bible}
-                        onValueChange={() => toggleSwitch(item.id, 'bible')}
-                        disabled={!studentData.present}
-                        trackColor={studentData.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
-                        thumbColor={studentData.bible ? '#f4f3f4' : '#f4f3f4'}
-                        ios_backgroundColor="#ccc"
-                      />
-
-                    </View>
-
-                    <View style={styles.checkboxItem}>
-                      <Text>Revista</Text>
-                      <Switch
-                        value={studentData.magazine}
-                        onValueChange={() => toggleSwitch(item.id, 'magazine')}
-                        disabled={!studentData.present}
-                        trackColor={studentData.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
-                        thumbColor={studentData.magazine ? '#f4f3f4' : '#f4f3f4'}
-                        ios_backgroundColor="#ccc"
-                      />
-
-                    </View>
-                  </View>
+            extraData={allStudents}
+            renderItem={({ item }) => (
+              <View style={styles.studentItem}>
+                <Text style={styles.studentName}>{item?.name}</Text>
+                <View style={styles.buttons}>
+                  <TouchableOpacity
+                    style={[styles.presenceButton, styles.present]}
+                    onPress={() => {
+                      // Handle presence logic here
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Presente</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.presenceButton, styles.absent]}
+                    onPress={() => {
+                      // Handle absence logic here
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Ausente</Text>
+                  </TouchableOpacity>
                 </View>
-              );
-            }}
+              </View>
+            )}
           />
-
           <TextInput
             style={styles.input}
             placeholder="Quantidade de Alunos"
@@ -495,7 +429,10 @@ const styles = StyleSheet.create({
   back: {
     color: '#007AFF', marginBottom: 10, fontSize: 16,
   },
-
+  studentItem: {
+    padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc',
+  },
+  studentName: { fontSize: 16, marginBottom: 5 },
   buttons: { flexDirection: 'row', gap: 10 },
   presenceButton: {
     padding: 6, paddingHorizontal: 12,
@@ -510,28 +447,4 @@ const styles = StyleSheet.create({
   titlePopUp: { fontSize: 18, marginBottom: 10 },
   inputPopUp: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 15 },
   buttonsPopUp: { flexDirection: 'row', justifyContent: 'space-between' },
-  studentItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-
-  studentName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-
-  checkboxGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-
-  checkboxItem: {
-    alignItems: 'center',
-    gap: 4,
-  },
 });
