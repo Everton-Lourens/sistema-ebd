@@ -1,3 +1,4 @@
+import { MyClass } from '@/app/(tabs)/class';
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
 import { compareDate } from '@/helper/date';
@@ -6,7 +7,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const resumoInit = {
   studentNumber: 0,
@@ -38,21 +39,47 @@ const initCall = {
 }
 
 const initTotalCall = {
-    totalStudent: 0,
-    totalPresence: 0,
-    totalBibleNumber: 0,
-    totalMagazineNumber: 0,
-    totalGuestNumber: 0,
-    totalOffersNumber: 0,
-  }
+  totalStudent: 0,
+  totalPresence: 0,
+  totalBibleNumber: 0,
+  totalMagazineNumber: 0,
+  totalGuestNumber: 0,
+  totalOffersNumber: 0,
+}
 
 export default function Resumo() {
   const [resumo, setResumo] = useState(resumoInit);
   const [allCall, setAllCall] = useState(initCall);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [allStudents, setAllStudents] = useState<MyClass[]>([]);
   const [data, setData] = useState<DataItem[]>([]);
   const [totalCall, setTotalCall] = useState(initTotalCall);
+  const [countStudents, setCountStudents] = useState(0);
+
+  const showAlert = (message: string) => {
+    if (Platform.OS !== 'web') {
+      Alert.alert(message, '', [{ text: 'OK' }]);
+    } else {
+      window.alert(message);
+    }
+  };
+
+  const getStudentList = (className = '') => {
+    const allStudents = MyClass.getAllStudents()
+    if (Array.isArray(allStudents) && allStudents.length > 0) {
+      //setAllStudents(allStudents);
+      //setCountStudents(allStudents.length);
+      return;
+    }
+    if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
+    setAllStudents([]);
+    MyClass.getStudents(className)
+      .then((students: MyClass[] | JSON) => {
+        if (Array.isArray(students) && students.length === 0) return;
+        setAllStudents(Array.isArray(students) ? students : Object.values(students));
+        setCountStudents(Object.values(students).length);
+      })
+  }
 
   useEffect(() => {
     console.log('🌀 isLoading mudou para:', isLoading);
@@ -62,18 +89,10 @@ export default function Resumo() {
 
   useFocusEffect(
     useCallback(() => {
-      setData([]);
-      setIsLoading(true);
-
-      getTotalGeral();
-
-      updateAllClasses()
-        .finally(() => {
-          setIsLoading(false);
-        });
-
+      setAllStudents([]);
+      getStudentList();
       return () => {
-        setIsLoading(true);
+        setAllStudents([]);
       };
     }, [])
   );
@@ -239,7 +258,7 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
               <Text style={styles.label}>Matriculados:</Text>
               <Text style={styles.value}>{item?.studentNumber || 0}</Text>
             </View>
-                        <View style={styles.item}>
+            <View style={styles.item}>
               <Text style={styles.label}>Ausentes:</Text>
               <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
             </View>
@@ -247,7 +266,7 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
               <Text style={styles.label}>Presentes:</Text>
               <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
             </View>
-                        <View style={styles.item}>
+            <View style={styles.item}>
               <Text style={styles.label}>Visitantes:</Text>
               <Text style={styles.value}>{item?.guestNumber || 0}</Text>
             </View>

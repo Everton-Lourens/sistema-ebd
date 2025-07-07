@@ -1,4 +1,4 @@
-import { MyClass } from '@/classes/class';
+import { MyClass } from '@/app/(tabs)/class';
 import { NewCall } from '@/classes/newCall';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { initialClasses } from '@/constants/ClassName';
@@ -54,49 +54,32 @@ export default function App() {
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
 
-  const [attendance, setAttendance] = useState({});
-
-  const toggleSwitch = (id: string, field: 'present' | 'bible' | 'magazine') => {
-    setAttendance(prev => {
-      const current = prev[id] || { present: false, bible: false, magazine: false };
-
-      if (field === 'present') {
-        const newPresent = !current.present;
-        if (!current.present)
-          return {
-            ...prev,
-            [id]: {
-              present: newPresent,
-              bible: newPresent ? current.bible : false,
-              magazine: newPresent ? current.magazine : false,
-              date: new Date().toISOString().split('T')[0],
-            },
-          };
-      }
-
-      // Se a presença estiver desmarcada, não altera bíblia nem revista
-      if (!current.present) return prev;
-
-      const allCalls = {
-        ...prev,
-        [id]: {
-          ...current,
-          [field]: !current[field],
-        },
-      };
-
-      const updatedCalls = Object.fromEntries(
-        Object.entries(allCalls).filter(([_, value]) => value.present)
-      );
-      return updatedCalls;
+  const toggleSwitch = (student: any, field: 'present' | 'bible' | 'magazine') => {
+    const newCall = {
+      present: field === 'present' ? !student.present : student.present,
+      bible:
+        !student.present
+          ? false
+          : field === 'bible'
+            ? !student.bible
+            : student.bible,
+      magazine:
+        !student.present
+          ? false
+          : field === 'magazine'
+            ? !student.magazine
+            : student.magazine,
+      className: student.className,
+      id: student.id,
+      name: student.name,
+    };
+    MyClass.callStudents(selectedClass?.name || '', newCall).then(() => {
+      setAllStudents(prev => prev.map(s => s.id === student.id ? newCall : s));
+    }).catch(e => {
+      showAlert('Erro ao atualizar presença');
+      console.log(e)
     });
   };
-
-  useEffect(() => {
-    if (selectedClass?.name) {
-      MyClass.editClassStudents(selectedClass?.name || '', attendance);
-    }
-  }, [attendance]);
 
   const showAlert = (message: string) => {
     if (Platform.OS !== 'web') {
@@ -164,7 +147,6 @@ export default function App() {
       newCall.guestNumber = totalGuestNumber.toString();
       newCall.offersNumber = totalOffersNumber.toString();
       newCall.save();
-      console.log('@@@@@@@@@@@@@@ FINALIZADO @@@@@@@@@@@@@@@@@@');
     });
   }
 
@@ -211,43 +193,37 @@ export default function App() {
   const getStudentList = (className = '') => {
     if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
     setAllStudents([]);
-    MyClass.getStudents(className)
-      .then((students: Student[] | JSON) => {
-        if (Array.isArray(students) && students.length === 0) return;
-        setAllStudents(Array.isArray(students) ? students : Object.values(students));
-        setCountStudents(Object.values(students).length);
+    MyClass.getAllStudents(className)
+      .then((students: any) => {
+        if (!students || (Array.isArray(students) && students.length === 0)) return;
+        setAllStudents(Array.isArray(students[className]) ? students[className] : []);
+        setCountStudents(Array.isArray(students[className]) ? students[className].length : 0);
       })
   }
   const addNewStudent = () => {
-    try {
-      if (!selectedClass?.name) return showAlert('Selecione uma turma');
-      MyClass.getStudents(selectedClass.name)
-        .then((students: Student[] | JSON) => {
-          const studentNames = Array.isArray(students) ? students.map((student: Student) => student.name) : Object.values(students).map((student: Student) => student.name);
-          if (studentNames.includes(name)) {
-            return showAlert('Aluno já cadastrado!');
-          } else {
-            setAllStudents([]);
-            const newStudent = {
-              id: uuid.v4(),
-              name,
-              present: false,
-              bible: false,
-              magazine: false,
-              className: selectedClass.name,
-            };
-            MyClass.addStudent(newStudent).then((studentsList: Student[]) => {
-              showAlert(`Aluno "${name}" adicionado!`);
-              setName('');
-              setPopUpNewStudent(false);
-              getStudentList(selectedClass.name);
-            });
-          }
-        })
-    } catch (error) {
-      console.trace(error);
+    if (!selectedClass?.name) return showAlert('Selecione uma turma');
+    setAllStudents([]);
+    const newStudent = {
+      id: uuid.v4(),
+      className: selectedClass.name,
+      name,
+      present: false,
+      bible: false,
+      magazine: false,
+    };
+    MyClass.addStudentInClass(newStudent).then((response) => {
+      if (response) {
+        showAlert(`Aluno "${name}" adicionado!`);
+        setName('');
+        setPopUpNewStudent(false);
+        getStudentList(selectedClass.name);
+      } else {
+        return showAlert('Erro ao adicionar aluno');
+      }
+    }).catch((err) => {
+      console.log(err)
       return showAlert('Erro ao adicionar aluno');
-    }
+    });
   }
 
   const isCalled = (className: string = ''): boolean => {
@@ -282,6 +258,9 @@ export default function App() {
       updateAllClasses().finally(() => {
         console.log('Atualização finalizada');
       });
+      return () => {
+        setAllStudents([]);
+      }
     }, [])
   );
 
@@ -392,14 +371,8 @@ export default function App() {
           <FlatList
             data={allStudents}
             keyExtractor={item => item?.id}
-            extraData={attendance}
+            extraData={allStudents}
             renderItem={({ item }) => {
-              const studentData = attendance[item.id] || {
-                present: false,
-                bible: false,
-                magazine: false,
-              };
-
               return (
                 <View style={styles.studentItem}>
                   <Text style={styles.studentName}>{item?.name}</Text>
@@ -407,10 +380,10 @@ export default function App() {
                     <View style={styles.checkboxItem}>
                       <Text>Presente</Text>
                       <Switch
-                        value={studentData.present}
-                        onValueChange={() => toggleSwitch(item.id, 'present')}
+                        value={item.present}
+                        onValueChange={() => toggleSwitch(item, 'present')}
                         trackColor={{ false: '#fc9797', true: '#00820b' }}
-                        thumbColor={studentData.present ? '#f4f3f4' : '#f4f3f4'}
+                        thumbColor={item.present ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#ccc"
                       />
                     </View>
@@ -418,11 +391,11 @@ export default function App() {
                     <View style={styles.checkboxItem}>
                       <Text>Bíblia</Text>
                       <Switch
-                        value={studentData.bible}
-                        onValueChange={() => toggleSwitch(item.id, 'bible')}
-                        disabled={!studentData.present}
-                        trackColor={studentData.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
-                        thumbColor={studentData.bible ? '#f4f3f4' : '#f4f3f4'}
+                        value={item.bible && item.present}
+                        onValueChange={() => toggleSwitch(item, 'bible')}
+                        disabled={!item.present}
+                        trackColor={item.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
+                        thumbColor={item.bible ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#ccc"
                       />
 
@@ -431,16 +404,16 @@ export default function App() {
                     <View style={styles.checkboxItem}>
                       <Text>Revista</Text>
                       <Switch
-                        value={studentData.magazine}
-                        onValueChange={() => toggleSwitch(item.id, 'magazine')}
-                        disabled={!studentData.present}
-                        trackColor={studentData.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
-                        thumbColor={studentData.magazine ? '#f4f3f4' : '#f4f3f4'}
+                        value={item.magazine && item.present}
+                        onValueChange={() => toggleSwitch(item, 'magazine')}
+                        disabled={!item.present}
+                        trackColor={item.present ? { false: '#fc9797', true: '#00820b' } : { false: '#ccc', true: '#ccc' }}
+                        thumbColor={item.magazine ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#ccc"
                       />
-                        <TouchableOpacity>
-                          <IconSymbol name="minus.circle.fill" size={20} color="red" />
-                        </TouchableOpacity>
+                      <TouchableOpacity>
+                        <IconSymbol name="minus.circle.fill" size={20} color="red" />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
