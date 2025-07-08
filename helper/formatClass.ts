@@ -54,8 +54,8 @@ export function formatGeralClass(rawData: object | string) {
    if (!rawData) return null;
    try {
       const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
-
       const totalMatriculados = Object.values(data).reduce((acc, curr) => acc + curr.enrolled, 0);
+      const totalAusentes = Object.values(data).reduce((acc, curr) => acc + curr.absent, 0);
       const totalPresentes = Object.values(data).reduce((acc, curr) => acc + curr.present, 0);
       const totalVisitantes = Object.values(data).reduce((acc, curr) => acc + Number(curr.visitors), 0);
       const totalOfertas = Object.values(data).reduce((acc, curr) => {
@@ -71,17 +71,57 @@ export function formatGeralClass(rawData: object | string) {
 
       const result = {
          enrolled: totalMatriculados,
+         absent: totalAusentes,
          present: totalPresentes,
          visitors: totalVisitantes,
          total: Number(totalPresentes) + Number(totalVisitantes),
          bibles: totalBiblias,
          magazines: totalRevistas,
          offers: formatToCurrency(Number(totalOfertas)),
-         attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2) + '%'
+         attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2) + '%',
       };
+
+      try {
+         result.rankingEnrolled = getRanking(data, 'enrolled');
+         result.rankingPresent = getRanking(data, 'present')
+         result.rankingVisitors = getRanking(data, 'visitors')
+         result.rankingTotal = getRanking(data, 'total')
+         result.rankingBibles = getRanking(data, 'bibles')
+         result.rankingMagazines = getRanking(data, 'magazines')
+         result.rankingOffers = getRanking(data, 'offers')
+         result.rankingAttendancePercentage = getRanking(data, 'attendancePercentage')
+
+      } catch (e) {
+         console.log(e);
+      }
+      console.log(result);
       return [result];
    } catch (e) {
       //console.log(e);
       return null
    }
 }
+
+
+export const getRanking = (data: object, campo: string, className: string) => {
+
+   return Object.entries(data)
+      .sort((a, b) => {
+         const valueA = a[1][campo] || '';
+         const valueB = b[1][campo] || '';
+         const numA = Number(String(valueA.replace(/[^\d]/g, '')) || 0);
+         const numB = Number(String(valueB.replace(/[^\d]/g, '')) || 0);
+         return numB - numA;
+      })
+      .slice(0, 3)
+      .map(([className, values], index) => ({
+         ...values,
+         className,
+         colocacao:
+            index === 0
+               ? '1º Lugar'
+               : index === 1
+                  ? '2º Lugar'
+                  : '3º Lugar',
+      }));
+};

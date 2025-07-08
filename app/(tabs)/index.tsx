@@ -74,7 +74,8 @@ export default function App() {
       name: student.name,
     };
     MyClass.callStudents(selectedClass?.name || '', newCall).then(() => {
-      setAllStudents(prev => prev.map(s => s.id === student.id ? newCall : s)); @@@@@@ fazer a oferta apagar se não tiver presença
+      setAllStudents(prev => prev.map(s => s.id === student.id ? newCall : s));
+      //@@@@@@ fazer a oferta apagar se não tiver presença
     }).catch(e => {
       showAlert('Erro ao atualizar presença');
       console.log(e)
