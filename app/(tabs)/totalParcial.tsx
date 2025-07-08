@@ -9,6 +9,19 @@ import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+interface IDataSummary {
+  className: string;
+  enrolled: number;
+  absent: number;
+  present: number;
+  visitors: string;
+  total: number;
+  bibles: number;
+  magazines: number;
+  offers: string;
+  attendancePercentage: string;
+}
+
 const resumoInit = {
   studentNumber: 0,
   presenceNumber: 0,
@@ -51,7 +64,7 @@ export default function Resumo() {
   const [resumo, setResumo] = useState(resumoInit);
   const [allCall, setAllCall] = useState(initCall);
   const [isLoading, setIsLoading] = useState(true);
-  const [allStudents, setAllStudents] = useState<MyClass[]>([]);
+  const [allStudents, setAllStudents] = useState<IDataSummary[]>([]);
   const [data, setData] = useState<DataItem[]>([]);
   const [totalCall, setTotalCall] = useState(initTotalCall);
   const [countStudents, setCountStudents] = useState(0);
@@ -64,25 +77,18 @@ export default function Resumo() {
     }
   };
 
-  const getStudentList = (className = '') => {
-    const allStudents = MyClass.getAllStudents()
-    if (Array.isArray(allStudents) && allStudents.length > 0) {
-      //setAllStudents(allStudents);
-      //setCountStudents(allStudents.length);
-      return;
-    }
-    if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
+  const getPartialReport = () => {
     setAllStudents([]);
-    MyClass.getStudents(className)
-      .then((students: MyClass[] | JSON) => {
-        if (Array.isArray(students) && students.length === 0) return;
-        setAllStudents(Array.isArray(students) ? students : Object.values(students));
-        setCountStudents(Object.values(students).length);
+    MyClass.getPartialReport()
+      .then((dataSummary: any) => {
+        if (Array.isArray(dataSummary) && dataSummary.length === 0) return;
+        console.log(dataSummary)
+        setAllStudents(Array.isArray(dataSummary) ? dataSummary : Object.values(dataSummary));
+        setCountStudents(Object.values(dataSummary).length);
       })
   }
 
   useEffect(() => {
-    console.log('🌀 isLoading mudou para:', isLoading);
     setData([]);
     updateAllClasses()
   }, [isLoading]);
@@ -90,7 +96,7 @@ export default function Resumo() {
   useFocusEffect(
     useCallback(() => {
       setAllStudents([]);
-      getStudentList();
+      getPartialReport();
       return () => {
         setAllStudents([]);
       };
@@ -185,7 +191,6 @@ export default function Resumo() {
   function checkDate(oldDate = '') {
     let sameDate = false;
     if (!oldDate) {
-      console.log('Sem data, limpando dados');
       sameDate = false;
       clearData();
       return false;
@@ -245,59 +250,59 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
     Clipboard.setStringAsync(texto);
   };
 
-  return data.length > 0 ? (
+  return allStudents.length > 0 ? (
     <View style={styles.container}>
       <FlatList
-        data={data}
+        data={allStudents}
         style={styles.container}
-        extraData={[data, allCall, isLoading]}
-        renderItem={({ item }) => (
+        extraData={[allStudents]}
+        renderItem={({ item, index }) => (
           <>
-            <Text style={styles.title}>{item?.title}</Text>
+            <Text style={styles.title}>{item?.className || 'ERRO'}</Text>
             <View style={styles.item}>
               <Text style={styles.label}>Matriculados:</Text>
-              <Text style={styles.value}>{item?.studentNumber || 0}</Text>
+              <Text style={styles.value}>{item?.enrolled || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{(Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)) || 0}</Text>
+              <Text style={styles.value}>{item?.absent}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Presentes:</Text>
-              <Text style={styles.value}>{item?.presenceNumber || 0}</Text>
+              <Text style={styles.value}>{item?.present || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.guestNumber || 0}</Text>
+              <Text style={styles.value}>{item?.visitors || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Total:</Text>
-              <Text style={styles.value}>{(Number(item?.presenceNumber || 0) + Number(item?.guestNumber || 0)) || 0}</Text>
+              <Text style={styles.value}>{item?.total || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
-              <Text style={styles.value}>{item?.bibleNumber || 0}</Text>
+              <Text style={styles.value}>{item?.bibles || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Revistas:</Text>
-              <Text style={styles.value}>{item?.magazineNumber || 0}</Text>
+              <Text style={styles.value}>{item?.magazines || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>
-              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
+              <Text style={styles.value}>{formatToCurrency(item?.offers || 0)}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
+              <Text style={styles.value}>{item?.attendancePercentage || 0}%</Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
-              <Text style={styles.buttonText}>Copiar {item?.title}</Text>
+              <Text style={styles.buttonText}>Copiar: {item?.className}</Text>
             </TouchableOpacity>
             <Text style={styles.buttonText}>========================================</Text>
             <Text style={styles.buttonText}>========================================</Text>
           </>
         )}
-        keyExtractor={(item) => item?.title}
+        keyExtractor={(item) => item?.className}
       />
     </View>
   ) : (

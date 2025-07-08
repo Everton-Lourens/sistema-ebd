@@ -74,7 +74,7 @@ export default function App() {
       name: student.name,
     };
     MyClass.callStudents(selectedClass?.name || '', newCall).then(() => {
-      setAllStudents(prev => prev.map(s => s.id === student.id ? newCall : s));
+      setAllStudents(prev => prev.map(s => s.id === student.id ? newCall : s)); @@@@@@ fazer a oferta apagar se não tiver presença
     }).catch(e => {
       showAlert('Erro ao atualizar presença');
       console.log(e)
@@ -193,7 +193,7 @@ export default function App() {
   const getStudentList = (className = '') => {
     if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
     setAllStudents([]);
-    MyClass.getAllStudents(className)
+    MyClass.getAllStudentsInClass(className)
       .then((students: any) => {
         if (!students || (Array.isArray(students) && students.length === 0)) return;
         setAllStudents(Array.isArray(students[className]) ? students[className] : []);
@@ -255,13 +255,11 @@ export default function App() {
 
   useFocusEffect(
     useCallback(() => {
-      updateAllClasses().finally(() => {
-        console.log('Atualização finalizada');
-      });
-      return () => {
+      if (selectedClass?.name) {
         setAllStudents([]);
+        getStudentList(selectedClass?.name)
       }
-    }, [])
+    }, [selectedClassId, selectedClass])
   );
 
   useEffect(() => {
@@ -270,17 +268,17 @@ export default function App() {
       MyClass.getClassDetail(selectedClass.name).then((detail) => {
         setGuestNumber(detail?.guestNumber || '');
         setOffersNumber(detail?.offersNumber || '');
+        getStudentList(selectedClass?.name)
       });
     }
   }, [selectedClassId, selectedClass]);
 
   useEffect(() => {
     if (selectedClass?.name) {
-      MyClass.editClassDetail(selectedClass.name,
-        {
-          guestNumber,
-          offersNumber
-        })
+      MyClass.editClassDetail(selectedClass.name, {
+        guestNumber,
+        offersNumber
+      })
     }
   }, [guestNumber, offersNumber]);
 

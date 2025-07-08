@@ -1,6 +1,8 @@
+import { CLASSES } from '@/constants/ClassName';
+import { formatClass, formatGeralClass } from '@/helper/formatClass';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CLASSES = 'classes';
+const THIS_CLASSES = 'classes';
 export interface StudentData {
     id: string;
     name: string;
@@ -39,7 +41,7 @@ export class MyClass {
             bible: newStudent.bible || false,
             magazine: newStudent.magazine || false,
         };
-        return AsyncStorage.getItem(CLASSES).then((classes) => {
+        return AsyncStorage.getItem(THIS_CLASSES).then((classes) => {
             try {
                 let classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
@@ -47,7 +49,7 @@ export class MyClass {
                     classesList[newStudent.className] = [];
                 }
                 classesList[newStudent.className].push(newStudentData);
-                AsyncStorage.setItem(CLASSES, JSON.stringify(classesList))
+                AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(classesList))
                 AsyncStorage.setItem(`student_${newStudentData.id}`, JSON.stringify({
                     name: newStudentData.name,
                     className: newStudentData.className
@@ -64,10 +66,10 @@ export class MyClass {
             })
     }
 
-    static getAllStudents(className = '') {
+    static getAllStudentsInClass(className = '') {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(CLASSES)
+        return AsyncStorage.getItem(THIS_CLASSES)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -78,10 +80,51 @@ export class MyClass {
             })
     }
 
+    static getAllStudents() {
+        return AsyncStorage.getItem(THIS_CLASSES)
+            .then((classes) => {
+                const classesList =
+                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
+                return Promise.all([
+                    this.getClassDetail(CLASSES.CRIANCA_PEQUENA),
+                    this.getClassDetail(CLASSES.CRIANCA_GRANDE),
+                    this.getClassDetail(CLASSES.ADOLESCENTE),
+                    this.getClassDetail(CLASSES.JOVENS),
+                    this.getClassDetail(CLASSES.SENHORAS),
+                    this.getClassDetail(CLASSES.SENHORES),
+                ]).then((results) => {
+                    try {
+                        Object.entries(CLASSES).forEach(([__, _], index) => {
+                            const className = results[index].details.className
+                            if (classesList[className] && Array.isArray(classesList[className])) {
+                                classesList[className].push(results[index].details);
+                            }
+                        });
+                        return classesList;
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            });
+    }
+
+    static getPartialReport() {
+        return this.getAllStudents().then((res) => {
+            if (!res) return [];
+            return formatClass(res);
+        });
+    }
+    static getGeralReport() {
+        return this.getAllStudents().then((res) => {
+            if (!res) return {};
+            const partialReport = formatClass(res);
+            return formatGeralClass(partialReport ? partialReport : {});
+        });
+    }
     static getStudentsInClass(className = '', id = '') {
         if (!className)
             throw new Error("Nome do aluno e turma obrigatórios.");
-        return AsyncStorage.getItem(CLASSES)
+        return AsyncStorage.getItem(THIS_CLASSES)
             .then((classes) => {
                 const classesList = classes !== null ? JSON.parse(classes) : [];
                 return classesList[className] || [];
@@ -100,13 +143,13 @@ export class MyClass {
             bible: newStudent.bible || false,
             magazine: newStudent.magazine || false,
         };
-        return AsyncStorage.getItem(CLASSES)
+        return AsyncStorage.getItem(THIS_CLASSES)
             .then((classes) => {
                 const classesList = classes !== null ? JSON.parse(classes) : {};
                 if (classesList[newStudent.className] && classesList[newStudent.className][newStudent.id]) {
                     classesList[newStudent.className][newStudent.id] = editStudentData;
                 }
-                AsyncStorage.setItem(CLASSES, JSON.stringify(classesList));
+                AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(classesList));
                 return classesList;
             })
     }
@@ -126,13 +169,13 @@ export class MyClass {
         if (!newStudent.name || !newStudent.className) {
             throw new Error("Nome do aluno e turma obrigatórios.");
         }
-        return AsyncStorage.getItem(CLASSES)
+        return AsyncStorage.getItem(THIS_CLASSES)
             .then((classes) => {
                 return classes !== null ? JSON.parse(classes) : [];
             })
             .then((classesList) => {
                 delete classesList[newStudent.className];
-                AsyncStorage.setItem(CLASSES, JSON.stringify(classesList));
+                AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(classesList));
                 return classesList
             });
     }
@@ -152,6 +195,14 @@ export class MyClass {
         if (!className || !classDetail) {
             throw new Error("Turma e detalhes obrigatórios.");
         }
+        const classDetailData = {
+            guestNumber: classDetail.guestNumber,
+            offersNumber: classDetail.offersNumber
+        };
+        return AsyncStorage.setItem(`${new Date().toISOString().split('T')[0]}_${className}_details`, JSON.stringify(classDetailData))
+            .then(() => {
+                return classDetail;
+            });
     }
 
     static getClassDetail(className: string) {
@@ -160,7 +211,13 @@ export class MyClass {
         }
         return AsyncStorage.getItem(`${new Date().toISOString().split('T')[0]}_${className}_details`)
             .then((classDetail) => {
-                return classDetail !== null ? JSON.parse(classDetail) : {};
+                const newClassDetail = classDetail !== null ? JSON.parse(classDetail) : {};
+                newClassDetail.details = {
+                    className,
+                    guestNumber: newClassDetail?.guestNumber || 0,
+                    offersNumber: newClassDetail?.offersNumber || 'R$ 0,00'
+                };
+                return newClassDetail;
             });
     }
 
@@ -170,7 +227,7 @@ export class MyClass {
 
         this.storageCall(className, newCall);
 
-        return AsyncStorage.getItem(CLASSES)
+        return AsyncStorage.getItem(THIS_CLASSES)
             .then((students) => {
                 const studentsList =
                     students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
@@ -185,7 +242,7 @@ export class MyClass {
                         }
                     });
                 }
-                AsyncStorage.setItem(CLASSES, JSON.stringify(studentsList));
+                AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(studentsList));
                 return studentsList
             });
     }

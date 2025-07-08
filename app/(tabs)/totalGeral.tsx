@@ -6,6 +6,21 @@ import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MyClass } from './class';
+
+interface IDataSummary {
+  className: string;
+  enrolled: number;
+  absent: number;
+  present: number;
+  visitors: string;
+  total: number;
+  bibles: number;
+  magazines: number;
+  offers: string;
+  attendancePercentage: string;
+}
+
 
 const resumoInit = {
   studentNumber: 0,
@@ -51,6 +66,8 @@ export default function Resumo() {
   const [empateVisitantes, setEmpateVisitantes] = useState(false);
   const [dataGeral, setDataGeral] = useState<DataItem[]>([]);
   const [isToday, setIsToday] = useState(true);
+  const [allStudents, setAllStudents] = useState<MyClass[]>([]);
+  const [countStudents, setCountStudents] = useState(0);
   const [totalCall, setTotalCall] = useState({
     totalStudent: 0,
     totalPresence: 0,
@@ -70,6 +87,26 @@ export default function Resumo() {
       }
     })
   }
+
+  const getGeralReport = () => {
+    setAllStudents([]);
+    MyClass.getGeralReport()
+      .then((dataSummary: any) => {
+        if (Array.isArray(dataSummary) && dataSummary.length === 0) return;
+        setAllStudents(Array.isArray(dataSummary) ? dataSummary : Object.values(dataSummary));
+        setCountStudents(Object.values(dataSummary).length);
+      })
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      setAllStudents([]);
+      getGeralReport();
+      return () => {
+        setAllStudents([]);
+      };
+    }, [])
+  );
 
   const getPercentage = (presence: string = '', allStudents: string = ''): number => {
     if (!allStudents || !presence) return 0;
@@ -376,51 +413,50 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
   return (
     <>
       <FlatList
-        data={dataGeral}
+        data={allStudents}
         style={styles.container}
-        extraData={[allCall, data, dataGeral]}
+        extraData={[allStudents]}
         renderItem={({ item }) => (
           <>
             <Text style={styles.title}>{item?.className}</Text>
             <View style={styles.item}>
               <Text style={styles.label}>Matriculados:</Text>
-              <Text style={styles.value}>{item?.studentNumber}</Text>
+              <Text style={styles.value}>{item?.enrolled || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{Number(item?.studentNumber || 0) - Number(item?.presenceNumber || 0)}</Text>
+              <Text style={styles.value}>{item?.absent || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Presentes:</Text>
-              <Text style={styles.value}>{item?.presenceNumber}</Text>
+              <Text style={styles.value}>{item?.present || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.guestNumber}</Text>
+              <Text style={styles.value}>{item?.visitors || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Total:</Text>
-              <Text style={styles.value}>{(Number(item?.presenceNumber || 0) + Number(item?.guestNumber || 0)) || 0}</Text>
+              <Text style={styles.value}>{item?.total || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
-              <Text style={styles.value}>{item?.bibleNumber}</Text>
+              <Text style={styles.value}>{item?.bibles || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Revistas:</Text>
-              <Text style={styles.value}>{item?.magazineNumber}</Text>
+              <Text style={styles.value}>{item?.magazines || 0}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>
-              <Text style={styles.value}>{formatToCurrency(item?.offersNumber || 0)}</Text>
+              <Text style={styles.value}>{formatToCurrency(item?.offers || 0)}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{parseFloat(((item?.presenceNumber / item?.studentNumber) * 100).toFixed(2)) || 0}%</Text>
+              <Text style={styles.value}>{item?.attendancePercentage || 0}%</Text>
             </View>
             {dataGeral.length > 0 ? (
               <>
-
 
                 <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
                   <Text style={styles.buttonText}>Copiar Resumo {item?.className}</Text>
@@ -479,15 +515,15 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {topBiblias[0]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[0]?.bibleNumber}</Text>
+                  <Text style={styles.value}>{topBiblias[0]?.bibleNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {topBiblias[1]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[1]?.bibleNumber}</Text>
+                  <Text style={styles.value}>{topBiblias[1]?.bibleNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {topBiblias[2]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[2]?.bibleNumber}</Text>
+                  <Text style={styles.value}>{topBiblias[2]?.bibleNumber || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Revistas</Text>
@@ -500,15 +536,15 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {topRevistas[0]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[0]?.magazineNumber}</Text>
+                  <Text style={styles.value}>{topRevistas[0]?.magazineNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {topRevistas[1]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[1]?.magazineNumber}</Text>
+                  <Text style={styles.value}>{topRevistas[1]?.magazineNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {topRevistas[2]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[2]?.magazineNumber}</Text>
+                  <Text style={styles.value}>{topRevistas[2]?.magazineNumber || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Visitantes</Text>
@@ -521,15 +557,15 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {topVisitantes[0]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[0]?.guestNumber}</Text>
+                  <Text style={styles.value}>{topVisitantes[0]?.guestNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {topVisitantes[1]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[1]?.guestNumber}</Text>
+                  <Text style={styles.value}>{topVisitantes[1]?.guestNumber || 0}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {topVisitantes[2]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[2]?.guestNumber}</Text>
+                  <Text style={styles.value}>{topVisitantes[2]?.guestNumber || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.buttonText}>============================================</Text>
