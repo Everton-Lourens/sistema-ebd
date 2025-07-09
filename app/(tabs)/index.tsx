@@ -1,4 +1,4 @@
-import { MyClass } from '@/app/(tabs)/class';
+import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { initialClasses } from '@/constants/ClassName';

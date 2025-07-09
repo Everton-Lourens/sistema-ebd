@@ -1,4 +1,4 @@
-import { MyClass } from '@/app/(tabs)/class';
+import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
 import { compareDate } from '@/helper/date';
@@ -307,7 +307,7 @@ Porcentagem: *${percentage}%*
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{!isNaN(item?.attendancePercentage) && item?.attendancePercentage || 0}%</Text>
+              <Text style={styles.value}>{!isNaN(item?.attendancePercentage) && item?.attendancePercentage || 0.00}%</Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={() => copiarResumo(item)}>
               <Text style={styles.buttonText}>Copiar: {item?.className}</Text>

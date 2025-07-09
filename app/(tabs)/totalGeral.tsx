@@ -6,7 +6,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MyClass } from './class';
+import { MyClass } from '../../classes/class';
 
 interface IDataSummary {
   className: string;
@@ -480,7 +480,7 @@ ${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houv
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{item?.attendancePercentage || 0}%</Text>
+              <Text style={styles.value}>{item?.attendancePercentage || 0.00}%</Text>
             </View>
             {allStudents.length > 0 ? (
               <>
@@ -499,15 +499,15 @@ ${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houv
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingAttendancePercentage[0]?.attendancePercentage ? item?.rankingAttendancePercentage[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[0]?.attendancePercentage) && item?.rankingAttendancePercentage[0]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[0]?.attendancePercentage) && item?.rankingAttendancePercentage[0]?.attendancePercentage || 0.00}%</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingAttendancePercentage[1]?.attendancePercentage ? item?.rankingAttendancePercentage[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[1]?.attendancePercentage) && item?.rankingAttendancePercentage[1]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[1]?.attendancePercentage) && item?.rankingAttendancePercentage[1]?.attendancePercentage || 0.00}%</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingAttendancePercentage[2]?.attendancePercentage ? item?.rankingAttendancePercentage[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[2]?.attendancePercentage) && item?.rankingAttendancePercentage[2]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[2]?.attendancePercentage) && item?.rankingAttendancePercentage[2]?.attendancePercentage || 0.00}%</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Ofertas</Text>
