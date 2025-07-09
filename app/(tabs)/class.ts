@@ -279,13 +279,16 @@ export class MyClass {
         if (!id) {
             throw new Error("ID do aluno é obrigatório.");
         }
-        const students = AsyncStorage.getItem(`students_${student.className}`);
-        const studentsList = students ? JSON.parse(students) : [];
-        const index = studentsList.findIndex((student: MyClass) => student.id === id);
-        if (index > -1) {
-            studentsList.splice(index, 1);
-            AsyncStorage.setItem(`students_${student.className}`, JSON.stringify(studentsList));
-        }
+        return AsyncStorage.getItem(THIS_CLASSES)
+            .then((classes) => {
+                const studentsList =
+                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? [];
+                const index = studentsList.findIndex((student: MyClass) => student.id === id);
+                if (index > -1) {
+                    studentsList.splice(index, 1);
+                    AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(studentsList));
+                }
+            })
     }
     static getStudent(id: string) {
         if (!id) {

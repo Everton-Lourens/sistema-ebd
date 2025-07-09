@@ -31,7 +31,7 @@ export function formatClass(rawData: object | string) {
          //console.log(`Revistas: ${revistas}`);
          //console.log(`Ofertas: R$ ${formatToCurrency(ofertas)}`);
          //console.log(`Porcentagem de presença: ${porcentagem}%`);
-         result[className] = {
+         const resultData = {
             className,
             enrolled: matriculados,
             absent: ausentes,
@@ -43,7 +43,19 @@ export function formatClass(rawData: object | string) {
             offers: formatToCurrency(ofertas),
             attendancePercentage: `${porcentagem}%`
          };
+
+         draw.push(resultData);
+         result[className] = resultData;
       }
+      console.log(checkDraw(draw, 'enrolled'));
+      console.log(checkDraw(draw, 'absent'));
+      console.log(checkDraw(draw, 'attendancePercentage'));
+      console.log(checkDraw(draw, 'bibles'));
+      console.log(checkDraw(draw, 'magazines'));
+      console.log(checkDraw(draw, 'offers'));
+      console.log(checkDraw(draw, 'present'));
+      console.log(checkDraw(draw, 'total'));
+      console.log(checkDraw(draw, 'visitors'));
       return result;
    } catch (e) {
       //console.log(e);
@@ -78,8 +90,7 @@ export function formatGeralClass(rawData: object | string) {
          total: Number(totalPresentes) + Number(totalVisitantes),
          bibles: totalBiblias,
          magazines: totalRevistas,
-         //magazines: (((Number(Number(totalPresentes) + Number(totalVisitantes)) / Number(totalRevistas)) * 100) || 0).toFixed(2) + '%',
-         offers: formatToCurrency(Number(totalOfertas + '00')),
+         offers: formatToCurrency(Number(totalOfertas)),
          attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2) + '%',
       };
 
@@ -95,6 +106,7 @@ export function formatGeralClass(rawData: object | string) {
       } catch (e) {
          console.log(e);
       }
+      console.log(JSON.stringify(result, null, 2));
       return [result];
    } catch (e) {
       //console.log(e);
@@ -117,6 +129,7 @@ export const getRanking = (data: object, campo: string) => {
       .map(([className, values], index) => ({
          ...values,
          className,
+         draw: checkDraw([data], campo),
          colocacao:
             index === 0
                ? '1º Lugar'
@@ -125,3 +138,37 @@ export const getRanking = (data: object, campo: string) => {
                   : '3º Lugar',
       }));
 };
+
+
+
+function checkDraw(draw, key = '') {
+   const valorMap = {};
+
+   ranking.forEach(item => {
+      let valor = item[campo];
+
+      // Se for campo de valor monetário, converte para número
+      if (campo === 'offers' && typeof valor === 'string') {
+         valor = parseFloat(valor.replace('R$ ', '').replace(',', '.')) || 0;
+      }
+
+      // Se for porcentagem, converte para número
+      if (campo === 'attendancePercentage' && typeof valor === 'string') {
+         valor = parseFloat(valor.replace('%', '')) || 0;
+      }
+
+      if (valorMap[valor]) {
+         valorMap[valor].push(item.className);
+      } else {
+         valorMap[valor] = [item.className];
+      }
+   });
+
+   const empates = Object.entries(valorMap).filter(([_, turmas]) => turmas.length > 1);
+
+   if (empates.length > 0) {
+      return true
+   } else {
+      return false
+   }
+}

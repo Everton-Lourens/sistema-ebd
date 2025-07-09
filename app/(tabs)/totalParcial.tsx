@@ -82,7 +82,6 @@ export default function Resumo() {
     MyClass.getPartialReport()
       .then((dataSummary: any) => {
         if (Array.isArray(dataSummary) && dataSummary.length === 0) return;
-        console.log(dataSummary)
         setAllStudents(Array.isArray(dataSummary) ? dataSummary : Object.values(dataSummary));
         setCountStudents(Object.values(dataSummary).length);
       })

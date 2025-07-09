@@ -283,6 +283,9 @@ export default function App() {
     }
   }, [guestNumber, offersNumber]);
 
+  const removeStudent = (student: MyClass) => {
+    return showAlert(`Função indisponível no momento`);
+  }
 
   return (
     <View style={styles.container}>
@@ -295,12 +298,12 @@ export default function App() {
             extraData={allCall}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={isCalled(item.name) ? styles.classItem : styles.classItemNotCalled}
+                style={styles.classItem}
                 onPress={() => setSelectedClassId(item.id)}
               >
                 <Text style={styles.className}>{item.name}</Text>
                 <Text style={styles.studentCount}>
-                  {`${allCall[item.name]?.studentNumber || '--'} Cadastrado(s)`}
+                  {'Abrir >>'}
                 </Text>
               </TouchableOpacity>
             )}
@@ -375,7 +378,12 @@ export default function App() {
               return (
                 <View style={styles.studentItem}>
                   <Text style={styles.studentName}>{item?.name}</Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+                  </View>
+
                   <View style={styles.checkboxGroup}>
+
                     <View style={styles.checkboxItem}>
                       <Text>Presente</Text>
                       <Switch
@@ -413,7 +421,13 @@ export default function App() {
                       <TouchableOpacity>
                         <IconSymbol name="minus.circle.fill" size={20} color="red" />
                       </TouchableOpacity>
+
                     </View>
+                    <TouchableOpacity onPress={() => {
+                      removeStudent(item)
+                    }}>
+                      <Text style={styles.remove}>X</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               );
@@ -427,7 +441,15 @@ export default function App() {
   );
 }
 
+
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: 'white', padding: 20, paddingTop: 50 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  removeButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   container: { flex: 1, backgroundColor: 'white', padding: 20, paddingTop: 50 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   subtitle: { fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 },
@@ -437,7 +459,7 @@ const styles = StyleSheet.create({
   },
   classItem: {
     borderWidth: 1, padding: 10,
-    borderRadius: 5, marginBottom: 10, backgroundColor: '#c8facc', borderColor: '#38a169'
+    borderRadius: 5, marginBottom: 10, backgroundColor: '#e6e3e3', borderColor: '#38a169'
   },
   classItemNotCalled: {
     borderWidth: 1, padding: 10,
@@ -448,7 +470,9 @@ const styles = StyleSheet.create({
   back: {
     color: '#007AFF', marginBottom: 10, fontSize: 16,
   },
-
+  remove: {
+    color: '#ff0000', marginBottom: 10, fontSize: 20,
+  },
   buttons: { flexDirection: 'row', gap: 10 },
   presenceButton: {
     padding: 6, paddingHorizontal: 12,
@@ -465,13 +489,12 @@ const styles = StyleSheet.create({
   buttonsPopUp: { flexDirection: 'row', justifyContent: 'space-between' },
   studentItem: {
     padding: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 5,
     borderColor: '#ccc',
     backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    borderRadius: 15,
     marginBottom: 8,
   },
-
   studentName: {
     fontSize: 16,
     fontWeight: 'bold',

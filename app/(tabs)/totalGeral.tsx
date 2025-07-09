@@ -26,7 +26,7 @@ const resumoInit = {
   studentNumber: 0,
   presenceNumber: 0,
   bibleNumber: 0,
-  magazineNumber: 0,
+  magazines: 0,
   guestNumber: 0,
   offersNumber: 0,
 };
@@ -37,7 +37,7 @@ type DataItem = {
   studentNumber: string;
   presenceNumber: string;
   bibleNumber: string;
-  magazineNumber: string;
+  magazines: string;
   guestNumber: string;
   offersNumber: string;
 };
@@ -47,7 +47,7 @@ export default function Resumo() {
   const [allCall, setAllCall] = useState({
     studentNumber: '',
     presenceNumber: '',
-    magazineNumber: '',
+    magazines: '',
     bibleNumber: '',
     guestNumber: '',
     offersNumber: '',
@@ -72,7 +72,7 @@ export default function Resumo() {
     totalStudent: 0,
     totalPresence: 0,
     totalBibleNumber: 0,
-    totalMagazineNumber: 0,
+    totalmagazines: 0,
     totalGuestNumber: 0,
     totalOffersNumber: 0,
   });
@@ -155,10 +155,9 @@ export default function Resumo() {
     setTopPresencas(gerarTop3(dataComPorcentagem, 'porcentagem'));
     setTopOfertas(gerarTop3(dataComPorcentagem, 'ofertas'));
     setTopBiblias(gerarTop3(dataComPorcentagem, 'bibleNumber'));
-    setTopRevistas(gerarTop3(dataComPorcentagem, 'magazineNumber'));
+    setTopRevistas(gerarTop3(dataComPorcentagem, 'magazines'));
     setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
   }
-  console.log(JSON.stringify(topPresencas, null, 2));
   useEffect(() => {
     setEmpatePresenca(
       (Number(topPresencas[0]?.porcentagem) > 0 &&
@@ -205,15 +204,15 @@ export default function Resumo() {
         Number(topBiblias[1]?.bibleNumber) === Number(topBiblias[2]?.bibleNumber))
     );
     setEmpateRevistas(
-      (Number(topRevistas[0]?.magazineNumber) > 0 &&
-        Number(topRevistas[1]?.magazineNumber) > 0 &&
-        Number(topRevistas[0]?.magazineNumber) === Number(topRevistas[1]?.magazineNumber)) ||
-      (Number(topRevistas[0]?.magazineNumber) > 0 &&
-        Number(topRevistas[2]?.magazineNumber) > 0 &&
-        Number(topRevistas[0]?.magazineNumber) === Number(topRevistas[2]?.magazineNumber)) ||
-      (Number(topRevistas[1]?.magazineNumber) > 0 &&
-        Number(topRevistas[2]?.magazineNumber) > 0 &&
-        Number(topRevistas[1]?.magazineNumber) === Number(topRevistas[2]?.magazineNumber))
+      (Number(topRevistas[0]?.magazines) > 0 &&
+        Number(topRevistas[1]?.magazines) > 0 &&
+        Number(topRevistas[0]?.magazines) === Number(topRevistas[1]?.magazines)) ||
+      (Number(topRevistas[0]?.magazines) > 0 &&
+        Number(topRevistas[2]?.magazines) > 0 &&
+        Number(topRevistas[0]?.magazines) === Number(topRevistas[2]?.magazines)) ||
+      (Number(topRevistas[1]?.magazines) > 0 &&
+        Number(topRevistas[2]?.magazines) > 0 &&
+        Number(topRevistas[1]?.magazines) === Number(topRevistas[2]?.magazines))
     );
     setEmpateVisitantes(
       (Number(topVisitantes[0]?.guestNumber) > 0 &&
@@ -226,13 +225,13 @@ export default function Resumo() {
         Number(topVisitantes[2]?.guestNumber) > 0 &&
         Number(topVisitantes[1]?.guestNumber) === Number(topVisitantes[2]?.guestNumber))
     );
-  }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes]);
+  }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes, allStudents]);
 
   function updateAllClasses() {
     let totalStudent = 0;
     let totalPresence = 0;
     let totalBibleNumber = 0;
-    let totalMagazineNumber = 0;
+    let totalmagazines = 0;
     let totalGuestNumber = 0;
     let totalOffersNumber = 0;
     const newCall = new NewCall();
@@ -248,7 +247,7 @@ export default function Resumo() {
           totalStudent += Number(data?.studentNumber) || 0;
           totalPresence += Number(data?.presenceNumber) || 0;
           totalBibleNumber += Number(data?.bibleNumber) || 0;
-          totalMagazineNumber += Number(data?.magazineNumber) || 0;
+          totalmagazines += Number(data?.magazines) || 0;
           totalGuestNumber += Number(data?.guestNumber) || 0;
           totalOffersNumber += Number(data?.offersNumber?.replace(/[^\d]/g, '')) || 0;
 
@@ -256,7 +255,7 @@ export default function Resumo() {
             totalStudent,
             totalPresence,
             totalBibleNumber,
-            totalMagazineNumber,
+            totalmagazines,
             totalGuestNumber,
             totalOffersNumber,
           });
@@ -269,7 +268,7 @@ export default function Resumo() {
               studentNumber: data?.studentNumber || '',
               presenceNumber: data?.presenceNumber || '',
               bibleNumber: data?.bibleNumber || '',
-              magazineNumber: data?.magazineNumber || '',
+              magazines: data?.magazines || '',
               guestNumber: data?.guestNumber || '',
               offersNumber: data?.offersNumber || '',
             }
@@ -284,7 +283,7 @@ export default function Resumo() {
                 studentNumber: data?.studentNumber || '',
                 presenceNumber: data?.presenceNumber || '',
                 bibleNumber: data?.bibleNumber || '',
-                magazineNumber: data?.magazineNumber || '',
+                magazines: data?.magazines || '',
                 guestNumber: data?.guestNumber || '',
                 offersNumber: data?.offersNumber || '',
               }
@@ -307,7 +306,7 @@ export default function Resumo() {
       newCall.studentNumber = totalStudent.toString();
       newCall.presenceNumber = totalPresence.toString();
       newCall.bibleNumber = totalBibleNumber.toString();
-      newCall.magazineNumber = totalMagazineNumber.toString();
+      newCall.magazines = totalmagazines.toString();
       newCall.guestNumber = totalGuestNumber.toString();
       newCall.offersNumber = totalOffersNumber.toString();
       newCall.save();
@@ -316,7 +315,7 @@ export default function Resumo() {
         studentNumber: totalStudent.toString(),
         presenceNumber: totalPresence.toString(),
         bibleNumber: totalBibleNumber.toString(),
-        magazineNumber: totalMagazineNumber.toString(),
+        magazines: totalmagazines.toString(),
         guestNumber: totalGuestNumber.toString(),
         offersNumber: totalOffersNumber.toString(),
       }]);
@@ -359,6 +358,24 @@ export default function Resumo() {
     return sameDate;
   }
 
+  function hasDuplicates(arr: (number | string | undefined | null)[]): boolean {
+    const numbers = arr
+      .map(n => {
+        if (typeof n === 'string') {
+          // Remove tudo que não for número, ponto ou vírgula
+          const clean = n.replace(/[^\d.,-]/g, '').replace(',', '.');
+          return Number(clean);
+        }
+        return Number(n);
+      })
+      .filter(n => !isNaN(n) && n > 0); // agora ignora 0 e negativos
+
+    // Se o array está vazio (por exemplo, só tinha zeros ou inválidos), não há duplicatas
+    if (numbers.length === 0) return false;
+
+    const unique = new Set(numbers);
+    return unique.size !== numbers.length;
+  }
 
   const copiarResumoGeral = () => {
     const texto = `
@@ -372,7 +389,7 @@ Presentes: *${resumo.presenceNumber || ''}*
 Visitantes: *${resumo.guestNumber || ''}*
 Total: *${resumo.presenceNumber + resumo.guestNumber || ''}*
 Bíblias: *${resumo.bibleNumber || ''}*
-Revistas: *${resumo.magazineNumber || ''}*
+Revistas: *${resumo.magazines || ''}*
 Ofertas: *${formatToCurrency(resumo.offersNumber)}*
 Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
 *=======================*
@@ -396,9 +413,9 @@ Vencedores em Bíblias: ${empateBiblias ? '\n*> HOUVE EMPATE <*' : ''}
 *=======================*
 
 Vencedores em Revistas: ${empateRevistas ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topRevistas[0]?.className || ''}*: *${topRevistas[0]?.magazineNumber || ''}*
-2° - *${topRevistas[1]?.className || ''}*: *${topRevistas[1]?.magazineNumber || ''}*
-3° - *${topRevistas[2]?.className || ''}*: *${topRevistas[2]?.magazineNumber || ''}*
+1° - *${topRevistas[0]?.className || ''}*: *${topRevistas[0]?.magazines || ''}*
+2° - *${topRevistas[1]?.className || ''}*: *${topRevistas[1]?.magazines || ''}*
+3° - *${topRevistas[2]?.className || ''}*: *${topRevistas[2]?.magazines || ''}*
 *=======================*
 
 Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
@@ -455,75 +472,74 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
               <Text style={styles.label}>Porcentagem:</Text>
               <Text style={styles.value}>{item?.attendancePercentage || 0}%</Text>
             </View>
-            {dataGeral.length > 0 ? (
+            {allStudents.length > 0 ? (
               <>
-
                 <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
-                  <Text style={styles.buttonText}>Copiar Resumo {item?.className}</Text>
+                  <Text style={styles.buttonText}>Copiar Resumo Geral {item?.className}</Text>
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Presença</Text>
                 {(
-                  empatePresenca
+                  hasDuplicates(item?.rankingAttendancePercentage.map((item) => item.attendancePercentage))
                 ) ? (
                   <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     {'> Houve Empate <'}
                   </Text>
                 ) : null}
                 <View style={styles.item}>
-                  <Text style={styles.label}>1° - {topPresencas[0]?.className}:</Text>
-                  <Text style={styles.value}>{topPresencas[0]?.porcentagem || 0}%</Text>
+                  <Text style={styles.label}>1° - {!!item?.rankingAttendancePercentage[0]?.attendancePercentage ? item?.rankingAttendancePercentage[0]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingAttendancePercentage[0]?.attendancePercentage || 0}%</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>2° - {topPresencas[1]?.className}:</Text>
-                  <Text style={styles.value}>{topPresencas[1]?.porcentagem || 0}%</Text>
+                  <Text style={styles.label}>2° - {!!item?.rankingAttendancePercentage[1]?.attendancePercentage ? item?.rankingAttendancePercentage[1]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingAttendancePercentage[1]?.attendancePercentage || 0}%</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>3° - {topPresencas[2]?.className}:</Text>
-                  <Text style={styles.value}>{topPresencas[2]?.porcentagem || 0}%</Text>
+                  <Text style={styles.label}>3° - {!!item?.rankingAttendancePercentage[2]?.attendancePercentage ? item?.rankingAttendancePercentage[2]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingAttendancePercentage[2]?.attendancePercentage || 0}%</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Ofertas</Text>
                 {(
-                  empateOfertas
+                  hasDuplicates(item?.rankingOffers.map((item) => item.offers))
                 ) ? (
                   <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     {'> Houve Empate <'}
                   </Text>
                 ) : null}
                 <View style={styles.item}>
-                  <Text style={styles.label}>1° - {topOfertas[0]?.className}:</Text>
-                  <Text style={styles.value}>{formatToCurrency(topOfertas[0]?.ofertas || 0)}</Text>
+                  <Text style={styles.label}>1° - {!!Number(item?.rankingOffers[0]?.offers.replace(/[^\d]/g, '')) ? item?.rankingOffers[0]?.className : ''}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(item?.rankingOffers[0]?.offers || 0)}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>2° - {topOfertas[1]?.className}:</Text>
-                  <Text style={styles.value}>{formatToCurrency(topOfertas[1]?.ofertas || 0)}</Text>
+                  <Text style={styles.label}>2° - {!!Number(item?.rankingOffers[1]?.offers.replace(/[^\d]/g, '')) ? item?.rankingOffers[1]?.className : ''}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(item?.rankingOffers[1]?.offers || 0)}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>3° - {topOfertas[2]?.className}:</Text>
-                  <Text style={styles.value}>{formatToCurrency(topOfertas[2]?.ofertas || 0)}</Text>
+                  <Text style={styles.label}>3° - {!!Number(item?.rankingOffers[2]?.offers.replace(/[^\d]/g, '')) ? item?.rankingOffers[2]?.className : ''}:</Text>
+                  <Text style={styles.value}>{formatToCurrency(item?.rankingOffers[2]?.offers || 0)}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Bíblias</Text>
                 {(
-                  empateBiblias
+                  hasDuplicates(item?.rankingBibles.map((item) => item.bibles))
                 ) ? (
                   <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     {'> Houve Empate <'}
                   </Text>
                 ) : null}
                 <View style={styles.item}>
-                  <Text style={styles.label}>1° - {topBiblias[0]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[0]?.bibleNumber || 0}</Text>
+                  <Text style={styles.label}>1° - {!!item?.rankingBibles[0]?.bibles ? item?.rankingBibles[0]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[0]?.bibles || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>2° - {topBiblias[1]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[1]?.bibleNumber || 0}</Text>
+                  <Text style={styles.label}>2° - {!!item?.rankingBibles[1]?.bibles ? item?.rankingBibles[1]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[1]?.bibles || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>3° - {topBiblias[2]?.className}:</Text>
-                  <Text style={styles.value}>{topBiblias[2]?.bibleNumber || 0}</Text>
+                  <Text style={styles.label}>3° - {!!item?.rankingBibles[2]?.bibles ? item?.rankingBibles[2]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[2]?.bibles || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Revistas</Text>
@@ -535,16 +551,16 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                   </Text>
                 ) : null}
                 <View style={styles.item}>
-                  <Text style={styles.label}>1° - {topRevistas[0]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[0]?.magazineNumber || 0}</Text>
+                  <Text style={styles.label}>1° - {!!item?.rankingMagazines[0]?.magazines ? item?.rankingMagazines[0]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[0]?.magazines || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>2° - {topRevistas[1]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[1]?.magazineNumber || 0}</Text>
+                  <Text style={styles.label}>2° - {!!item?.rankingMagazines[1]?.magazines ? item?.rankingMagazines[1]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[1]?.magazines || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>3° - {topRevistas[2]?.className}:</Text>
-                  <Text style={styles.value}>{topRevistas[2]?.magazineNumber || 0}</Text>
+                  <Text style={styles.label}>3° - {!!item?.rankingMagazines[2]?.magazines ? item?.rankingMagazines[2]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[2]?.magazines || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Visitantes</Text>
@@ -556,16 +572,16 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                   </Text>
                 ) : null}
                 <View style={styles.item}>
-                  <Text style={styles.label}>1° - {topVisitantes[0]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[0]?.guestNumber || 0}</Text>
+                  <Text style={styles.label}>1° - {!!item?.rankingVisitors[0]?.visitors ? item?.rankingVisitors[0]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[0]?.visitors || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>2° - {topVisitantes[1]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[1]?.guestNumber || 0}</Text>
+                  <Text style={styles.label}>2° - {!!item?.rankingVisitors[1]?.visitors ? item?.rankingVisitors[1]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[1]?.visitors || 0}</Text>
                 </View>
                 <View style={styles.item}>
-                  <Text style={styles.label}>3° - {topVisitantes[2]?.className}:</Text>
-                  <Text style={styles.value}>{topVisitantes[2]?.guestNumber || 0}</Text>
+                  <Text style={styles.label}>3° - {!!item?.rankingVisitors[2]?.visitors ? item?.rankingVisitors[2]?.className : ''}:</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[2]?.visitors || 0}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.buttonText}>============================================</Text>
