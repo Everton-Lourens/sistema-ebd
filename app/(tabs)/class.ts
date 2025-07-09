@@ -275,21 +275,35 @@ export class MyClass {
         } catch (error) { console.trace(error) }
     }
 
-    static removeStudent(id: string) {
-        if (!id) {
-            throw new Error("ID do aluno é obrigatório.");
+    static removeStudent(id: string, className: string) {
+        if (!id || !className) {
+            throw new Error("ID e nome da turma são obrigatórios.");
         }
-        return AsyncStorage.getItem(THIS_CLASSES)
-            .then((classes) => {
+
+        try {
+            return AsyncStorage.getItem(THIS_CLASSES).then((students) => {
                 const studentsList =
-                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? [];
-                const index = studentsList.findIndex((student: MyClass) => student.id === id);
-                if (index > -1) {
-                    studentsList.splice(index, 1);
-                    AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(studentsList));
+                    students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
+
+                if (!studentsList[className]) {
+                    console.warn(`Turma "${className}" não encontrada.`);
+                    return false;
                 }
-            })
+                studentsList[className] = studentsList[className].filter(
+                    (student: MyClass) => student.id !== id
+                );
+                AsyncStorage.setItem(THIS_CLASSES, JSON.stringify(studentsList));
+                console.log(`Aluno com ID ${id} removido da turma ${className}`);
+                return true;
+            });
+
+        } catch (error) {
+            console.error("Erro ao remover aluno:", error);
+            return false
+        }
     }
+
+
     static getStudent(id: string) {
         if (!id) {
             throw new Error("ID do aluno é obrigatório.");

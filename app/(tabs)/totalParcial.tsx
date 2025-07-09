@@ -231,23 +231,38 @@ export default function Resumo() {
     })
   }
 
-  const copiarResumoGeral = (item) => {
-    const texto = `
-Resumo ${item.title} - *${new Date().toLocaleDateString('pt-BR')}*
+  const copiarResumo = (item) => {
+    const enrolled = Number(item?.enrolled) || 0;
+    const present = Number(item?.present) || 0;
+    const absent = Number(item?.absent) || 0;
+    const visitors = Number(item?.visitors) || 0;
+    const total = Number(item?.total) || 0;
+    const bibles = Number(item?.bibles) || 0;
+    const magazines = Number(item?.magazines) || 0;
 
-Matriculados: *${allCall[item.title]?.studentNumber || 0}*
-Ausentes: *${allCall[item.title]?.studentNumber - allCall[item.title]?.presenceNumber || 0}*
-Presentes: *${allCall[item.title]?.presenceNumber || 0}*
-Visitantes: *${allCall[item.title]?.guestNumber || 0}*
-Total: *${(allCall[item.title]?.presenceNumber || 0) + (allCall[item.title]?.guestNumber || 0)}*
-Bíblias: *${allCall[item.title]?.bibleNumber || 0}*
-Revistas: *${allCall[item.title]?.magazineNumber || 0}*
-Ofertas: *${formatToCurrency(allCall[item.title]?.offersNumber || 0)}*
-Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall[item.title]?.studentNumber || '') || 0}%*
+    const offers = item?.offers || 'R$ 0,00';
+
+    const percentage = !isNaN(present) && !isNaN(enrolled) && enrolled > 0
+      ? ((present / enrolled) * 100).toFixed(2)
+      : '0.00';
+
+    const texto = `
+Resumo ${item.className} - *${new Date().toLocaleDateString('pt-BR')}*
+
+Matriculados: *${enrolled}*
+Ausentes: *${absent}*
+Presentes: *${present}*
+Visitantes: *${visitors}*
+Total: *${total}*
+Bíblias: *${bibles}*
+Revistas: *${magazines}*
+Ofertas: *${offers}*
+Porcentagem: *${percentage}%*
   `.trim();
 
     Clipboard.setStringAsync(texto);
   };
+
 
   return allStudents.length > 0 ? (
     <View style={styles.container}>
@@ -292,9 +307,9 @@ Porcentagem: *${getPercentage(allCall[item.title]?.presenceNumber || '', allCall
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{item?.attendancePercentage || 0}%</Text>
+              <Text style={styles.value}>{!isNaN(item?.attendancePercentage) && item?.attendancePercentage || 0}%</Text>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
+            <TouchableOpacity style={styles.button} onPress={() => copiarResumo(item)}>
               <Text style={styles.buttonText}>Copiar: {item?.className}</Text>
             </TouchableOpacity>
             <Text style={styles.buttonText}>========================================</Text>

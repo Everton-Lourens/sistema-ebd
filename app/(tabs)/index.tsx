@@ -227,21 +227,6 @@ export default function App() {
     });
   }
 
-  const isCalled = (className: string = ''): boolean => {
-    if (className === '') throw new Error('O nome da turma é obrigatório');
-    if (
-      !allCall[className]?.studentNumber ||
-      !allCall[className]?.presenceNumber ||
-      !allCall[className]?.magazineNumber ||
-      !allCall[className]?.bibleNumber ||
-      !allCall[className]?.guestNumber ||
-      !allCall[className]?.offersNumber
-    ) {
-      return false
-    }
-    return true
-  }
-
   useEffect(() => {
     const totalPresence = Number(presenceNumber) + Number(guestNumber);
     const checkBibleNumber = Number(bibleNumber) > totalPresence;
@@ -284,7 +269,32 @@ export default function App() {
   }, [guestNumber, offersNumber]);
 
   const removeStudent = (student: MyClass) => {
-    return showAlert(`Função indisponível no momento`);
+    //showAlert(`Função indisponível no momento`);
+    Alert.alert(
+      'Remover Aluno',
+      `Remover o aluno "${student.name}"?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Remover',
+          onPress: () => {
+            const isRemoved = MyClass.removeStudent(student.id, student.className);
+            if (!isRemoved) return showAlert('Erro ao remover aluno');
+            setSelectedClassId(null);
+            setAllStudents([]);
+            /* Resolver depois */
+            //setAllStudents(prev => prev.filter(s => s.id !== student.id));
+            //getStudentList(selectedClass?.name);
+            showAlert(`Aluno ${student.name} removido da classe: ${student.className}!`);
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
   }
 
   return (
@@ -443,8 +453,6 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', padding: 20, paddingTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   removeButton: {
     position: 'absolute',
     right: 0,

@@ -377,55 +377,65 @@ export default function Resumo() {
     return unique.size !== numbers.length;
   }
 
-  const copiarResumoGeral = () => {
+  const copiarResumoGeral = (resumo) => {
+    const parseNumber = (v) => Number(v) || 0;
+    const formatPorcentagem = (v) =>
+      isNaN(parseFloat(v)) ? '0.00' : parseFloat(v).toFixed(2);
+
     const texto = `
-Resumo - *${new Date().toLocaleDateString('pt-BR')}*
+Resumo Geral - *${new Date().toLocaleDateString('pt-BR')}*
 
 *=======================*
 Total Geral:
-Matriculados: *${resumo.studentNumber || ''}*
-Ausentes: *${resumo.studentNumber - resumo.presenceNumber || ''}*
-Presentes: *${resumo.presenceNumber || ''}*
-Visitantes: *${resumo.guestNumber || ''}*
-Total: *${resumo.presenceNumber + resumo.guestNumber || ''}*
-Bíblias: *${resumo.bibleNumber || ''}*
-Revistas: *${resumo.magazines || ''}*
-Ofertas: *${formatToCurrency(resumo.offersNumber)}*
-Porcentagem Geral: *${parseFloat(((resumo.presenceNumber / resumo.studentNumber) * 100).toFixed(2)) || 0}%*
+Matriculados: *${parseNumber(resumo.enrolled)}*
+Ausentes: *${parseNumber(resumo.absent)}*
+Presentes: *${parseNumber(resumo.present)}*
+Visitantes: *${parseNumber(resumo.visitors)}*
+Total: *${parseNumber(resumo.total)}*
+Bíblias: *${parseNumber(resumo.bibles)}*
+Revistas: *${parseNumber(resumo.magazines)}*
+Ofertas: *${resumo.offers || 'R$ 0,00'}*
+Porcentagem Geral: *${formatPorcentagem(resumo.attendancePercentage)}%*
 *=======================*
 
-Vencedores em Presença: ${empatePresenca ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topPresencas[0]?.className || ''}*: *${topPresencas[0]?.porcentagem || 0}%*
-2° - *${topPresencas[1]?.className || ''}*: *${topPresencas[1]?.porcentagem || 0}%*
-3° - *${topPresencas[2]?.className || ''}*: *${topPresencas[2]?.porcentagem || 0}%*
+Vencedores em Presença:
+${hasDuplicates(resumo?.rankingAttendancePercentage.map((item) => item.attendancePercentage)) ? '*> Houve Empate <*' : ''}
+1º - *${resumo.rankingAttendancePercentage[0]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[0]?.attendancePercentage)}%*
+2º - *${resumo.rankingAttendancePercentage[1]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[1]?.attendancePercentage)}%*
+3º - *${resumo.rankingAttendancePercentage[2]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[2]?.attendancePercentage)}%*
 *=======================*
 
-Vencedores em Ofertas: ${empateOfertas ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topOfertas[0]?.className || ''}*: *${formatToCurrency(topOfertas[0]?.ofertas || 0)}*
-2° - *${topOfertas[1]?.className || ''}*: *${formatToCurrency(topOfertas[1]?.ofertas || 0)}*
-3° - *${topOfertas[2]?.className || ''}*: *${formatToCurrency(topOfertas[2]?.ofertas || 0)}*
+Vencedores em Ofertas:
+${hasDuplicates(resumo?.rankingOffers.map((item) => item.offers)) ? '*> Houve Empate <*' : ''}
+1º - *${resumo.rankingOffers[0]?.className || ''}*: *${resumo.rankingOffers[0]?.offers || 'R$ 0,00'}*
+2º - *${resumo.rankingOffers[1]?.className || ''}*: *${resumo.rankingOffers[1]?.offers || 'R$ 0,00'}*
+3º - *${resumo.rankingOffers[2]?.className || ''}*: *${resumo.rankingOffers[2]?.offers || 'R$ 0,00'}*
 *=======================*
 
-Vencedores em Bíblias: ${empateBiblias ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topBiblias[0]?.className || ''}*: *${topBiblias[0]?.bibleNumber || ''}*
-2° - *${topBiblias[1]?.className || ''}*: *${topBiblias[1]?.bibleNumber || ''}*
-3° - *${topBiblias[2]?.className || ''}*: *${topBiblias[2]?.bibleNumber || ''}*
+Vencedores em Bíblias:
+${hasDuplicates(resumo?.rankingBibles.map((item) => item.bibles)) ? '*> Houve Empate <*' : ''}
+1º - *${resumo.rankingBibles[0]?.className || ''}*: *${parseNumber(resumo.rankingBibles[0]?.bibles)}*
+2º - *${resumo.rankingBibles[1]?.className || ''}*: *${parseNumber(resumo.rankingBibles[1]?.bibles)}*
+3º - *${resumo.rankingBibles[2]?.className || ''}*: *${parseNumber(resumo.rankingBibles[2]?.bibles)}*
 *=======================*
 
-Vencedores em Revistas: ${empateRevistas ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topRevistas[0]?.className || ''}*: *${topRevistas[0]?.magazines || ''}*
-2° - *${topRevistas[1]?.className || ''}*: *${topRevistas[1]?.magazines || ''}*
-3° - *${topRevistas[2]?.className || ''}*: *${topRevistas[2]?.magazines || ''}*
+Vencedores em Revistas:
+${hasDuplicates(resumo?.rankingMagazines.map((item) => item.magazines)) ? '*> Houve Empate <*' : ''}
+1º - *${resumo.rankingMagazines[0]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[0]?.magazines)}*
+2º - *${resumo.rankingMagazines[1]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[1]?.magazines)}*
+3º - *${resumo.rankingMagazines[2]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[2]?.magazines)}*
 *=======================*
 
-Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
-1° - *${topVisitantes[0]?.className || ''}*: *${topVisitantes[0]?.guestNumber || ''}*
-2° - *${topVisitantes[1]?.className || ''}*: *${topVisitantes[1]?.guestNumber || ''}*
-3° - *${topVisitantes[2]?.className || ''}*: *${topVisitantes[2]?.guestNumber || ''}*
+Vencedores em Visitantes:
+${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houve Empate <*' : ''}
+1º - *${resumo.rankingVisitors[0]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[0]?.visitors)}*
+2º - *${resumo.rankingVisitors[1]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[1]?.visitors)}*
+3º - *${resumo.rankingVisitors[2]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[2]?.visitors)}*
   `.trim();
 
     Clipboard.setStringAsync(texto);
   };
+
 
   return (
     <>
@@ -474,7 +484,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
             </View>
             {allStudents.length > 0 ? (
               <>
-                <TouchableOpacity style={styles.button} onPress={copiarResumoGeral}>
+                <TouchableOpacity style={styles.button} onPress={() => copiarResumoGeral(item)}>
                   <Text style={styles.buttonText}>Copiar Resumo Geral {item?.className}</Text>
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>============================================</Text>
@@ -489,15 +499,15 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingAttendancePercentage[0]?.attendancePercentage ? item?.rankingAttendancePercentage[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingAttendancePercentage[0]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[0]?.attendancePercentage) && item?.rankingAttendancePercentage[0]?.attendancePercentage || 0}%</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingAttendancePercentage[1]?.attendancePercentage ? item?.rankingAttendancePercentage[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingAttendancePercentage[1]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[1]?.attendancePercentage) && item?.rankingAttendancePercentage[1]?.attendancePercentage || 0}%</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingAttendancePercentage[2]?.attendancePercentage ? item?.rankingAttendancePercentage[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingAttendancePercentage[2]?.attendancePercentage || 0}%</Text>
+                  <Text style={styles.value}>{!isNaN(item?.rankingAttendancePercentage[2]?.attendancePercentage) && item?.rankingAttendancePercentage[2]?.attendancePercentage || 0}%</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Ofertas</Text>
@@ -544,7 +554,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Revistas</Text>
                 {(
-                  empateRevistas
+                  hasDuplicates(item?.rankingMagazines.map((item) => item.magazines))
                 ) ? (
                   <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     {'> Houve Empate <'}
@@ -565,7 +575,7 @@ Vencedores em Visitantes: ${empateVisitantes ? '\n*> HOUVE EMPATE <*' : ''}
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Visitantes</Text>
                 {(
-                  empateVisitantes
+                  hasDuplicates(item?.rankingVisitors.map((item) => item.visitors))
                 ) ? (
                   <Text style={{ color: '#b8af02', fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     {'> Houve Empate <'}

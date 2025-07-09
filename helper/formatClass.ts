@@ -20,7 +20,7 @@ export function formatClass(rawData: object | string) {
          const ofertas = group.find(item => item.offersNumber)?.offersNumber || 0;
          const biblias = students.filter(s => s.present && s.bible).length;
          const revistas = students.filter(s => s.present && s.magazine).length;
-         const porcentagem = ((presentes / matriculados) * 100).toFixed(2);
+         const porcentagem = ((presentes / matriculados) * 100).toFixed(2) || 0;
          //console.log(`\nRelatório da turma: ${className}`);
          //console.log(`Matriculados: ${matriculados}`);
          //console.log(`Ausentes: ${ausentes}`);
@@ -41,7 +41,7 @@ export function formatClass(rawData: object | string) {
             bibles: biblias,
             magazines: revistas,
             offers: formatToCurrency(ofertas),
-            attendancePercentage: `${porcentagem}%`
+            attendancePercentage: `${porcentagem}`
          };
       }
       return result;
@@ -80,7 +80,7 @@ export function formatGeralClass(rawData: object | string) {
          magazines: totalRevistas,
          //magazines: (((Number(Number(totalPresentes) + Number(totalVisitantes)) / Number(totalRevistas)) * 100) || 0).toFixed(2) + '%',
          offers: formatToCurrency(Number(totalOfertas + '00')),
-         attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2) + '%',
+         attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2),
       };
 
       try {
