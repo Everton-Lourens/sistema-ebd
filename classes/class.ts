@@ -41,9 +41,9 @@ export class MyClass {
             present: newStudent.present || false,
             bible: newStudent.bible || false,
             magazine: newStudent.magazine || false,
-            date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+            date: new Date().toISOString().split('T')[0],
         };
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`).then((classes) => {
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`).then((classes) => {
             try {
                 let classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
@@ -52,7 +52,7 @@ export class MyClass {
                 }
                 classesList[newStudent.className].push(newStudentData);
                 AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
-                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`, JSON.stringify(classesList))
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`, JSON.stringify(classesList))
                 AsyncStorage.setItem(`student_${newStudentData.id}`, JSON.stringify({
                     name: newStudentData.name,
                     className: newStudentData.className
@@ -72,7 +72,7 @@ export class MyClass {
     static getAllStudentsInClass2(className = '') {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -86,7 +86,7 @@ export class MyClass {
     static getAllStudentsInClass(className = '') {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -95,7 +95,7 @@ export class MyClass {
                         .then((classes) => {
                             const classesList =
                                 classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                            AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`, JSON.stringify(classesList))
+                            AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`, JSON.stringify(classesList))
                             return className in classesList ? { [className]: classesList[className] } : {};
                         })
                 } else {
@@ -105,7 +105,7 @@ export class MyClass {
     }
 
     static getAllStudents() {
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -159,19 +159,19 @@ export class MyClass {
             bible: newStudent.bible || false,
             magazine: newStudent.magazine || false,
         };
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`)
             .then((classes) => {
                 const classesList = classes !== null ? JSON.parse(classes) : {};
                 if (classesList[newStudent.className] && classesList[newStudent.className][newStudent.id]) {
                     classesList[newStudent.className][newStudent.id] = editStudentData;
                 }
-                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`, JSON.stringify(classesList));
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`, JSON.stringify(classesList));
                 return classesList;
             })
     */
     }
 
-    static countStudentsInClass(className: string, date = new Date(Date.now() + 86400000).toISOString().split('T')[0]) {
+    static countStudentsInClass(className: string, date = new Date().toISOString().split('T')[0]) {
         if (!className) {
             throw new Error("Turma é obrigatória.");
         }
@@ -185,7 +185,7 @@ export class MyClass {
         if (!className) {
             throw new Error("Turma é obrigatória.");
         }
-        return AsyncStorage.getItem(`${new Date(Date.now() + 86400000).toISOString().split('T')[0]}_${className}_students`)
+        return AsyncStorage.getItem(`${new Date().toISOString().split('T')[0]}_${className}_students`)
             .then((students) => {
                 const studentsList = students !== null ? JSON.parse(students) : [];
                 return studentsList.length;
@@ -200,7 +200,7 @@ export class MyClass {
             guestNumber: classDetail.guestNumber,
             offersNumber: classDetail.offersNumber
         };
-        return AsyncStorage.setItem(`${new Date(Date.now() + 86400000).toISOString().split('T')[0]}_${className}_details`, JSON.stringify(classDetailData))
+        return AsyncStorage.setItem(`${new Date().toISOString().split('T')[0]}_${className}_details`, JSON.stringify(classDetailData))
             .then(() => {
                 return classDetail;
             });
@@ -210,7 +210,7 @@ export class MyClass {
         if (!className) {
             throw new Error("Turma é obrigatória.");
         }
-        return AsyncStorage.getItem(`${new Date(Date.now() + 86400000).toISOString().split('T')[0]}_${className}_details`)
+        return AsyncStorage.getItem(`${new Date().toISOString().split('T')[0]}_${className}_details`)
             .then((classDetail) => {
                 const newClassDetail = classDetail !== null ? JSON.parse(classDetail) : {};
                 newClassDetail.details = {
@@ -228,7 +228,7 @@ export class MyClass {
 
         this.storageCall(className, newCall);
 
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`)
             .then((students) => {
                 const studentsList =
                     students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
@@ -243,14 +243,14 @@ export class MyClass {
                         }
                     });
                 }
-                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`, JSON.stringify(studentsList));
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`, JSON.stringify(studentsList));
                 return studentsList
             });
     }
 
     private static storageCall(className: string, newCall: any) {
         try {
-            AsyncStorage.getItem(`call_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}_${className}`)
+            AsyncStorage.getItem(`call_${new Date().toISOString().split('T')[0]}_${className}`)
                 .then((calls) => {
                     const callsList = calls !== null ? JSON.parse(calls) : [];
                     const callIndex = callsList.findIndex((call) => call.id === Object.keys(newCall)[0]);
@@ -267,11 +267,11 @@ export class MyClass {
                             present: newCall[Object.keys(newCall)[0]]?.present,
                             bible: newCall[Object.keys(newCall)[0]]?.bible,
                             magazine: newCall[Object.keys(newCall)[0]]?.magazine,
-                            date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+                            date: new Date().toISOString().split('T')[0],
                         }
                         callsList.push(call);
                     }
-                    AsyncStorage.setItem(`call_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}_${className}`, JSON.stringify(callsList));
+                    AsyncStorage.setItem(`call_${new Date().toISOString().split('T')[0]}_${className}`, JSON.stringify(callsList));
                 })
         } catch (error) { console.trace(error) }
     }
@@ -281,7 +281,7 @@ export class MyClass {
             throw new Error("ID e nome da turma são obrigatórios.");
         }
         try {
-            AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`).then((students) => {
+            AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`).then((students) => {
                 const studentsList =
                     students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
 
@@ -292,7 +292,7 @@ export class MyClass {
                 studentsList[className] = studentsList[className].filter(
                     (student: MyClass) => student.id !== id
                 );
-                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date(Date.now() + 86400000).toISOString().split('T')[0]}`, JSON.stringify(studentsList));
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${new Date().toISOString().split('T')[0]}`, JSON.stringify(studentsList));
                 return true;
             });
         } catch (error) {

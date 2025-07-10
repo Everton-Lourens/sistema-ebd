@@ -203,28 +203,28 @@ export default function Resumo() {
     }
     return sameDate;
   }
-const copiarResumo = (item: any) => {
-  MyClass.getAllStudentsInClass(item?.className).then(data => {
-    const alunosDaTurma = data?.[item.className] || []; // acessa o array
+  const copiarResumo = (item: any) => {
+    MyClass.getAllStudentsInClass(item?.className).then(data => {
+      const alunosDaTurma = data?.[item.className] || []; // acessa o array
 
-    const enrolled = Number(item?.enrolled) || 0;
-    const present = Number(item?.present) || 0;
-    const absent = Number(item?.absent) || 0;
-    const visitors = Number(item?.visitors) || 0;
-    const total = Number(item?.total) || 0;
-    const bibles = Number(item?.bibles) || 0;
-    const magazines = Number(item?.magazines) || 0;
-    const offers = item?.offers || 'R$ 0,00';
+      const enrolled = Number(item?.enrolled) || 0;
+      const present = Number(item?.present) || 0;
+      const absent = Number(item?.absent) || 0;
+      const visitors = Number(item?.visitors) || 0;
+      const total = Number(item?.total) || 0;
+      const bibles = Number(item?.bibles) || 0;
+      const magazines = Number(item?.magazines) || 0;
+      const offers = item?.offers || 'R$ 0,00';
 
-    const percentage = !isNaN(present) && !isNaN(enrolled) && enrolled > 0
-      ? ((present / enrolled) * 100).toFixed(2)
-      : '0.00';
+      const percentage = !isNaN(present) && !isNaN(enrolled) && enrolled > 0
+        ? ((present / enrolled) * 100).toFixed(2)
+        : '0.00';
 
-    const presentList = alunosDaTurma
-      .map((aluno: any) => `- ${aluno.name}: ${aluno.present ? '*Presente*' : 'Falta'}`)
-      .join('\n');
+      const presentList = alunosDaTurma
+        .map((aluno: any) => `- ${aluno.name}: ${aluno.present ? '*Presente*' : 'Falta'}`)
+        .join('\n');
 
-    const texto = `
+      const texto = `
 Resumo ${item.className} - *${new Date().toLocaleDateString('pt-BR')}*
 
 Matriculados: *${enrolled}*
@@ -241,9 +241,9 @@ Porcentagem: *${percentage}%*
 ${presentList}
     `.trim();
 
-    Clipboard.setStringAsync(texto);
-  });
-};
+      Clipboard.setStringAsync(texto);
+    });
+  };
 
 
   return allStudents.length > 0 ? (
@@ -255,7 +255,8 @@ ${presentList}
         renderItem={({ item, index }) => item?.present === 0 && !!item?.className ?
           (
             <>
-              <Text style={styles.title}>{item?.className || ''}</Text>
+              <Text style={styles.title}>{item?.className}{' '}</Text>
+              <Text style={{ color: 'red', alignSelf: 'center' }}>(Classe sem presença)</Text>
               <Text style={styles.buttonText}>========================================</Text>
             </>
           )
@@ -328,7 +329,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#333',
     alignSelf: 'center'
   },
