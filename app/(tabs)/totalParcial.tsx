@@ -256,7 +256,7 @@ ${presentList}
           (
             <>
               <Text style={styles.title}>{item?.className}{' '}</Text>
-              <Text style={{ color: 'red', alignSelf: 'center' }}>(Classe sem presença)</Text>
+              <Text style={{ color: 'red', alignSelf: 'center', marginBottom: 10 }}>(Classe sem presença)</Text>
               <Text style={styles.buttonText}>========================================</Text>
             </>
           )
