@@ -1,13 +1,12 @@
 import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
-import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface IDataSummary {
   className: string;
@@ -68,14 +67,6 @@ export default function Resumo() {
   const [data, setData] = useState<DataItem[]>([]);
   const [totalCall, setTotalCall] = useState(initTotalCall);
   const [countStudents, setCountStudents] = useState(0);
-
-  const showAlert = (message: string) => {
-    if (Platform.OS !== 'web') {
-      Alert.alert(message, '', [{ text: 'OK' }]);
-    } else {
-      window.alert(message);
-    }
-  };
 
   const getPartialReport = () => {
     setAllStudents([]);
@@ -212,26 +203,10 @@ export default function Resumo() {
     }
     return sameDate;
   }
+const copiarResumo = (item: any) => {
+  MyClass.getAllStudentsInClass(item?.className).then(data => {
+    const alunosDaTurma = data?.[item.className] || []; // acessa o array
 
-  const getPercentage = (presence: string = '', allStudents: string = ''): number => {
-    if (!allStudents || !presence) return 0;
-    return parseFloat(((Number(presence) / Number(allStudents)) * 100).toFixed(2));
-  }
-
-
-  const getTotalGeral = () => {
-    const newCall = new NewCall();
-    newCall.className = 'TOTAL_GERAL';
-    newCall.getCall('TOTAL_GERAL').then((result: any) => {
-      if (result) {
-        const sameDate = compareDate(result.callDate);
-        if (sameDate) setResumo(result);
-        else setResumo(resumoInit);
-      }
-    })
-  }
-
-  const copiarResumo = (item) => {
     const enrolled = Number(item?.enrolled) || 0;
     const present = Number(item?.present) || 0;
     const absent = Number(item?.absent) || 0;
@@ -239,12 +214,15 @@ export default function Resumo() {
     const total = Number(item?.total) || 0;
     const bibles = Number(item?.bibles) || 0;
     const magazines = Number(item?.magazines) || 0;
-
     const offers = item?.offers || 'R$ 0,00';
 
     const percentage = !isNaN(present) && !isNaN(enrolled) && enrolled > 0
       ? ((present / enrolled) * 100).toFixed(2)
       : '0.00';
+
+    const presentList = alunosDaTurma
+      .map((aluno: any) => `- ${aluno.name}: ${aluno.present ? '*Presente*' : 'Falta'}`)
+      .join('\n');
 
     const texto = `
 Resumo ${item.className} - *${new Date().toLocaleDateString('pt-BR')}*
@@ -258,10 +236,14 @@ Bíblias: *${bibles}*
 Revistas: *${magazines}*
 Ofertas: *${offers}*
 Porcentagem: *${percentage}%*
-  `.trim();
+
+*Lista de Presença:*
+${presentList}
+    `.trim();
 
     Clipboard.setStringAsync(texto);
-  };
+  });
+};
 
 
   return allStudents.length > 0 ? (
@@ -270,52 +252,58 @@ Porcentagem: *${percentage}%*
         data={allStudents}
         style={styles.container}
         extraData={[allStudents]}
-        renderItem={({ item, index }) => (
-          <>
-            <Text style={styles.title}>{item?.className || 'ERRO'}</Text>
-            <View style={styles.item}>
-              <Text style={styles.label}>Matriculados:</Text>
-              <Text style={styles.value}>{item?.enrolled || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{item?.absent}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Presentes:</Text>
-              <Text style={styles.value}>{item?.present || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.visitors || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Total:</Text>
-              <Text style={styles.value}>{item?.total || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Bíblias:</Text>
-              <Text style={styles.value}>{item?.bibles || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Revistas:</Text>
-              <Text style={styles.value}>{item?.magazines || 0}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Ofertas:</Text>
-              <Text style={styles.value}>{formatToCurrency(item?.offers || 0)}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Porcentagem:</Text>
-              <Text style={styles.value}>{!isNaN(item?.attendancePercentage) && item?.attendancePercentage || 0.00}%</Text>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={() => copiarResumo(item)}>
-              <Text style={styles.buttonText}>Copiar: {item?.className}</Text>
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>========================================</Text>
-            <Text style={styles.buttonText}>========================================</Text>
-          </>
-        )}
+        renderItem={({ item, index }) => item?.present === 0 && !!item?.className ?
+          (
+            <>
+              <Text style={styles.title}>{item?.className || ''}</Text>
+              <Text style={styles.buttonText}>========================================</Text>
+            </>
+          )
+          : (
+            <>
+              <Text style={styles.title}>{item?.className || ''}</Text>
+              <View style={styles.item}>
+                <Text style={styles.label}>Matriculados:</Text>
+                <Text style={styles.value}>{item?.enrolled || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Ausentes:</Text>
+                <Text style={styles.value}>{item?.absent}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Presentes:</Text>
+                <Text style={styles.value}>{item?.present || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Visitantes:</Text>
+                <Text style={styles.value}>{item?.visitors || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Total:</Text>
+                <Text style={styles.value}>{item?.total || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Bíblias:</Text>
+                <Text style={styles.value}>{item?.bibles || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Revistas:</Text>
+                <Text style={styles.value}>{item?.magazines || 0}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Ofertas:</Text>
+                <Text style={styles.value}>{formatToCurrency(item?.offers || 0)}</Text>
+              </View>
+              <View style={styles.item}>
+                <Text style={styles.label}>Porcentagem:</Text>
+                <Text style={styles.value}>{!isNaN(item?.attendancePercentage) && item?.attendancePercentage || 0.00}%</Text>
+              </View>
+              <TouchableOpacity style={styles.button} onPress={() => copiarResumo(item)}>
+                <Text style={styles.buttonText}>Copiar: {item?.className}</Text>
+              </TouchableOpacity>
+              <Text style={styles.buttonText}>========================================</Text>
+            </>
+          )}
         keyExtractor={(item) => item?.className}
       />
     </View>
