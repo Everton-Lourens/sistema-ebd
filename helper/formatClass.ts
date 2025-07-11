@@ -64,7 +64,7 @@ export function formatGeralClass(rawData: object | string) {
             .replace(/\s/g, '')
             .replace('R$', '')
             .replace(',', '.');
-         const valor = parseFloat(valorStr);
+         const valor = Number(valorStr.replace('.', ''))
          return acc + (isNaN(valor) ? 0 : valor);
       }, 0);
       const totalBiblias = Object.values(data).reduce((acc, curr) => acc + curr.bibles, 0);
@@ -79,7 +79,7 @@ export function formatGeralClass(rawData: object | string) {
          bibles: totalBiblias,
          magazines: totalRevistas,
          //magazines: (((Number(Number(totalPresentes) + Number(totalVisitantes)) / Number(totalRevistas)) * 100) || 0).toFixed(2) + '%',
-         offers: formatToCurrency(Number(totalOfertas + '00')),
+         offers: formatToCurrency(Number(totalOfertas)),
          attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2),
       };
 

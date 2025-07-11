@@ -31,7 +31,6 @@ export default function App() {
     offersNumber: '',
   });
   const [selectedClassId, setSelectedClassId] = useState(null);
-  const [newCallAlert, setNewCallAlert] = useState(false);
   const [presenceNumber, setPresenceNumber] = useState('');
   const [studentNumber, setStudentNumber] = useState('');
   const [bibleNumber, setBibleNumber] = useState('');
@@ -172,24 +171,6 @@ export default function App() {
       return false
     }
   }
-
-  const handleNewCall = (className = '') => {
-    if (!className || !studentNumber || !presenceNumber || !bibleNumber || !magazineNumber || !guestNumber || !offersNumber)
-      return showAlert('Preencha todos os campos');
-    const newCall = new NewCall();
-    newCall.setCall({
-      className,
-      studentNumber,
-      presenceNumber,
-      bibleNumber,
-      magazineNumber,
-      guestNumber,
-      offersNumber,
-    });
-    newCall.save()
-    updateAllClasses()
-    showAlert('Salvo com sucesso');
-  };
 
   const getStudentList = (className = '') => {
     if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');

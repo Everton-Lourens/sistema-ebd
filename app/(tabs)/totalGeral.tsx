@@ -4,7 +4,7 @@ import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MyClass } from '../../classes/class';
 
@@ -124,108 +124,6 @@ export default function Resumo() {
     }, [])
   );
 
-  useEffect(() => {
-    checkEmpateClasses();
-  }, [data]);
-
-  function checkEmpateClasses() {
-    const checkDataEmpate = Object.values(allCall).filter(item => Object.values(item).some(value => value !== ""));
-    if (checkDataEmpate.length === 0) return;
-    // Cálculo dos rankings
-    const dataComPorcentagem = checkDataEmpate.map((item: any) => ({
-      ...item,
-      porcentagem: getPercentage(item?.presenceNumber, item?.studentNumber) || 0,
-      ofertas: Number(item?.offersNumber?.replace(/[^\d]/g, '') || 0),
-    }));
-
-    const gerarTop3 = (data: any[], campo: string) => {
-      return [...data]
-        .sort((a, b) => (b[campo] ?? 0) - (a[campo] ?? 0))
-        .slice(0, 3)
-        .map((item, index) => ({
-          ...item,
-          colocacao:
-            index === 0
-              ? '1º Lugar'
-              : index === 1
-                ? '2º Lugar'
-                : '3º Lugar',
-        }));
-    };
-    setTopPresencas(gerarTop3(dataComPorcentagem, 'porcentagem'));
-    setTopOfertas(gerarTop3(dataComPorcentagem, 'ofertas'));
-    setTopBiblias(gerarTop3(dataComPorcentagem, 'bibleNumber'));
-    setTopRevistas(gerarTop3(dataComPorcentagem, 'magazines'));
-    setTopVisitantes(gerarTop3(dataComPorcentagem, 'guestNumber'));
-  }
-  useEffect(() => {
-    setEmpatePresenca(
-      (Number(topPresencas[0]?.porcentagem) > 0 &&
-        Number(topPresencas[1]?.porcentagem) > 0 &&
-        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[1]?.porcentagem)) ||
-      (Number(topPresencas[0]?.porcentagem) > 0 &&
-        Number(topPresencas[2]?.porcentagem) > 0 &&
-        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[2]?.porcentagem)) ||
-      (Number(topPresencas[1]?.porcentagem) > 0 &&
-        Number(topPresencas[2]?.porcentagem) > 0 &&
-        Number(topPresencas[1]?.porcentagem) === Number(topPresencas[2]?.porcentagem))
-    );
-    setEmpatePresenca(
-      (Number(topPresencas[0]?.porcentagem) > 0 &&
-        Number(topPresencas[1]?.porcentagem) > 0 &&
-        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[1]?.porcentagem)) ||
-      (Number(topPresencas[0]?.porcentagem) > 0 &&
-        Number(topPresencas[2]?.porcentagem) > 0 &&
-        Number(topPresencas[0]?.porcentagem) === Number(topPresencas[2]?.porcentagem)) ||
-      (Number(topPresencas[1]?.porcentagem) > 0 &&
-        Number(topPresencas[2]?.porcentagem) > 0 &&
-        Number(topPresencas[1]?.porcentagem) === Number(topPresencas[2]?.porcentagem))
-    );
-    setEmpateOfertas(
-      (Number(topOfertas[0]?.ofertas) > 0 &&
-        Number(topOfertas[1]?.ofertas) > 0 &&
-        Number(topOfertas[0]?.ofertas) === Number(topOfertas[1]?.ofertas)) ||
-      (Number(topOfertas[0]?.ofertas) > 0 &&
-        Number(topOfertas[2]?.ofertas) > 0 &&
-        Number(topOfertas[0]?.ofertas) === Number(topOfertas[2]?.ofertas)) ||
-      (Number(topOfertas[1]?.ofertas) > 0 &&
-        Number(topOfertas[2]?.ofertas) > 0 &&
-        Number(topOfertas[1]?.ofertas) === Number(topOfertas[2]?.ofertas))
-    );
-    setEmpateBiblias(
-      (Number(topBiblias[0]?.bibleNumber) > 0 &&
-        Number(topBiblias[1]?.bibleNumber) > 0 &&
-        Number(topBiblias[0]?.bibleNumber) === Number(topBiblias[1]?.bibleNumber)) ||
-      (Number(topBiblias[0]?.bibleNumber) > 0 &&
-        Number(topBiblias[2]?.bibleNumber) > 0 &&
-        Number(topBiblias[0]?.bibleNumber) === Number(topBiblias[2]?.bibleNumber)) ||
-      (Number(topBiblias[1]?.bibleNumber) > 0 &&
-        Number(topBiblias[2]?.bibleNumber) > 0 &&
-        Number(topBiblias[1]?.bibleNumber) === Number(topBiblias[2]?.bibleNumber))
-    );
-    setEmpateRevistas(
-      (Number(topRevistas[0]?.magazines) > 0 &&
-        Number(topRevistas[1]?.magazines) > 0 &&
-        Number(topRevistas[0]?.magazines) === Number(topRevistas[1]?.magazines)) ||
-      (Number(topRevistas[0]?.magazines) > 0 &&
-        Number(topRevistas[2]?.magazines) > 0 &&
-        Number(topRevistas[0]?.magazines) === Number(topRevistas[2]?.magazines)) ||
-      (Number(topRevistas[1]?.magazines) > 0 &&
-        Number(topRevistas[2]?.magazines) > 0 &&
-        Number(topRevistas[1]?.magazines) === Number(topRevistas[2]?.magazines))
-    );
-    setEmpateVisitantes(
-      (Number(topVisitantes[0]?.guestNumber) > 0 &&
-        Number(topVisitantes[1]?.guestNumber) > 0 &&
-        Number(topVisitantes[0]?.guestNumber) === Number(topVisitantes[1]?.guestNumber)) ||
-      (Number(topVisitantes[0]?.guestNumber) > 0 &&
-        Number(topVisitantes[2]?.guestNumber) > 0 &&
-        Number(topVisitantes[0]?.guestNumber) === Number(topVisitantes[2]?.guestNumber)) ||
-      (Number(topVisitantes[1]?.guestNumber) > 0 &&
-        Number(topVisitantes[2]?.guestNumber) > 0 &&
-        Number(topVisitantes[1]?.guestNumber) === Number(topVisitantes[2]?.guestNumber))
-    );
-  }, [topPresencas, topOfertas, topBiblias, topRevistas, topVisitantes, allStudents]);
 
   function updateAllClasses() {
     let totalStudent = 0;
@@ -394,40 +292,35 @@ Visitantes: *${parseNumber(resumo.visitors)}*
 Total: *${parseNumber(resumo.total)}*
 Bíblias: *${parseNumber(resumo.bibles)}*
 Revistas: *${parseNumber(resumo.magazines)}*
-Ofertas: *${resumo.offers || 'R$ 0,00'}*
+Ofertas: *${parseFloat((resumo.offers || 'R$ 0,00').replace(/[^\d,]/g, '').replace(',', '.')) === 0 ? 'Não houve' : resumo.offers}*
 Porcentagem Geral: *${formatPorcentagem(resumo.attendancePercentage)}%*
 *=======================*
 
-Vencedores em Presença:
-${hasDuplicates(resumo?.rankingAttendancePercentage.map((item) => item.attendancePercentage)) ? '*> Houve Empate <*' : ''}
+Vencedores em Presença:\n${hasDuplicates(resumo?.rankingAttendancePercentage.map((item) => item.attendancePercentage)) ? '*> Houve Empate <*' : ''}
 1º - *${resumo.rankingAttendancePercentage[0]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[0]?.attendancePercentage)}%*
 2º - *${resumo.rankingAttendancePercentage[1]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[1]?.attendancePercentage)}%*
 3º - *${resumo.rankingAttendancePercentage[2]?.className || ''}*: *${formatPorcentagem(resumo.rankingAttendancePercentage[2]?.attendancePercentage)}%*
 *=======================*
 
-Vencedores em Ofertas:
-${hasDuplicates(resumo?.rankingOffers.map((item) => item.offers)) ? '*> Houve Empate <*' : ''}
+Vencedores em Ofertas:\n${hasDuplicates(resumo?.rankingOffers.map((item) => item.offers)) ? '*> Houve Empate <*' : ''}
 1º - *${resumo.rankingOffers[0]?.className || ''}*: *${resumo.rankingOffers[0]?.offers || 'R$ 0,00'}*
 2º - *${resumo.rankingOffers[1]?.className || ''}*: *${resumo.rankingOffers[1]?.offers || 'R$ 0,00'}*
 3º - *${resumo.rankingOffers[2]?.className || ''}*: *${resumo.rankingOffers[2]?.offers || 'R$ 0,00'}*
 *=======================*
 
-Vencedores em Bíblias:
-${hasDuplicates(resumo?.rankingBibles.map((item) => item.bibles)) ? '*> Houve Empate <*' : ''}
+Vencedores em Bíblias:\n${hasDuplicates(resumo?.rankingBibles.map((item) => item.bibles)) ? '*> Houve Empate <*' : ''}
 1º - *${resumo.rankingBibles[0]?.className || ''}*: *${parseNumber(resumo.rankingBibles[0]?.bibles)}*
 2º - *${resumo.rankingBibles[1]?.className || ''}*: *${parseNumber(resumo.rankingBibles[1]?.bibles)}*
 3º - *${resumo.rankingBibles[2]?.className || ''}*: *${parseNumber(resumo.rankingBibles[2]?.bibles)}*
 *=======================*
 
-Vencedores em Revistas:
-${hasDuplicates(resumo?.rankingMagazines.map((item) => item.magazines)) ? '*> Houve Empate <*' : ''}
+Vencedores em Revistas:\n${hasDuplicates(resumo?.rankingMagazines.map((item) => item.magazines)) ? '*> Houve Empate <*' : ''}
 1º - *${resumo.rankingMagazines[0]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[0]?.magazines)}*
 2º - *${resumo.rankingMagazines[1]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[1]?.magazines)}*
 3º - *${resumo.rankingMagazines[2]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[2]?.magazines)}*
 *=======================*
 
-Vencedores em Visitantes:
-${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houve Empate <*' : ''}
+Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houve Empate <*' : ''}
 1º - *${resumo.rankingVisitors[0]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[0]?.visitors)}*
 2º - *${resumo.rankingVisitors[1]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[1]?.visitors)}*
 3º - *${resumo.rankingVisitors[2]?.className || ''}*: *${parseNumber(resumo.rankingVisitors[2]?.visitors)}*

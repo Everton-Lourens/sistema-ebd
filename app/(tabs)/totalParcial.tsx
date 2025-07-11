@@ -234,7 +234,7 @@ Visitantes: *${visitors}*
 Total: *${total}*
 Bíblias: *${bibles}*
 Revistas: *${magazines}*
-Ofertas: *${offers}*
+Ofertas: *${parseFloat(offers.replace(/[^\d,]/g, '').replace(',', '.')) === 0 ? 'Não houve' : offers}*
 Porcentagem: *${percentage}%*
 
 *Lista de Presença:*

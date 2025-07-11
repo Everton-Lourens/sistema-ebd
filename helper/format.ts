@@ -13,3 +13,5 @@ export const formatToCurrency = (stringNumber: string | number) => {
     }
     return stringNumber;
 }
+
+export const getToday = () => new Date().toISOString().split('T')[0];
