@@ -2,7 +2,7 @@ import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { initialClasses } from '@/constants/ClassName';
-import { formatToCurrency } from '@/helper/format';
+import { formatToCurrency, getToday } from '@/helper/format';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -175,12 +175,36 @@ export default function App() {
   const getStudentList = (className = '') => {
     if (!className) return showAlert('ERROO getStudentList: nome da turma é obrigatório');
     setAllStudents([]);
-    MyClass.getAllStudentsInClass(className)
+    MyClass.getAllStudentsInClass(className, getToday())
       .then((students: any) => {
         if (!students || (Array.isArray(students) && students.length === 0)) return;
         setAllStudents(Array.isArray(students[className]) ? students[className] : []);
         setCountStudents(Array.isArray(students[className]) ? students[className].length : 0);
       })
+  }
+
+  const clearAll = () => {
+    Alert.alert(
+      'Zerar todos os dados?',
+      'Tem certeza que deseja zerar todos os dados? Essa opção não pode ser desfeita.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sim, zerar',
+          onPress: () => {
+            MyClass.clear().then(() => {
+              setAllStudents([]);
+              setSelectedClassId(null);
+              showAlert('Todos os dados foram zerados.');
+            })
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   }
   const addNewStudent = () => {
     if (!selectedClass?.name) return showAlert('Selecione uma turma');
@@ -309,6 +333,7 @@ export default function App() {
                   <Text style={styles.titlePopUp}>{selectedClass.name}</Text>
                   <TextInput
                     style={styles.inputPopUp}
+                    placeholderTextColor="#999"
                     placeholder="Nome do aluno"
                     value={name}
                     onChangeText={setName}
@@ -424,8 +449,6 @@ export default function App() {
               );
             }}
           />
-
-
         </>
       )}
     </View>
