@@ -7,6 +7,10 @@ export const CLASSES = {
     SENHORES: 'Filhos de Sião',
 }
 
+export const THIS_CLASSES_TODAY = 'classes';
+
+export const THIS_CLASSES_STORAGE = 'classes_storage';
+
 export const initialClasses = [
   CLASSES.CRIANCA_PEQUENA,
   CLASSES.CRIANCA_GRANDE,

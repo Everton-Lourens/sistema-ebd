@@ -203,7 +203,7 @@ export default function Resumo() {
     }
     return sameDate;
   }
-  const copiarResumo = (item: any) => {
+  const copiarResumoOld = (item: any) => {
     MyClass.getAllStudentsInClass(item?.className).then(data => {
       const alunosDaTurma = data?.[item.className] || []; // acessa o array
 
@@ -245,6 +245,48 @@ ${presentList}
     });
   };
 
+  const copiarResumo = (item: any) => {
+    MyClass.getAllStudentsInClass(item?.className).then(data => {
+      const alunosDaTurma = data?.[item.className] || []; // acessa o array
+
+      const enrolled = Number(item?.enrolled) || 0;
+      const present = Number(item?.present) || 0;
+      const absent = Number(item?.absent) || 0;
+      const visitors = Number(item?.visitors) || 0;
+      const total = Number(item?.total) || 0;
+      const bibles = Number(item?.bibles) || 0;
+      const magazines = Number(item?.magazines) || 0;
+      const offers = item?.offers || 'R$ 0,00';
+
+      const percentage = !isNaN(present) && !isNaN(enrolled) && enrolled > 0
+        ? ((present / enrolled) * 100).toFixed(2)
+        : '0.00';
+
+      const presentList = alunosDaTurma
+        .map((aluno: any) => `- ${aluno.name}: ${aluno.present ? '*Presente*' : 'Falta'}`)
+        .join('\n');
+
+      const texto = `
+Resumo ${item.className} - *${new Date().toLocaleDateString('pt-BR')}*
+
+Matriculados: *${enrolled}*
+Ausentes: *${absent === 0 ? 'Não Houve' : absent}*
+Presentes: *${present === 0 ? 'Não Houve' : present}*
+Visitantes: *${visitors === 0 ? 'Não Houve' : visitors}*
+Total: *${total === 0 ? 'Não Houve' : total}*
+Bíblias: *${bibles === 0 ? 'Não Houve' : bibles}*
+Revistas: *${magazines === 0 ? 'Não Houve' : magazines}*
+Ofertas: *${parseFloat(offers.replace(/[^\d,]/g, '').replace(',', '.')) === 0 ? 'Não Houve' : offers}*
+Porcentagem: *${percentage === '0.00' ? 'Não Houve' : `${percentage}%`}*
+
+*Lista de Presença:*
+${presentList ? presentList : 'Não Houve'}
+    `.trim();
+
+      Clipboard.setStringAsync(texto);
+    });
+  };
+
 
   return allStudents.length > 0 ? (
     <View style={styles.container}>
@@ -265,7 +307,7 @@ ${presentList}
               <Text style={styles.title}>{item?.className || ''}</Text>
               <View style={styles.item}>
                 <Text style={styles.label}>Matriculados:</Text>
-                <Text style={styles.value}>{item?.enrolled || 0}</Text>
+                <Text style={styles.value}>{item?.enrolled || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Ausentes:</Text>
@@ -273,23 +315,23 @@ ${presentList}
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Presentes:</Text>
-                <Text style={styles.value}>{item?.present || 0}</Text>
+                <Text style={styles.value}>{item?.present || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Visitantes:</Text>
-                <Text style={styles.value}>{item?.visitors || 0}</Text>
+                <Text style={styles.value}>{item?.visitors || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Total:</Text>
-                <Text style={styles.value}>{item?.total || 0}</Text>
+                <Text style={styles.value}>{item?.total || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Bíblias:</Text>
-                <Text style={styles.value}>{item?.bibles || 0}</Text>
+                <Text style={styles.value}>{item?.bibles || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Revistas:</Text>
-                <Text style={styles.value}>{item?.magazines || 0}</Text>
+                <Text style={styles.value}>{item?.magazines || 'Não Houve'}</Text>
               </View>
               <View style={styles.item}>
                 <Text style={styles.label}>Ofertas:</Text>

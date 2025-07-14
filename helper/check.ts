@@ -1,3 +1,5 @@
+import { THIS_CLASSES_TODAY } from "@/constants/ClassName";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getToday } from "./format";
 
 /**
@@ -9,12 +11,13 @@ import { getToday } from "./format";
  */
 export function checkClasses(classesList: Record<string, { [key: string]: any; bible: boolean; magazine: boolean; present: boolean; }[]>) {
     const today = getToday();
+    let dataAluno;
 
-    return Object.fromEntries(
+    Object.fromEntries(
         Object.entries(classesList).map(([turma, alunos]) => [
             turma,
             (alunos || []).map(aluno => {
-                const dataAluno = (aluno.date ?? '').toString().split('T')[0];
+                dataAluno = (aluno.date ?? '').toString().split('T')[0];
                 if (dataAluno === today) return aluno;
                 return {
                     ...aluno,
@@ -26,6 +29,10 @@ export function checkClasses(classesList: Record<string, { [key: string]: any; b
             }),
         ])
     );
+    if (dataAluno === today)
+        AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(classesList))
+
+    return classesList
 }
 
 /* ---------- Exemplo rápido ---------- */

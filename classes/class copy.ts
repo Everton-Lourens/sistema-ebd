@@ -43,7 +43,7 @@ export class MyClass {
             magazine: newStudent.magazine || false,
             date: getToday(),
         };
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY).then((classes) => {
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`).then((classes) => {
             try {
                 let classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
@@ -52,7 +52,7 @@ export class MyClass {
                 }
                 classesList[newStudent.className].push(newStudentData);
                 AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(classesList))
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(classesList))
                 AsyncStorage.setItem(`student_${newStudentData.id}`, JSON.stringify({
                     name: newStudentData.name,
                     className: newStudentData.className
@@ -72,12 +72,12 @@ export class MyClass {
     static getAllStudentsInClass(className = '', GET_TODAY = getToday()) {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
                 const checkedClasses = checkClasses(classesList)
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(checkedClasses))
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}`, JSON.stringify(checkedClasses))
                 return className in checkedClasses ? { [className]: checkedClasses[className] } : {};
             })
     }
@@ -96,7 +96,7 @@ export class MyClass {
     static getAllStudentsInClass22(className = '', GET_TODAY = getToday()) {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${GET_TODAY}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -105,7 +105,7 @@ export class MyClass {
                         .then((classes) => {
                             const classesList =
                                 classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                            AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(classesList))
+                            AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(classesList))
                             return className in classesList ? { [className]: classesList[className] } : {};
                         })
                 } else {
@@ -115,7 +115,7 @@ export class MyClass {
     }
 
     static getAllStudents() {
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -238,7 +238,7 @@ export class MyClass {
 
         this.storageCall(className, newCall);
 
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
             .then((students) => {
                 const studentsList =
                     students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
@@ -253,7 +253,7 @@ export class MyClass {
                         }
                     });
                 }
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(studentsList));
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(studentsList));
                 return studentsList
             });
     }
@@ -291,7 +291,7 @@ export class MyClass {
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(null))
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(null))
                 AsyncStorage.clear().then(() => {
                     return AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
                 });
@@ -303,7 +303,7 @@ export class MyClass {
             throw new Error("ID e nome da turma são obrigatórios.");
         }
         try {
-            AsyncStorage.getItem(THIS_CLASSES_TODAY).then((students) => {
+            AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`).then((students) => {
                 const studentsList =
                     students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
 
@@ -314,7 +314,7 @@ export class MyClass {
                 studentsList[className] = studentsList[className].filter(
                     (student: MyClass) => student.id !== id
                 );
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(studentsList));
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(studentsList));
                 return true;
             });
         } catch (error) {

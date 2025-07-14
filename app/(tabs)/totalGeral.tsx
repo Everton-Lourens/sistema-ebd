@@ -286,14 +286,14 @@ Resumo Geral - *${new Date().toLocaleDateString('pt-BR')}*
 *=======================*
 Total Geral:
 Matriculados: *${parseNumber(resumo.enrolled)}*
-Ausentes: *${parseNumber(resumo.absent)}*
-Presentes: *${parseNumber(resumo.present)}*
-Visitantes: *${parseNumber(resumo.visitors)}*
-Total: *${parseNumber(resumo.total)}*
-Bíblias: *${parseNumber(resumo.bibles)}*
-Revistas: *${parseNumber(resumo.magazines)}*
-Ofertas: *${parseFloat((resumo.offers || 'R$ 0,00').replace(/[^\d,]/g, '').replace(',', '.')) === 0 ? 'Não houve' : resumo.offers}*
-Porcentagem Geral: *${formatPorcentagem(resumo.attendancePercentage)}%*
+Ausentes: *${parseNumber(resumo.absent) === 0 ? 'Não Houve' : parseNumber(resumo.absent)}*
+Presentes: *${parseNumber(resumo.present) === 0 ? 'Não Houve' : parseNumber(resumo.present)}*
+Visitantes: *${parseNumber(resumo.visitors) === 0 ? 'Não Houve' : parseNumber(resumo.visitors)}*
+Total: *${parseNumber(resumo.total) === 0 ? 'Não Houve' : parseNumber(resumo.total)}*
+Bíblias: *${parseNumber(resumo.bibles) === 0 ? 'Não Houve' : parseNumber(resumo.bibles)}*
+Revistas: *${parseNumber(resumo.magazines) === 0 ? 'Não Houve' : parseNumber(resumo.magazines)}*
+Ofertas: *${parseFloat((resumo.offers || 'R$ 0,00').replace(/[^\d,]/g, '').replace(',', '.')) === 0 ? 'Não Houve' : resumo.offers}*
+Porcentagem Geral: *${parseFloat(resumo.attendancePercentage) === 0 ? 'Não Houve' : `${formatPorcentagem(resumo.attendancePercentage)}%`}*
 *=======================*
 
 Vencedores em Presença:\n${hasDuplicates(resumo?.rankingAttendancePercentage.map((item) => item.attendancePercentage)) ? '*> Houve Empate <*' : ''}
@@ -341,31 +341,31 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
             <Text style={styles.title}>{item?.className}</Text>
             <View style={styles.item}>
               <Text style={styles.label}>Matriculados:</Text>
-              <Text style={styles.value}>{item?.enrolled || 0}</Text>
+              <Text style={styles.value}>{item?.enrolled || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ausentes:</Text>
-              <Text style={styles.value}>{item?.absent || 0}</Text>
+              <Text style={styles.value}>{item?.absent || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Presentes:</Text>
-              <Text style={styles.value}>{item?.present || 0}</Text>
+              <Text style={styles.value}>{item?.present || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Visitantes:</Text>
-              <Text style={styles.value}>{item?.visitors || 0}</Text>
+              <Text style={styles.value}>{item?.visitors || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Total:</Text>
-              <Text style={styles.value}>{item?.total || 0}</Text>
+              <Text style={styles.value}>{item?.total || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Bíblias:</Text>
-              <Text style={styles.value}>{item?.bibles || 0}</Text>
+              <Text style={styles.value}>{item?.bibles || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Revistas:</Text>
-              <Text style={styles.value}>{item?.magazines || 0}</Text>
+              <Text style={styles.value}>{item?.magazines || 'Não Houve'}</Text>
             </View>
             <View style={styles.item}>
               <Text style={styles.label}>Ofertas:</Text>
@@ -434,15 +434,15 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingBibles[0]?.bibles ? item?.rankingBibles[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[0]?.bibles || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[0]?.bibles || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingBibles[1]?.bibles ? item?.rankingBibles[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[1]?.bibles || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[1]?.bibles || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingBibles[2]?.bibles ? item?.rankingBibles[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[2]?.bibles || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[2]?.bibles || 'Não Houve'}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Revistas</Text>
@@ -455,15 +455,15 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingMagazines[0]?.magazines ? item?.rankingMagazines[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[0]?.magazines || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[0]?.magazines || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingMagazines[1]?.magazines ? item?.rankingMagazines[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[1]?.magazines || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[1]?.magazines || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingMagazines[2]?.magazines ? item?.rankingMagazines[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[2]?.magazines || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[2]?.magazines || 'Não Houve'}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Visitantes</Text>
@@ -476,15 +476,15 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingVisitors[0]?.visitors ? item?.rankingVisitors[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingVisitors[0]?.visitors || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[0]?.visitors || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingVisitors[1]?.visitors ? item?.rankingVisitors[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingVisitors[1]?.visitors || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[1]?.visitors || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingVisitors[2]?.visitors ? item?.rankingVisitors[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingVisitors[2]?.visitors || 0}</Text>
+                  <Text style={styles.value}>{item?.rankingVisitors[2]?.visitors || 'Não Houve'}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.buttonText}>============================================</Text>
