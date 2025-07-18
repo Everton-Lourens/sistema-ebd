@@ -9,17 +9,7 @@ export function useFormAuth() {
         throw error
       })
   }
-
-  async function getStudentById(id: string) {
-    await SQLiteService.getStudentById(id)
-      .catch((error) => {
-        console.log(error)
-        throw error
-      })
-  }
-
   return {
     onRegister,
-    getStudentById
   }
 }
