@@ -31,7 +31,7 @@ export default function RegisterForm() {
       return true
     }).catch(() => {
       Alert.alert(
-        "Register Failed!",
+        "Falha ao registrar aluno!",
         "Form data: " + JSON.stringify(values)
       );
       return false
@@ -39,7 +39,6 @@ export default function RegisterForm() {
   }
 
   function isFormValid(isValid: boolean, touched: TouchedFields): boolean {
-    console.log(isValid, touched)
     return isValid && Object.keys(touched).length !== 0;
   }
 
@@ -102,7 +101,6 @@ export default function RegisterForm() {
                   handleChange={handleChange}
                   handleBlur={handleBlur}
                 />
-
 
                 <TouchableOpacity
                   // @ts-ignore

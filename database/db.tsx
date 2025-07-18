@@ -14,43 +14,41 @@ export class SQLiteService {
             CREATE TABLE IF NOT EXISTS students (
                 id TEXT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL,
-                class TEXT NOT NULL
+                studentClass TEXT NOT NULL
             );
         `);
     };
 
-    static insertStudent = ({ name, studentClass }: IRegisterData) => {
-        return new Promise((resolve, reject) => {
-            try {
-                const id = Crypto.randomUUID();
-                db.runAsync(
-                    'INSERT INTO students (id, name, studentClass) VALUES (?, ?, ?)',
-                    id,
-                    name,
-                    studentClass
-                );
-                resolve(true);
-            } catch (error) {
-                reject(error);
-                logger.error(error);
-            }
-        });
+    static insertStudent = async ({ name, studentClass }: IRegisterData) => {
+        try {
+            const id = Crypto.randomUUID();
+            await db.runAsync(
+                'INSERT INTO students (id, name, studentClass) VALUES (?, ?, ?)',
+                id,
+                name,
+                studentClass
+            );
+            return true;
+        } catch (error) {
+            logger.error(error);
+            throw error;
+        }
     };
 
-    static getStudents() {
-        return db
-            .getAllAsync('SELECT * FROM students')
-            .then((result) => result)
-            .catch((error) => {
-                console.error('Erro ao buscar todos os estudantes:', error);
-                throw error;
-            });
-    }
+    static getStudents = async () => {
+        try {
+            const result = await db.getAllAsync('SELECT * FROM students');
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.error('Erro ao buscar todos os estudantes:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
 
 }
 
 SQLiteService.init();
-function uuid(): SQLite.SQLiteBindValue {
-    throw new Error('Function not implemented.');
-}
+
 
