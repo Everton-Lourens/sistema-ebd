@@ -1,10 +1,10 @@
 export const CLASSES = {
-    CRIANCA_PEQUENA: 'Cordeirinhos de Cristo',
-    CRIANCA_GRANDE: 'Shalom',
-    ADOLESCENTE: 'Filhos de Asáfe',
-    JOVENS: 'Mensageiros de Cristo',
-    SENHORAS: 'Rosa de Saron',
-    SENHORES: 'Filhos de Sião',
+  CRIANCA_PEQUENA: 'Cordeirinhos de Cristo',
+  CRIANCA_GRANDE: 'Shalom',
+  ADOLESCENTE: 'Filhos de Asáfe',
+  JOVENS: 'Mensageiros de Cristo',
+  SENHORAS: 'Rosa de Saron',
+  SENHORES: 'Filhos de Sião',
 }
 
 export const THIS_CLASSES_TODAY = 'classes';

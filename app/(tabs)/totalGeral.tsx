@@ -309,15 +309,15 @@ Vencedores em Ofertas:\n${hasDuplicates(resumo?.rankingOffers.map((item) => item
 *=======================*
 
 Vencedores em Bíblias:\n${hasDuplicates(resumo?.rankingBibles.map((item) => item.bibles)) ? '*> Houve Empate <*' : ''}
-1º - *${resumo.rankingBibles[0]?.className || ''}*: *${parseNumber(resumo.rankingBibles[0]?.bibles)}*
-2º - *${resumo.rankingBibles[1]?.className || ''}*: *${parseNumber(resumo.rankingBibles[1]?.bibles)}*
-3º - *${resumo.rankingBibles[2]?.className || ''}*: *${parseNumber(resumo.rankingBibles[2]?.bibles)}*
+1º - *${resumo.rankingBibles[0]?.className || ''}*: *${parseNumber(resumo.rankingBibles[0]?.bibles) + '%'}*
+2º - *${resumo.rankingBibles[1]?.className || ''}*: *${parseNumber(resumo.rankingBibles[1]?.bibles) + '%'}*
+3º - *${resumo.rankingBibles[2]?.className || ''}*: *${parseNumber(resumo.rankingBibles[2]?.bibles) + '%'}*
 *=======================*
 
 Vencedores em Revistas:\n${hasDuplicates(resumo?.rankingMagazines.map((item) => item.magazines)) ? '*> Houve Empate <*' : ''}
-1º - *${resumo.rankingMagazines[0]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[0]?.magazines)}*
-2º - *${resumo.rankingMagazines[1]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[1]?.magazines)}*
-3º - *${resumo.rankingMagazines[2]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[2]?.magazines)}*
+1º - *${resumo.rankingMagazines[0]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[0]?.magazines) + '%'}*
+2º - *${resumo.rankingMagazines[1]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[1]?.magazines) + '%'}*
+3º - *${resumo.rankingMagazines[2]?.className || ''}*: *${parseNumber(resumo.rankingMagazines[2]?.magazines) + '%'}*
 *=======================*
 
 Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) => item.visitors)) ? '*> Houve Empate <*' : ''}
@@ -434,15 +434,15 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingBibles[0]?.bibles ? item?.rankingBibles[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[0]?.bibles || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[0]?.bibles + '%' || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingBibles[1]?.bibles ? item?.rankingBibles[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[1]?.bibles || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[1]?.bibles + '%' || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingBibles[2]?.bibles ? item?.rankingBibles[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingBibles[2]?.bibles || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingBibles[2]?.bibles + '%' || 'Não Houve'}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Revistas</Text>
@@ -455,15 +455,15 @@ Vencedores em Visitantes:\n${hasDuplicates(resumo?.rankingVisitors.map((item) =>
                 ) : null}
                 <View style={styles.item}>
                   <Text style={styles.label}>1° - {!!item?.rankingMagazines[0]?.magazines ? item?.rankingMagazines[0]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[0]?.magazines || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[0]?.magazines + '%' || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>2° - {!!item?.rankingMagazines[1]?.magazines ? item?.rankingMagazines[1]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[1]?.magazines || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[1]?.magazines + '%' || 'Não Houve'}</Text>
                 </View>
                 <View style={styles.item}>
                   <Text style={styles.label}>3° - {!!item?.rankingMagazines[2]?.magazines ? item?.rankingMagazines[2]?.className : ''}:</Text>
-                  <Text style={styles.value}>{item?.rankingMagazines[2]?.magazines || 'Não Houve'}</Text>
+                  <Text style={styles.value}>{item?.rankingMagazines[2]?.magazines + '%' || 'Não Houve'}</Text>
                 </View>
                 <Text style={styles.buttonText}>============================================</Text>
                 <Text style={styles.title}>Vencedores em Visitantes</Text>

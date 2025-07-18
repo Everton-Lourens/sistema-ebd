@@ -1,5 +1,5 @@
+import { IRegisterData } from '@/components/screens/Register/interfaces/IRegisterData';
 import { CLASSES, THIS_CLASSES_STORAGE, THIS_CLASSES_TODAY } from '@/constants/ClassName';
-import { checkClasses } from '@/helper/check';
 import { getToday } from '@/helper/format';
 import { formatClass, formatGeralClass } from '@/helper/formatClass';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,14 @@ export class MyClass {
     bible: boolean;
     magazine: boolean;
     className: string;
+    enrolled: number;
+    absent: number;
+    visitors: string;
+    total: number;
+    bibles: number;
+    magazines: number;
+    offers: string;
+    attendancePercentage: string;
 
     constructor(id: string, name: string, className: string) {
         this.id = id;
@@ -28,14 +36,21 @@ export class MyClass {
         this.present = false;
         this.bible = false;
         this.magazine = false;
+        this.enrolled = 0;
+        this.absent = 0;
+        this.visitors = '';
+        this.total = 0;
+        this.bibles = 0;
+        this.magazines = 0;
+        this.offers = '';
+        this.attendancePercentage = '';
     }
 
-    static addStudentInClass(newStudent: MyClass) {
-        if (!newStudent.name || !newStudent.className) {
-            throw new Error("Nome do aluno e turma obrigatórios.");
-        }
+    static addStudentInClass(newStudent: IRegisterData) {
+        if (!newStudent.name || !newStudent.studentClass) throw new Error("Nome do aluno e turma obrigatórios.");
+
         const newStudentData = {
-            className: newStudent.className,
+            className: newStudent.studentClass,
             id: newStudent.id,
             name: newStudent.name,
             present: newStudent.present || false,
@@ -43,70 +58,69 @@ export class MyClass {
             magazine: newStudent.magazine || false,
             date: getToday(),
         };
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY).then((classes) => {
-            try {
-                let classesList =
-                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
-                if (!classesList.hasOwnProperty(newStudent.className)) {
-                    classesList[newStudent.className] = [];
+
+        AsyncStorage.getItem(THIS_CLASSES_STORAGE)
+            .then((classes) => {
+                try {
+                    let classesList =
+                        classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
+                    if (!classesList.hasOwnProperty(newStudent.className)) {
+                        classesList[newStudent.className] = [];
+                    }
+                    classesList[newStudent.className].push(newStudentData);
+                    AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
+                    AsyncStorage.setItem(`student_${newStudentData.id}`, JSON.stringify({
+                        name: newStudentData.name,
+                        className: newStudentData.className
+                    }));
+                    return true;
+                } catch (e) {
+                    console.log(e);
+                    return false;
                 }
-                classesList[newStudent.className].push(newStudentData);
-                AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(classesList))
-                AsyncStorage.setItem(`student_${newStudentData.id}`, JSON.stringify({
-                    name: newStudentData.name,
-                    className: newStudentData.className
-                }));
-                return true;
-            } catch (e) {
+            })
+            .catch((e) => {
                 console.log(e);
-                return false;
-            }
-        })
+                return e;
+            })
+
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
+            .then((classes) => {
+                try {
+                    let classesList =
+                        classes !== null && typeof classes === 'string' ? JSON.parse(classes) : {};
+                    if (!classesList.hasOwnProperty(newStudent.className)) {
+                        classesList[newStudent.className] = [];
+                    }
+                    classesList[newStudent.className].push(newStudentData);
+                    AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(classesList))
+                    return true;
+                } catch (e) {
+                    console.log(e);
+                    return false;
+                }
+            })
             .catch((e) => {
                 console.log(e);
                 return e;
             })
     }
 
-    static getAllStudentsInClass(className = '', GET_TODAY = getToday()) {
+    static getAllStudentsInClass(className = '') {
         if (!className)
             throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                const checkedClasses = checkClasses(classesList)
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(checkedClasses))
-                return className in checkedClasses ? { [className]: checkedClasses[className] } : {};
-            })
-    }
 
-    static getAllStudentsInClassByDate(className = '', GET_TODAY = '') {
-        if (!className || !GET_TODAY)
-            throw new Error("Nome da turma e data é obrigatório.");
-        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${GET_TODAY}`)
-            .then((classes) => {
-                const classesList =
-                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                return className in classesList ? { [className]: classesList[className] } : {};
-            })
-    }
-
-    static getAllStudentsInClass22(className = '', GET_TODAY = getToday()) {
-        if (!className)
-            throw new Error("Nome da turma é obrigatório.");
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
-            .then((classes) => {
-                const classesList =
-                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
                 if (Object.keys(classesList).length === 0) {
                     return AsyncStorage.getItem(THIS_CLASSES_STORAGE)
-                        .then((classes) => {
-                            const classesList =
-                                classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                            AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(classesList))
-                            return className in classesList ? { [className]: classesList[className] } : {};
+                        .then((classesStorage) => {
+                            const classesListStorage =
+                                classesStorage !== null && typeof classesStorage === 'string' ? JSON.parse(classesStorage) : classesStorage ?? {};
+                            AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(classesList))
+                            return className in classesListStorage ? { [className]: classesListStorage[className] } : {};
                         })
                 } else {
                     return className in classesList ? { [className]: classesList[className] } : {};
@@ -114,8 +128,19 @@ export class MyClass {
             })
     }
 
+    static getAllStudentsInClassByDate(className = '', date = '') {
+        if (!className || !date)
+            throw new Error("Nome da turma e data é obrigatório.");
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${date}`)
+            .then((classes) => {
+                const classesList =
+                    classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
+                return className in classesList ? { [className]: classesList[className] } : {};
+            })
+    }
+
     static getAllStudents() {
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
@@ -181,27 +206,6 @@ export class MyClass {
     */
     }
 
-    static countStudentsInClass(className: string, date = getToday()) {
-        if (!className) {
-            throw new Error("Turma é obrigatória.");
-        }
-        return AsyncStorage.getItem(`${date}_${className}_students`)
-            .then((students) => {
-                const studentsList = students !== null ? JSON.parse(students) : [];
-                return studentsList.length;
-            });
-    }
-    static countStudents(className: string) {
-        if (!className) {
-            throw new Error("Turma é obrigatória.");
-        }
-        return AsyncStorage.getItem(`${getToday()}_${className}_students`)
-            .then((students) => {
-                const studentsList = students !== null ? JSON.parse(students) : [];
-                return studentsList.length;
-            });
-    }
-
     static editClassDetail(className: string, classDetail: any) {
         if (!className || !classDetail) {
             throw new Error("Turma e detalhes obrigatórios.");
@@ -232,66 +236,12 @@ export class MyClass {
             });
     }
 
-    static callStudents(className: string, newCall: any) {
-        if (!className || !newCall)
-            throw new Error("Turma e presença obrigatórias.");
-
-        this.storageCall(className, newCall);
-
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
-            .then((students) => {
-                const studentsList =
-                    students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
-
-                if (studentsList[className]) {
-                    studentsList[className].map((student: any) => {
-                        const id = student.id;
-                        if (newCall?.id === id) {
-                            student.present = newCall?.present;
-                            student.bible = newCall?.bible;
-                            student.magazine = newCall?.magazine;
-                        }
-                    });
-                }
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(studentsList));
-                return studentsList
-            });
-    }
-
-    private static storageCall(className: string, newCall: any) {
-        try {
-            AsyncStorage.getItem(`call_${getToday()}_${className}`)
-                .then((calls) => {
-                    const callsList = calls !== null ? JSON.parse(calls) : [];
-                    const callIndex = callsList.findIndex((call) => call.id === Object.keys(newCall)[0]);
-                    if (callIndex > -1) {
-                        callsList[callIndex] = {
-                            ...callsList[callIndex],
-                            ...newCall[Object.keys(newCall)[0]],
-                        }
-                    } else {
-                        const call = {
-                            id: Object.keys(newCall)[0],
-                            className,
-                            name: newCall[Object.keys(newCall)[0]]?.name,
-                            present: newCall[Object.keys(newCall)[0]]?.present,
-                            bible: newCall[Object.keys(newCall)[0]]?.bible,
-                            magazine: newCall[Object.keys(newCall)[0]]?.magazine,
-                            date: getToday(),
-                        }
-                        callsList.push(call);
-                    }
-                    AsyncStorage.setItem(`call_${getToday()}_${className}`, JSON.stringify(callsList));
-                })
-        } catch (error) { console.trace(error) }
-    }
-
     static clear() {
-        return AsyncStorage.getItem(THIS_CLASSES_TODAY)
+        return AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
             .then((classes) => {
                 const classesList =
                     classes !== null && typeof classes === 'string' ? JSON.parse(classes) : classes ?? {};
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(null))
+                AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(null))
                 AsyncStorage.clear().then(() => {
                     return AsyncStorage.setItem(THIS_CLASSES_STORAGE, JSON.stringify(classesList))
                 });
@@ -303,20 +253,21 @@ export class MyClass {
             throw new Error("ID e nome da turma são obrigatórios.");
         }
         try {
-            AsyncStorage.getItem(THIS_CLASSES_TODAY).then((students) => {
-                const studentsList =
-                    students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
+            AsyncStorage.getItem(`${THIS_CLASSES_TODAY}_${getToday()}`)
+                .then((students) => {
+                    const studentsList =
+                        students !== null && typeof students === 'string' ? JSON.parse(students) : students ?? [];
 
-                if (!studentsList[className]) {
-                    console.warn(`Turma "${className}" não encontrada.`);
-                    return false;
-                }
-                studentsList[className] = studentsList[className].filter(
-                    (student: MyClass) => student.id !== id
-                );
-                AsyncStorage.setItem(THIS_CLASSES_TODAY, JSON.stringify(studentsList));
-                return true;
-            });
+                    if (!studentsList[className]) {
+                        console.warn(`Turma "${className}" não encontrada.`);
+                        return false;
+                    }
+                    studentsList[className] = studentsList[className].filter(
+                        (student: MyClass) => student.id !== id
+                    );
+                    AsyncStorage.setItem(`${THIS_CLASSES_TODAY}_${getToday()}`, JSON.stringify(studentsList));
+                    return true;
+                });
         } catch (error) {
             console.error("Erro ao remover aluno:", error);
             return false

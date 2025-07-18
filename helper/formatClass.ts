@@ -1,25 +1,47 @@
+import { MyClass } from "@/classes/class";
 import { formatToCurrency } from "./format";
+
+type RankingResult = {
+   enrolled: number | object;
+   absent: number | object;
+   present: number | object;
+   visitors: number | object;
+   total: number | object;
+   bibles: string;
+   magazines: string;
+   offers: string;
+   attendancePercentage: string;
+   rankingEnrolled?: any;
+   rankingPresent?: any;
+   rankingVisitors?: any;
+   rankingTotal?: any;
+   rankingBibles?: any;
+   rankingMagazines?: any;
+   rankingOffers?: any;
+   rankingAttendancePercentage?: any;
+};
 
 export function formatClass(rawData: object | string) {
    if (!rawData) return null;
    try {
       const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
-      let result = {};
-      let draw = [];
+      let result: Record<string, any> = {};
 
       for (const className in data) {
          const group = data[className];
          const students = group;
 
-         const matriculados = students.filter(s => s.name).length;
-         const ausentes = students.filter(s => s.present === false).length;
-         const presentes = students.filter(s => s.present === true).length;
-         const visitantes = group.find(item => item.guestNumber)?.guestNumber || 0;
+         const matriculados = students.filter((s: { name: any; }) => s.name).length;
+         const ausentes = students.filter((s: { present: boolean; }) => s.present === false).length;
+         const presentes = students.filter((s: { present: boolean; }) => s.present === true).length;
+         const visitantes = group.find((item: { guestNumber: any; }) => item.guestNumber)?.guestNumber || 0;
          const total = (Number(presentes) + Number(visitantes));
-         const ofertas = group.find(item => item.offersNumber)?.offersNumber || 0;
-         const biblias = students.filter(s => s.present && s.bible).length;
-         const revistas = students.filter(s => s.present && s.magazine).length;
+         const ofertas = group.find((item: { offersNumber: any; }) => item.offersNumber)?.offersNumber || 0;
+         const bibliasNumber = students.filter((s: { present: any; bible: any; }) => s.present && s.bible).length;
+         const biblias = ((bibliasNumber / matriculados) * 100).toFixed(2) || 0;
+         const revistasNumber = students.filter((s: { present: any; magazine: any; }) => s.present && s.magazine).length;
+         const revistas = ((revistasNumber / matriculados) * 100).toFixed(2) || 0;
          const porcentagem = ((presentes / matriculados) * 100).toFixed(2) || 0;
          //console.log(`\nRelatório da turma: ${className}`);
          //console.log(`Matriculados: ${matriculados}`);
@@ -51,34 +73,35 @@ export function formatClass(rawData: object | string) {
    }
 }
 
-export function formatGeralClass(rawData: object | string) {
+export function formatGeralClass(rawData: MyClass | object) {
    if (!rawData) return null;
    try {
       const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
-      const totalMatriculados = Object.values(data).reduce((acc, curr) => acc + curr.enrolled, 0);
-      const totalAusentes = Object.values(data).reduce((acc, curr) => acc + curr.absent, 0);
-      const totalPresentes = Object.values(data).reduce((acc, curr) => acc + curr.present, 0);
-      const totalVisitantes = Object.values(data).reduce((acc, curr) => acc + Number(curr.visitors), 0);
+      const totalMatriculados = Object.values(data).reduce((acc, curr) => acc + (curr as any).enrolled, 0);
+      const totalAusentes = Object.values(data).reduce((acc, curr) => acc + (curr as any).absent, 0);
+      const totalPresentes = Object.values(data).reduce((acc, curr) => acc + (curr as any).present, 0);
+      const totalVisitantes = Object.values(data).reduce((acc, curr) => (curr as any) + Number((curr as any).visitors), 0);
       const totalOfertas = Object.values(data).reduce((acc, curr) => {
-         const valorStr = curr.offers
+         const valorStr = (curr as any).offers
             .replace(/\s/g, '')
             .replace('R$', '')
             .replace(',', '.');
          const valor = Number(valorStr.replace('.', ''))
-         return acc + (isNaN(valor) ? 0 : valor);
+         return (curr as any) + (isNaN(valor) ? 0 : valor);
       }, 0);
-      const totalBiblias = Object.values(data).reduce((acc, curr) => acc + curr.bibles, 0);
-      const totalRevistas = Object.values(data).reduce((acc, curr) => acc + curr.magazines, 0);
+      const totalBiblias = Object.values(data).reduce((acc, curr) => acc + (curr as any).bibles, 0);
+      const totalRevistas = Object.values(data).reduce((acc, curr) => acc + (curr as any).magazines, 0);
 
-      const result = {
-         enrolled: totalMatriculados,
-         absent: totalAusentes,
-         present: totalPresentes,
-         visitors: totalVisitantes,
+
+
+      const result: RankingResult = {
+         enrolled: totalMatriculados || 0,
+         absent: totalAusentes || 0,
+         present: totalPresentes || false,
+         visitors: totalVisitantes || 0,
          total: Number(totalPresentes) + Number(totalVisitantes),
-         bibles: totalBiblias,
-         magazines: totalRevistas,
-         //magazines: (((Number(Number(totalPresentes) + Number(totalVisitantes)) / Number(totalRevistas)) * 100) || 0).toFixed(2) + '%',
+         bibles: (((Number(totalBiblias) / Number(totalMatriculados)) * 100) || 0).toFixed(2),
+         magazines: (((Number(totalRevistas) / Number(totalMatriculados)) * 100) || 0).toFixed(2),
          offers: formatToCurrency(Number(totalOfertas)),
          attendancePercentage: (((Number(totalPresentes) / Number(totalMatriculados)) * 100) || 0).toFixed(2),
       };
