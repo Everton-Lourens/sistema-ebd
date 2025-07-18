@@ -25,15 +25,14 @@ export default function RegisterForm() {
     return onRegister(values).then(() => {
       Alert.alert(
         "Aluno Registrado!",
-        "Dados: " + JSON.stringify(values)
+        "Nome: " + values.name +
+        "\nClasse: " + values.studentClass,
       );
-      return true
     }).catch(() => {
       Alert.alert(
         "Falha ao registrar aluno!",
         "Form data: " + JSON.stringify(values)
       );
-      return false
     })
   }
 
