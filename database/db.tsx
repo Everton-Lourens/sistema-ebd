@@ -47,6 +47,19 @@ export class SQLiteService {
         }
     };
 
+
+    static getStudentById = async (id: string) => {
+        try {
+            const result = await db.getAllSync('SELECT * FROM students WHERE id = ?', id);
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.error('Erro ao buscar estudante por id:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
+
 }
 
 SQLiteService.init();

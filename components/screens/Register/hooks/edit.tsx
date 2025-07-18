@@ -1,15 +1,6 @@
 import { SQLiteService } from '@/database/db';
-import { IRegisterData } from '../interfaces/IRegisterData';
 
 export function useFormAuth() {
-  async function onRegister(registerData: IRegisterData) {
-    await SQLiteService.insertStudent(registerData)
-      .catch((error) => {
-        console.log(error)
-        throw error
-      })
-  }
-
   async function getStudentById(id: string) {
     await SQLiteService.getStudentById(id)
       .catch((error) => {
@@ -19,7 +10,6 @@ export function useFormAuth() {
   }
 
   return {
-    onRegister,
     getStudentById
   }
 }

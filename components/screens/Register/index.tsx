@@ -21,7 +21,6 @@ export default function RegisterForm() {
   const { onRegister } = useFormAuth()
 
   function onSubmitHandler(values: IRegisterData) {
-    console.log(values)
     // https://reactnative.dev/docs/alert
     return onRegister(values).then(() => {
       Alert.alert(
