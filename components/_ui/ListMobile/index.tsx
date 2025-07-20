@@ -65,14 +65,14 @@ export function ListMobile({
   return (
     <FlatList
       data={items}
-      keyExtractor={(item) => item._id}
+      keyExtractor={(item) => item.id}
       contentContainerStyle={{ padding: 12 }}
       renderItem={({ item }) => {
-        const isOpen = itemOpened[item._id] || false;
+        const isOpen = itemOpened[item.id] || false;
         return (
           <View style={styles.card}>
             <TouchableOpacity
-              onPress={() => handleOpenItem(item._id)}
+              onPress={() => handleOpenItem(item.id)}
               style={styles.listItem}
             >
               {itemFields.map((field, index) => (

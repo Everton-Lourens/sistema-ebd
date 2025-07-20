@@ -1,78 +1,18 @@
 
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { styles } from "@/constants/styles"
-import { useUserStore } from "@/stores/User/useUserStore"
-import { TouchedFields } from "@/types/form"
-import { useFocusEffect } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
-import { useCallback } from "react"
 import {
-  Alert,
   SafeAreaView,
   Text,
+  TouchableOpacity,
   View
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { useFormAuth } from "./hooks/useFormAuth"
-import { IStudentData } from "./interfaces/IStudentData"
+import { useDashboard } from "./hooks/useDashboard"
 
 export default function Dashboard() {
-  const {
-    id,
-    setId,
-    name,
-    setName,
-    studentClass,
-    setStudentClass,
-    isEditing,
-    setIsEditing,
-  } = useUserStore();
-  const { onRegister } = useFormAuth()
-
-  function onSubmitHandler(values: IStudentData) {
-    /*
-    if (isEditing && id) {
-      updateStudent(id, values); // lógica para editar
-    } else {
-      createStudent(values); // lógica para novo cadastro
-    }
-    router.push('/'); // redireciona após salvar
-*/
-    // https://reactnative.dev/docs/alert
-    return onRegister(values).then(() => {
-      Alert.alert(
-        "Aluno Registrado!",
-        "Nome: " + values.name +
-        "\nClasse: " + values.studentClass,
-      );
-    }).catch(() => {
-      Alert.alert(
-        "Falha ao registrar aluno!",
-        "Form data: " + JSON.stringify(values)
-      );
-    })
-  }
-
-  function isFormValid(isValid: boolean, touched: TouchedFields): boolean {
-    return isValid && Object.keys(touched).length !== 0;
-  }
-
-  const focusEffectCallback = useCallback(() => {
-    if (isEditing) {
-      if (!name || !studentClass || !id)
-        throw new Error('Edição de usuário inválida');
-      console.log('Editando user: ' + name);
-    }
-    return () => {
-      setId('');
-      setName('');
-      setStudentClass('');
-      setIsEditing(false);
-    };
-  }, []);
-
-  useFocusEffect(focusEffectCallback);
-
+  const { getDashboardData } = useDashboard()
   return (
     <>
       <SafeAreaView style={styles.topSafeArea} />
@@ -97,30 +37,40 @@ export default function Dashboard() {
               emptyText="Nenhum registro disponível!"
               items={[
                 {
-                  _id: 1,
-                  nome: 'Carlos',
+                  id: 1,
+                  class: 'Cordeirinhos de Cristo',
                   email: 'carlos@email.com',
                   idade: 28,
-                  cidade: 'Salvador',
+                  church: 'Dois de Julho',
+                  city: 'Camaçari',
+                  countClass: 3,
                 },
                 {
-                  _id: 2,
-                  nome: 'Ana',
+                  id: 2,
+                  class: 'Shalom',
                   email: 'ana@email.com',
                   idade: 24,
-                  cidade: 'Camaçari',
+                  church: 'Dois de Julho',
+                  city: 'Camaçari',
+                  countClass: 2,
                 },
               ]}
               itemFields={[
-                { field: 'nome', valueFormatter: undefined },
-                { field: 'email', valueFormatter: undefined },
+                { field: 'class', valueFormatter: undefined },
+                { field: 'countClass', valueFormatter: undefined },
               ]}
               collapseItems={[
-                { field: 'idade', headerName: 'Idade', type: 'text' },
-                { field: 'cidade', headerName: 'Cidade', type: 'text' },
+                { field: 'countClass', headerName: 'Matriculados', type: 'text' },
+                { field: 'city', headerName: 'Cidade', type: 'text' },
               ]}
             />
           </View>
+                <TouchableOpacity
+        style={styles.button}
+        onPress={getDashboardData}
+      >
+        <Text style={styles.buttonText}>Buscar dados</Text>
+      </TouchableOpacity>
         </KeyboardAwareScrollView>
       </SafeAreaView>
     </>
