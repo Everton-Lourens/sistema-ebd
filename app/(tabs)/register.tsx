@@ -1,5 +1,5 @@
-import RegisterForm from '@/components/screens/Register';
+import StudentFormScreen from '@/screens/Register';
 
 export default function Register() {
-    return <RegisterForm />;
+    return <StudentFormScreen />;
 }

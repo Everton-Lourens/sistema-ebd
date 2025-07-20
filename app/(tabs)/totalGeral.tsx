@@ -4,7 +4,7 @@ import { compareDate } from '@/helper/date';
 import { formatToCurrency } from '@/helper/format';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MyClass } from '../../classes/class';
 

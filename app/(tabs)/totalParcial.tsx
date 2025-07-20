@@ -2,10 +2,10 @@ import { MyClass } from '@/classes/class';
 import { NewCall } from '@/classes/newCall';
 import { initialClasses } from '@/constants/ClassName';
 import { formatToCurrency } from '@/helper/format';
+import { useFocusEffect } from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
-import { useFocusEffect } from 'expo-router';
 import { navigate } from 'expo-router/build/global-state/routing';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface IDataSummary {

@@ -1,174 +1,153 @@
+import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from 'react';
 import {
-  Collapse,
-  List,
-  ListItem,
-  ListItemButton,
-  Skeleton,
-} from '@mui/material'
-import style from './ListMobile.module.scss'
-import { useState } from 'react'
-import { EmptyItems } from '../EmptyItems'
-import { CollapseItem } from './interfaces/CollapseItem'
-import { Field } from './interfaces/Field'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
-import { ItemStatus } from './interfaces/IItemStatus'
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+type Field = {
+  field: string;
+  valueFormatter?: ({ value, data }: { value: any; data: any }) => string;
+};
+
+type CollapseItem = {
+  field: string;
+  headerName: string;
+  type?: 'actions' | 'text';
+  valueFormatter?: ({ value, data }: { value: any; data: any }) => string;
+};
 
 type Props = {
-  items: any[]
-  itemFields: Field[]
-  collapseItems: CollapseItem[]
-  emptyText?: string
-  loading?: boolean
-}
+  items: any[];
+  itemFields: Field[];
+  collapseItems: CollapseItem[];
+  emptyText?: string;
+  loading?: boolean;
+};
 
 export function ListMobile({
   items,
   itemFields,
   collapseItems,
-  emptyText,
-  loading,
+  emptyText = 'Nenhum item encontrado',
+  loading = false,
 }: Props) {
-  const [itemOpened, setItemOpened] = useState<ItemStatus>({})
+  const [itemOpened, setItemOpened] = useState<{ [id: string]: boolean }>({});
 
-  function handleOpenItem(itemId: string) {
-    setItemOpened({
-      [itemId]: !itemOpened[itemId],
-    })
+  function handleOpenItem(id: string) {
+    setItemOpened((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#555" />
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
+
+  if (!items || items.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text>{emptyText}</Text>
+      </View>
+    );
   }
 
   return (
-    <List className={style.list}>
-      {!loading &&
-        items?.length > 0 &&
-        items?.map((item: any) => {
-          const collapseOpened = itemOpened[item._id] || false
-
-          return (
-            <div
-              style={{
-                opacity: loading ? 0.5 : 1,
-              }}
-              key={item._id}
-              className={style.groupItem}
+    <FlatList
+      data={items}
+      keyExtractor={(item) => item._id}
+      contentContainerStyle={{ padding: 12 }}
+      renderItem={({ item }) => {
+        const isOpen = itemOpened[item._id] || false;
+        return (
+          <View style={styles.card}>
+            <TouchableOpacity
+              onPress={() => handleOpenItem(item._id)}
+              style={styles.listItem}
             >
-              <ListItem
-                onClick={() => {
-                  handleOpenItem(item._id)
-                }}
-                className={style.listItem}
-              >
-                {itemFields?.map((field, index) => {
-                  return (
-                    <span
-                      className={field?.cellClass?.({
-                        value: item[field.field],
-                        data: item,
-                      })}
-                      key={field.field}
-                      style={{
-                        marginRight: index === 0 ? 'auto' : 0,
-                      }}
-                    >
-                      {field?.valueFormatter?.({
-                        value: item[field.field],
-                        data: item,
-                      })}
-
-                      {field?.cellRenderer?.({
-                        value: item[field.field],
-                        data: item,
-                      })}
-                    </span>
-                  )
-                })}
-                {collapseItems?.length > 0 && (
-                  <FontAwesomeIcon
-                    className={style.angleIcon}
-                    icon={collapseOpened ? faAngleUp : faAngleDown}
-                  />
-                )}
-              </ListItem>
-
+              {itemFields.map((field, index) => (
+                <Text key={field.field} style={[styles.cell, index === 0 && { flex: 1 }]}>
+                  {field.valueFormatter
+                    ? field.valueFormatter({ value: item[field.field], data: item })
+                    : String(item[field.field])}
+                </Text>
+              ))}
               {collapseItems?.length > 0 && (
-                <Collapse in={collapseOpened} className={style.collapse}>
-                  <List className={style.collapseList}>
-                    {collapseItems.map((collapseItem) => {
-                      return (
-                        <ListItemButton
-                          key={collapseItem.field}
-                          className={style.collapseListItem}
-                          disableRipple
-                        >
-                          {collapseItem.type === 'actions' ? (
-                            <>
-                              {collapseItem?.cellRenderer?.({
-                                value: item[collapseItem.field],
-                                data: item,
-                              })}
-                            </>
-                          ) : (
-                            <>
-                              <span style={{ fontWeight: '600' }}>
-                                {collapseItem.headerName}
-                              </span>
-                              <span
-                                className={collapseItem?.cellClass?.({
-                                  value: item[collapseItem.field],
-                                  data: item,
-                                })}
-                              >
-                                {collapseItem?.valueFormatter?.({
-                                  value: item[collapseItem.field],
-                                  data: item,
-                                })}
-
-                                {collapseItem?.cellRenderer?.({
-                                  value: item[collapseItem.field],
-                                  data: item,
-                                })}
-                              </span>
-                            </>
-                          )}
-                        </ListItemButton>
-                      )
-                    })}
-                  </List>
-                </Collapse>
+                <FontAwesome
+                  name={isOpen ? 'angle-up' : 'angle-down'}
+                  size={20}
+                  color="#555"
+                />
               )}
-            </div>
-          )
-        })}
+            </TouchableOpacity>
 
-      {(items.length === 0 || !items) && !loading && (
-        <EmptyItems text={emptyText || 'Nenhum item encontrado'} />
-      )}
-
-      {loading &&
-        [1, 2, 3, 4, 5].map((item) => {
-          return (
-            <div key={item} className={style.groupItem}>
-              <ListItemButton className={style.listItem}>
-                <Skeleton
-                  variant="text"
-                  height={18}
-                  width={50}
-                  sx={{
-                    fontSize: '1rem',
-                    marginRight: 'auto',
-                    borderRadius: 15,
-                  }}
-                />
-                <Skeleton
-                  variant="text"
-                  height={18}
-                  width={150}
-                  sx={{ fontSize: '1rem', borderRadius: 15 }}
-                />
-              </ListItemButton>
-            </div>
-          )
-        })}
-    </List>
-  )
+            {isOpen && collapseItems.length > 0 && (
+              <View style={styles.collapse}>
+                {collapseItems.map((collapseItem) => (
+                  <View key={collapseItem.field} style={styles.collapseItem}>
+                    <Text style={styles.collapseTitle}>{collapseItem.headerName}</Text>
+                    <Text>
+                      {collapseItem.valueFormatter
+                        ? collapseItem.valueFormatter({
+                            value: item[collapseItem.field],
+                            data: item,
+                          })
+                        : String(item[collapseItem.field])}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        );
+      }}
+    />
+  );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#fff',
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 8,
+    elevation: 2,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  cell: {
+    marginRight: 8,
+    fontWeight: '500',
+  },
+  collapse: {
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    paddingTop: 10,
+  },
+  collapseItem: {
+    marginBottom: 8,
+  },
+  collapseTitle: {
+    fontWeight: 'bold',
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+});

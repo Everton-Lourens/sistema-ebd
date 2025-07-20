@@ -1,7 +1,7 @@
-import { IRegisterData } from '@/components/screens/Register/interfaces/IRegisterData';
 import { CLASSES, THIS_CLASSES_STORAGE, THIS_CLASSES_TODAY } from '@/constants/ClassName';
 import { getToday } from '@/helper/format';
 import { formatClass, formatGeralClass } from '@/helper/formatClass';
+import { IStudentData } from '@/screens/Register/interfaces/IStudentData';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface StudentData {
@@ -46,7 +46,7 @@ export class MyClass {
         this.attendancePercentage = '';
     }
 
-    static addStudentInClass(newStudent: IRegisterData) {
+    static addStudentInClass(newStudent: IStudentData) {
         if (!newStudent.name || !newStudent.studentClass) throw new Error("Nome do aluno e turma obrigatórios.");
 
         const newStudentData = {

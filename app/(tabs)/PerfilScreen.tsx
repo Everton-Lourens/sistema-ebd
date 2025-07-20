@@ -1,6 +1,5 @@
-import React from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useUserStore } from '../../constants/User/useUserStore';
+import { useUserStore } from '../../stores/User/useUserStore';
 
 export default function PerfilScreen({ navigation }: any) {
   const { name, setName } = useUserStore();

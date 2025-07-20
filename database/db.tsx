@@ -1,5 +1,5 @@
-import { IRegisterData } from '@/components/screens/Register/interfaces/IRegisterData';
 import { logger } from '@/helper/logger';
+import { IStudentData } from '@/screens/Register/interfaces/IStudentData';
 import * as Crypto from 'expo-crypto';
 import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabaseSync('myDB.db');
@@ -19,7 +19,7 @@ export class SQLiteService {
         `);
     };
 
-    static insertStudent = async ({ name, studentClass }: IRegisterData) => {
+    static insertStudent = async ({ name, studentClass }: IStudentData) => {
         try {
             const id = Crypto.randomUUID();
             await db.runAsync(
