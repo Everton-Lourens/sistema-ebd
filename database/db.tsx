@@ -12,8 +12,6 @@ export class SQLiteService {
 
     private static createTable = async () => {
         await db.execAsync(`
-            DROP TABLE IF EXISTS classes;
-            DROP TABLE IF EXISTS students;
             PRAGMA foreign_keys = ON;
 
             CREATE TABLE IF NOT EXISTS classes (
