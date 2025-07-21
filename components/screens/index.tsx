@@ -1,3 +1,0 @@
-import './Dashboard'
-import './Register'
-

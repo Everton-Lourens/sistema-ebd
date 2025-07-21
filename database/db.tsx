@@ -8,6 +8,7 @@ export class SQLiteService {
 
     static init = () => {
         SQLiteService.createTable();
+        logger.info('Database initialized');
     };
 
     private static createTable = async () => {
@@ -26,6 +27,14 @@ export class SQLiteService {
                 FOREIGN KEY (classId) REFERENCES classes(id)
             );
 
+            CREATE TABLE IF NOT EXISTS attendance (
+                id TEXT PRIMARY KEY NOT NULL,
+                studentId TEXT NOT NULL,
+                date TEXT NOT NULL DEFAULT CURRENT_DATE,
+                present BOOLEAN NOT NULL,
+                FOREIGN KEY (studentId) REFERENCES students(id)
+            );
+
             INSERT OR IGNORE INTO classes (id, name) VALUES
                 ('1', 'Crianças Menores'),
                 ('2', 'Crianças Maiores'),
@@ -33,6 +42,34 @@ export class SQLiteService {
                 ('4', 'Jovens'),
                 ('5', 'Senhores'),
                 ('6', 'Senhoras');
+
+            INSERT OR IGNORE INTO students (id, name, classId) VALUES
+                    ('s1', 'Ana', '1'),
+                    ('s2', 'Bruno', '1'),
+                    ('s3', 'Clara', '2'),
+                    ('s4', 'Daniel', '2'),
+                    ('s5', 'Eduardo', '3'),
+                    ('s6', 'Fernanda', '3'),
+                    ('s7', 'Gustavo', '4'),
+                    ('s8', 'Helena', '4'),
+                    ('s9', 'Igor', '5'),
+                    ('s10', 'Joana', '5'),
+                    ('s11', 'Karina', '6'),
+                    ('s12', 'Lucas', '6');
+
+            INSERT OR IGNORE INTO attendance (id, studentId, present) VALUES
+                ('a1', 's1', 1),
+                ('a2', 's2', 0),
+                ('a3', 's3', 1),
+                ('a4', 's4', 1),
+                ('a5', 's5', 0),
+                ('a6', 's6', 1),
+                ('a7', 's7', 1),
+                ('a8', 's8', 1),
+                ('a9', 's9', 0),
+                ('a10', 's10', 0),
+                ('a11', 's11', 1),
+                ('a12', 's12', 1);
         `);
 
     };
@@ -78,10 +115,9 @@ export class SQLiteService {
         }
     };
 
-
     static getClasses = async () => {
         try {
-            const result = await db.getAllAsync('SELECT * FROM students');
+            const result = await db.getAllAsync('SELECT * FROM classes');
             console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
@@ -89,6 +125,28 @@ export class SQLiteService {
             throw error;
         }
     };
+
+    static getDashboardClasses = async () => {
+        try {
+            const result = await db.getAllAsync(`
+                SELECT
+                    s.classId,
+                    COUNT(s.id) AS enrolled,
+                    SUM(CASE WHEN a.present = 0 THEN 1 ELSE 0 END) AS absent,
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present
+                FROM students s
+                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+                GROUP BY s.classId
+            `);
+
+            console.log(JSON.stringify(result, null, 2));
+            return result;
+        } catch (error) {
+            logger.error('Erro ao contar alunos por classe: ' + error);
+            throw error;
+        }
+    };
+
 
 }
 

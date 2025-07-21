@@ -1,5 +1,6 @@
 
 import { ListMobile } from "@/components/_ui/ListMobile"
+import { ClassStore } from "@/constants/dashboard"
 import { styles } from "@/constants/styles"
 import { StatusBar } from "expo-status-bar"
 import {
@@ -13,6 +14,14 @@ import { useDashboard } from "./hooks/useDashboard"
 
 export default function Dashboard() {
   const { getDashboardData } = useDashboard()
+
+  const loadingDashboard = () => {
+    const classStore: ClassStore[] = [];
+    for (let i = 0; i < 10; i++) {
+      //classStore.push(useClassStore);
+    }
+  }
+
   return (
     <>
       <SafeAreaView style={styles.topSafeArea} />
@@ -65,12 +74,12 @@ export default function Dashboard() {
               ]}
             />
           </View>
-                <TouchableOpacity
-        style={styles.button}
-        onPress={getDashboardData}
-      >
-        <Text style={styles.buttonText}>Buscar dados</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={getDashboardData}
+          >
+            <Text style={styles.buttonText}>Buscar dados</Text>
+          </TouchableOpacity>
         </KeyboardAwareScrollView>
       </SafeAreaView>
     </>
