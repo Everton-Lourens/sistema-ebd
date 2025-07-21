@@ -1,3 +1,18 @@
+import { create } from "zustand";
+
+type ClassDashboard = {
+    id: string;
+    name: string;
+};
+
+type ClassDashboardStore = {
+    arrayDashboardData: ClassDashboard[];
+    setDashboardData: (data: ClassDashboard[]) => void;
+    addToDashboardData: (item: ClassDashboard) => void;
+    clearDashboardData: () => void;
+};
+
+
 export interface ClassStore {
     id: string;
     present: number;
@@ -58,3 +73,13 @@ export const createClassStore = (raw: RawClassData): ClassStore => {
         attendancePercentage,
     };
 };
+
+export const useDashboardStore = create<ClassDashboardStore>((set) => ({
+    arrayDashboardData: [],
+    setDashboardData: (data) => set({ arrayDashboardData: data }),
+    addToDashboardData: (item) =>
+        set((state) => ({
+            arrayDashboardData: [...state.arrayDashboardData, item],
+        })),
+    clearDashboardData: () => set({ arrayDashboardData: [] }),
+}));

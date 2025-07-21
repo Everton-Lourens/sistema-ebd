@@ -17,7 +17,9 @@ export function Loading({ size = 24, color = '#ffffff', style }: Props) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: '30%',
   },
 });

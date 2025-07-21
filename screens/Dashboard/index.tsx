@@ -1,8 +1,11 @@
 
 import { ListMobile } from "@/components/_ui/ListMobile"
-import { ClassStore } from "@/constants/dashboard"
+import { Loading } from "@/components/_ui/Loading"
+import { useDashboardStore } from "@/constants/dashboard"
 import { styles } from "@/constants/styles"
+import { useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
+import { useCallback } from "react"
 import {
   SafeAreaView,
   Text,
@@ -13,13 +16,26 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useDashboard } from "./hooks/useDashboard"
 
 export default function Dashboard() {
-  const { getDashboardData } = useDashboard()
+  const { loadingDashboard } = useDashboard()
+  const { arrayDashboardData, setDashboardData, clearDashboardData } = useDashboardStore();
 
-  const loadingDashboard = () => {
-    const classStore: ClassStore[] = [];
-    for (let i = 0; i < 10; i++) {
-      //classStore.push(useClassStore);
-    }
+  const focusEffectCallback = useCallback(() => {
+    onRefresh();
+    return () => {
+      clearDashboardData();
+    };
+  }, []);
+
+  useFocusEffect(focusEffectCallback);
+
+  const onRefresh = () => {
+    loadingDashboard().then((data: any) => setDashboardData(data));
+  }
+
+  const loadinDiv = () => {
+    return (
+        <Loading size={100} color="gray" />
+    )
   }
 
   return (
@@ -38,49 +54,33 @@ export default function Dashboard() {
           style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          extraScrollHeight={150}
+          extraScrollHeight={150} 
         >
+
+          {arrayDashboardData.length == 0 ? loadinDiv() :
           <View style={{ flex: 1 }}>
             <ListMobile
               loading={false}
               emptyText="Nenhum registro disponível!"
-              items={[
-                {
-                  id: 1,
-                  class: 'Cordeirinhos de Cristo',
-                  email: 'carlos@email.com',
-                  idade: 28,
-                  church: 'Dois de Julho',
-                  city: 'Camaçari',
-                  countClass: 3,
-                },
-                {
-                  id: 2,
-                  class: 'Shalom',
-                  email: 'ana@email.com',
-                  idade: 24,
-                  church: 'Dois de Julho',
-                  city: 'Camaçari',
-                  countClass: 2,
-                },
-              ]}
+              items={arrayDashboardData}
               itemFields={[
-                { field: 'class', valueFormatter: undefined },
-                { field: 'countClass', valueFormatter: undefined },
+                { field: 'className', valueFormatter: undefined },
+                { field: 'enrolled', valueFormatter: undefined },
               ]}
               collapseItems={[
-                { field: 'countClass', headerName: 'Matriculados', type: 'text' },
-                { field: 'city', headerName: 'Cidade', type: 'text' },
+                { field: 'attendancePercentage', headerName: 'Percentual', type: 'text' },
+                { field: 'total', headerName: 'Total', type: 'text' },
               ]}
             />
-          </View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={getDashboardData}
-          >
-            <Text style={styles.buttonText}>Buscar dados</Text>
-          </TouchableOpacity>
+          </View>}
+
         </KeyboardAwareScrollView>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={onRefresh}
+        >
+          <Text style={styles.buttonText}>Atualizar</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </>
   );

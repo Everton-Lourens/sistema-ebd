@@ -13,10 +13,6 @@ export class SQLiteService {
 
     private static createTable = async () => {
         await db.execAsync(`
-            DROP TABLE IF EXISTS classes;
-            DROP TABLE IF EXISTS students;
-            DROP TABLE IF EXISTS detailsClasses;
-            DROP TABLE IF EXISTS attendance;
             PRAGMA foreign_keys = ON;
 
             CREATE TABLE IF NOT EXISTS classes (
@@ -91,8 +87,8 @@ export class SQLiteService {
             INSERT OR IGNORE INTO detailsClasses (id, offer, visitors, classId) VALUES
                 ('dc1', 'R$ 1,00', 1, '1'),
                 ('dc2', 'R$ 4,00', 0, '2'),
-                ('dc3', 'R$ 1,00', 0, '3'),
-                ('dc4', 'R$ 1,00', 20, '4'),
+                ('dc3', 'R$ 1,00', 1, '3'),
+                ('dc4', 'R$ 1,00', 3, '4'),
                 ('dc5', 'R$ 5,00', 0, '5'),
                 ('dc6', 'R$ 1,00', 0, '6');
         `);
@@ -151,11 +147,11 @@ export class SQLiteService {
         }
     };
 
-    static getDashboardClasses = async () => {
+    static getDashboardData = async () => {
         try {
             const result = await db.getAllAsync(`
                 SELECT
-                    s.classId,
+                    s.classId as id,
                     c.name AS className,
                     COUNT(s.id) AS enrolled,
                     SUM(CASE WHEN a.present = 0 THEN 1 ELSE 0 END) AS absent,
@@ -164,15 +160,16 @@ export class SQLiteService {
                     SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) + COALESCE(dc.visitors, 0) AS total,
                     SUM(COALESCE(a.bible, 0)) AS bible,
                     SUM(COALESCE(a.magazine, 0)) AS magazine,
-                    dc.offer
+                    dc.offer,
+                    ROUND((SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id), 2) AS attendancePercentage,
+                    ROUND((SUM(COALESCE(a.bible, 0)) * 100.0) / COUNT(s.id), 2) AS biblePercentage,
+                    ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2) AS magazinePercentage
                 FROM students s
                 LEFT JOIN classes c ON c.id = s.classId
                 LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
                 LEFT JOIN detailsClasses dc ON dc.classId = s.classId
                 GROUP BY s.classId, c.name, dc.visitors
             `);
-
-            console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao contar alunos por classe: ' + error);
