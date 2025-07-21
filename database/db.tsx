@@ -58,6 +58,7 @@ export class SQLiteService {
 
             INSERT OR IGNORE INTO students (id, name, classId) VALUES
                     ('s1', 'Ana', '1'),
+                    ('s1', 'Carlos', '1'),
                     ('s2', 'Bruno', '1'),
                     ('s3', 'Clara', '2'),
                     ('s4', 'Daniel', '2'),
@@ -66,9 +67,11 @@ export class SQLiteService {
                     ('s7', 'Gustavo', '4'),
                     ('s8', 'Helena', '4'),
                     ('s9', 'Igor', '5'),
-                    ('s10', 'Joana', '5'),
+                    ('s10', 'Maicon', '5'),
                     ('s11', 'Karina', '6'),
-                    ('s12', 'Lucas', '6');
+                    ('s12', 'Julia', '6'),
+                    ('s12', 'Roberta', '6'),
+                    ('s12', 'Amanda', '6');
 
             INSERT OR IGNORE INTO attendance (id, studentId, present, bible, magazine) VALUES
                 ('a1', 's1', 1, 1, 1),
@@ -88,9 +91,9 @@ export class SQLiteService {
                 ('dc1', 'R$ 1,00', 1, '1'),
                 ('dc2', 'R$ 4,00', 0, '2'),
                 ('dc3', 'R$ 1,00', 1, '3'),
-                ('dc4', 'R$ 1,00', 3, '4'),
+                ('dc4', 'R$ 1,00', 2, '4'),
                 ('dc5', 'R$ 5,00', 0, '5'),
-                ('dc6', 'R$ 1,00', 0, '6');
+                ('dc6', 'R$ 1,00', 3, '6');
         `);
 
     };
@@ -151,16 +154,16 @@ export class SQLiteService {
                     s.classId as id,
                     c.name AS className,
                     COUNT(s.id) AS enrolled,
-                    SUM(CASE WHEN a.present = 0 THEN 1 ELSE 0 END) AS absent,
+                    (COUNT(s.id) - SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END)) AS absent,
                     SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
                     COALESCE(dc.visitors, 0) AS visitors,
                     SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) + COALESCE(dc.visitors, 0) AS total,
                     SUM(COALESCE(a.bible, 0)) AS bible,
                     SUM(COALESCE(a.magazine, 0)) AS magazine,
                     dc.offer,
-                    ROUND((SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id), 2) AS attendancePercentage,
-                    ROUND((SUM(COALESCE(a.bible, 0)) * 100.0) / COUNT(s.id), 2) AS biblePercentage,
-                    ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2) AS magazinePercentage
+                    CONCAT(ROUND((SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id), 2), '%') AS attendancePercentage,
+                    CONCAT(ROUND((SUM(COALESCE(a.bible, 0)) * 100.0) / COUNT(s.id), 2), '%') AS biblePercentage,
+                    CONCAT(ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2), '%') AS magazinePercentage
                 FROM students s
                 LEFT JOIN classes c ON c.id = s.classId
                 LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE

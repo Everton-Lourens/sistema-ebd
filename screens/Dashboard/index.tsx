@@ -52,8 +52,17 @@ export default function Dashboard() {
                 { field: 'enrolled', valueFormatter: undefined },
               ]}
               collapseItems={[
-                { field: 'attendancePercentage', headerName: 'Percentual', type: 'text' },
+                { field: 'enrolled', headerName: 'Matriculados', type: 'text' },
+                { field: 'absent', headerName: 'Ausentes', type: 'text' },
+                { field: 'present', headerName: 'Presentes', type: 'text' },
+                { field: 'visitors', headerName: 'Visitantes', type: 'text' },
                 { field: 'total', headerName: 'Total', type: 'text' },
+                { field: 'bible', headerName: 'Bíblia', type: 'text' },
+                { field: 'magazine', headerName: 'Revista', type: 'text' },
+                { field: 'offer', headerName: 'Oferta', type: 'text' },
+                { field: 'attendancePercentage', headerName: 'Percentual de Presença', type: 'text' },
+                { field: 'biblePercentage', headerName: 'Percentual de Bíblia', type: 'text' },
+                { field: 'magazinePercentage', headerName: 'Percentual de Revista', type: 'text' },
               ]}
             />
           </View>

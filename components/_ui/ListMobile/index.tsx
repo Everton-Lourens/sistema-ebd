@@ -93,15 +93,17 @@ export function ListMobile({
                 <View style={styles.collapse}>
                   {collapseItems.map((collapseItem) => (
                     <View key={collapseItem.field} style={styles.collapseItem}>
-                      <Text style={styles.collapseTitle}>{collapseItem.headerName}</Text>
-                      <Text>
-                        {collapseItem.valueFormatter
-                          ? collapseItem.valueFormatter({
-                            value: item[collapseItem.field],
-                            data: item,
-                          })
-                          : String(item[collapseItem.field])}
-                      </Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.collapseTitle}>{collapseItem.headerName}</Text>
+                        <Text>
+                          {collapseItem.valueFormatter
+                            ? collapseItem.valueFormatter({
+                              value: item[collapseItem.field],
+                              data: item,
+                            })
+                            : String(item[collapseItem.field])}
+                        </Text>
+                      </View>
                     </View>
                   ))}
                 </View>
