@@ -13,16 +13,31 @@ export class SQLiteService {
 
     private static createTable = async () => {
         await db.execAsync(`
+            DROP TABLE IF EXISTS classes;
+            DROP TABLE IF EXISTS students;
+            DROP TABLE IF EXISTS detailsClasses;
+            DROP TABLE IF EXISTS attendance;
             PRAGMA foreign_keys = ON;
 
             CREATE TABLE IF NOT EXISTS classes (
                 id TEXT PRIMARY KEY NOT NULL,
+                date TEXT NOT NULL DEFAULT CURRENT_DATE,
                 name TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS students (
                 id TEXT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL,
+                date TEXT NOT NULL DEFAULT CURRENT_DATE,
+                classId TEXT NOT NULL,
+                FOREIGN KEY (classId) REFERENCES classes(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS detailsClasses (
+                id TEXT PRIMARY KEY NOT NULL,
+                offer TEXT NOT NULL,
+                visitors NUMBER,
+                date TEXT NOT NULL DEFAULT CURRENT_DATE,
                 classId TEXT NOT NULL,
                 FOREIGN KEY (classId) REFERENCES classes(id)
             );
@@ -32,6 +47,8 @@ export class SQLiteService {
                 studentId TEXT NOT NULL,
                 date TEXT NOT NULL DEFAULT CURRENT_DATE,
                 present BOOLEAN NOT NULL,
+                bible NUMBER,
+                magazine NUMBER,
                 FOREIGN KEY (studentId) REFERENCES students(id)
             );
 
@@ -57,19 +74,27 @@ export class SQLiteService {
                     ('s11', 'Karina', '6'),
                     ('s12', 'Lucas', '6');
 
-            INSERT OR IGNORE INTO attendance (id, studentId, present) VALUES
-                ('a1', 's1', 1),
-                ('a2', 's2', 0),
-                ('a3', 's3', 1),
-                ('a4', 's4', 1),
-                ('a5', 's5', 0),
-                ('a6', 's6', 1),
-                ('a7', 's7', 1),
-                ('a8', 's8', 1),
-                ('a9', 's9', 0),
-                ('a10', 's10', 0),
-                ('a11', 's11', 1),
-                ('a12', 's12', 1);
+            INSERT OR IGNORE INTO attendance (id, studentId, present, bible, magazine) VALUES
+                ('a1', 's1', 1, 1, 1),
+                ('a2', 's2', 0, 0, 0),
+                ('a3', 's3', 1, 1, 1),
+                ('a4', 's4', 1, 1, 1),
+                ('a5', 's5', 0, 0, 0),
+                ('a6', 's6', 1, 1, 1),
+                ('a7', 's7', 1, 1, 1),
+                ('a8', 's8', 1, 1, 1),
+                ('a9', 's9', 0, 0, 0),
+                ('a10', 's10', 0, 0, 0),
+                ('a11', 's11', 1, 1, 1),
+                ('a12', 's12', 1, 1, 1);
+
+            INSERT OR IGNORE INTO detailsClasses (id, offer, visitors, classId) VALUES
+                ('dc1', 'R$ 1,00', 1, '1'),
+                ('dc2', 'R$ 4,00', 0, '2'),
+                ('dc3', 'R$ 1,00', 0, '3'),
+                ('dc4', 'R$ 1,00', 20, '4'),
+                ('dc5', 'R$ 5,00', 0, '5'),
+                ('dc6', 'R$ 1,00', 0, '6');
         `);
 
     };
@@ -131,12 +156,20 @@ export class SQLiteService {
             const result = await db.getAllAsync(`
                 SELECT
                     s.classId,
+                    c.name AS className,
                     COUNT(s.id) AS enrolled,
                     SUM(CASE WHEN a.present = 0 THEN 1 ELSE 0 END) AS absent,
-                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
+                    COALESCE(dc.visitors, 0) AS visitors,
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) + COALESCE(dc.visitors, 0) AS total,
+                    SUM(COALESCE(a.bible, 0)) AS bible,
+                    SUM(COALESCE(a.magazine, 0)) AS magazine,
+                    dc.offer
                 FROM students s
+                LEFT JOIN classes c ON c.id = s.classId
                 LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
-                GROUP BY s.classId
+                LEFT JOIN detailsClasses dc ON dc.classId = s.classId
+                GROUP BY s.classId, c.name, dc.visitors
             `);
 
             console.log(JSON.stringify(result, null, 2));
@@ -146,7 +179,6 @@ export class SQLiteService {
             throw error;
         }
     };
-
 
 }
 
