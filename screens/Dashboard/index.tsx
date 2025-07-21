@@ -1,6 +1,5 @@
 
 import { ListMobile } from "@/components/_ui/ListMobile"
-import { Loading } from "@/components/_ui/Loading"
 import { useDashboardStore } from "@/constants/dashboard"
 import { styles } from "@/constants/styles"
 import { useFocusEffect } from "expo-router"
@@ -12,7 +11,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { useDashboard } from "./hooks/useDashboard"
 
 export default function Dashboard() {
@@ -29,13 +27,8 @@ export default function Dashboard() {
   useFocusEffect(focusEffectCallback);
 
   const onRefresh = () => {
+    clearDashboardData();
     loadingDashboard().then((data: any) => setDashboardData(data));
-  }
-
-  const loadinDiv = () => {
-    return (
-        <Loading size={100} color="gray" />
-    )
   }
 
   return (
@@ -49,22 +42,13 @@ export default function Dashboard() {
           <Text style={styles.headerText}>Register</Text>
         </View>
 
-        {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}
-        <KeyboardAwareScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          extraScrollHeight={150} 
-        >
-
-          {arrayDashboardData.length == 0 ? loadinDiv() :
           <View style={{ flex: 1 }}>
             <ListMobile
-              loading={false}
+              loading={arrayDashboardData.length === 0}
               emptyText="Nenhum registro disponível!"
               items={arrayDashboardData}
               itemFields={[
-                { field: 'className', valueFormatter: undefined },
+                { field: 'className', valueFormatter: undefined }, 
                 { field: 'enrolled', valueFormatter: undefined },
               ]}
               collapseItems={[
@@ -72,9 +56,8 @@ export default function Dashboard() {
                 { field: 'total', headerName: 'Total', type: 'text' },
               ]}
             />
-          </View>}
+          </View>
 
-        </KeyboardAwareScrollView>
         <TouchableOpacity
           style={styles.button}
           onPress={onRefresh}

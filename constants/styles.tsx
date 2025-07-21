@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 const HEADER_BACKGROUND = "#3498db";
 const CONTENT_BACKGROUND = "#f9f9f9";
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor:
-      Platform.OS === "ios" ? CONTENT_BACKGROUND : HEADER_BACKGROUND,
+      CONTENT_BACKGROUND,
   },
   header: {
     height: 60,

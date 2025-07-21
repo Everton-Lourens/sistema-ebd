@@ -1,13 +1,13 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { Loading } from '../Loading';
 
 type Field = {
   field: string;
@@ -47,10 +47,7 @@ export function ListMobile({
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#555" />
-        <Text>Carregando...</Text>
-      </View>
+      <Loading size={100} color="gray" />
     );
   }
 
@@ -63,55 +60,57 @@ export function ListMobile({
   }
 
   return (
-    <FlatList
-      data={items}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{ padding: 12 }}
-      renderItem={({ item }) => {
-        const isOpen = itemOpened[item.id] || false;
-        return (
-          <View style={styles.card}>
-            <TouchableOpacity
-              onPress={() => handleOpenItem(item.id)}
-              style={styles.listItem}
-            >
-              {itemFields.map((field, index) => (
-                <Text key={field.field} style={[styles.cell, index === 0 && { flex: 1 }]}>
-                  {field.valueFormatter
-                    ? field.valueFormatter({ value: item[field.field], data: item })
-                    : String(item[field.field])}
-                </Text>
-              ))}
-              {collapseItems?.length > 0 && (
-                <FontAwesome
-                  name={isOpen ? 'angle-up' : 'angle-down'}
-                  size={20}
-                  color="#555"
-                />
-              )}
-            </TouchableOpacity>
+    <View style={{ padding: 20 }}>
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: 12 }}
+        renderItem={({ item }) => {
+          const isOpen = itemOpened[item.id] || false;
+          return (
+            <View style={styles.card}>
+              <TouchableOpacity
+                onPress={() => handleOpenItem(item.id)}
+                style={styles.listItem}
+              >
+                {itemFields.map((field, index) => (
+                  <Text key={field.field} style={[styles.cell, index === 0 && { flex: 1 }]}>
+                    {field.valueFormatter
+                      ? field.valueFormatter({ value: item[field.field], data: item })
+                      : String(item[field.field])}
+                  </Text>
+                ))}
+                {collapseItems?.length > 0 && (
+                  <FontAwesome
+                    name={isOpen ? 'angle-up' : 'angle-down'}
+                    size={20}
+                    color="#555"
+                  />
+                )}
+              </TouchableOpacity>
 
-            {isOpen && collapseItems.length > 0 && (
-              <View style={styles.collapse}>
-                {collapseItems.map((collapseItem) => (
-                  <View key={collapseItem.field} style={styles.collapseItem}>
-                    <Text style={styles.collapseTitle}>{collapseItem.headerName}</Text>
-                    <Text>
-                      {collapseItem.valueFormatter
-                        ? collapseItem.valueFormatter({
+              {isOpen && collapseItems.length > 0 && (
+                <View style={styles.collapse}>
+                  {collapseItems.map((collapseItem) => (
+                    <View key={collapseItem.field} style={styles.collapseItem}>
+                      <Text style={styles.collapseTitle}>{collapseItem.headerName}</Text>
+                      <Text>
+                        {collapseItem.valueFormatter
+                          ? collapseItem.valueFormatter({
                             value: item[collapseItem.field],
                             data: item,
                           })
-                        : String(item[collapseItem.field])}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        );
-      }}
-    />
+                          : String(item[collapseItem.field])}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          );
+        }}
+      />
+    </View>
   );
 }
 
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     marginBottom: 12,
-    padding: 12,
+    padding: 15,
     borderRadius: 8,
     elevation: 2,
   },
@@ -148,6 +147,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: '30%',
   },
 });
