@@ -39,7 +39,7 @@ export default function Dashboard() {
 
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Register</Text>
+          <Text style={styles.headerText}>Dashboard</Text>
         </View>
 
           <View style={{ flex: 1 }}>

@@ -26,6 +26,7 @@ export const styles = StyleSheet.create({
   },
   header: {
     height: 60,
+    marginBottom: 20,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: HEADER_BACKGROUND,
@@ -33,6 +34,8 @@ export const styles = StyleSheet.create({
   headerText: {
     color: "#fff",
     fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
   },
   content: {
     padding: 20,

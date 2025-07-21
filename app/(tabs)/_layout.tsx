@@ -28,36 +28,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Alunos',
+          title: 'Dashboard',
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.3.fill" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="totalGeral"
-        options={{
-          title: 'Total Geral',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chart.bar.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="totalParcial"
-        options={{
-          title: 'Total Parcial',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="register"
         options={{
-          title: 'Cadastrar Aluno',
+          title: 'Adicionar aluno',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />
+            <IconSymbol size={28} name="chart.bar.fill" color={color} />
           ),
         }}
       />
