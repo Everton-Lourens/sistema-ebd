@@ -8,6 +8,7 @@ export default function FormField({
   label,
   secureTextEntry,
   autoCapitalize,
+  placeholder,
   values,
   touched,
   errors,
@@ -22,6 +23,9 @@ export default function FormField({
         style={styles.input}
         value={values[field]}
         onChangeText={handleChange(field)}
+        placeholder={placeholder}
+        placeholderTextColor="gray"
+        autoCorrect={true}
         onBlur={() => handleBlur(field)}
         secureTextEntry={secureTextEntry}
         autoCapitalize={autoCapitalize || "none"}

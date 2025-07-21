@@ -95,14 +95,14 @@ export class SQLiteService {
 
     };
 
-    static insertStudent = async ({ name, studentClass }: IStudentData) => {
+    static insertStudent = async ({ name, classId }: IStudentData) => {
         try {
             const id = Crypto.randomUUID();
             await db.runAsync(
-                'INSERT INTO students (id, name, studentClass) VALUES (?, ?, ?)',
+                'INSERT INTO students (id, name, classId) VALUES (?, ?, ?)',
                 id,
                 name,
-                studentClass
+                classId
             );
             return true;
         } catch (error) {
@@ -114,7 +114,6 @@ export class SQLiteService {
     static getStudents = async () => {
         try {
             const result = await db.getAllAsync('SELECT * FROM students');
-            console.log(result);
             return result;
         } catch (error) {
             console.error('Erro ao buscar todos os estudantes:', error);
@@ -127,7 +126,6 @@ export class SQLiteService {
     static getStudentById = async (id: string) => {
         try {
             const result = await db.getAllSync('SELECT * FROM students WHERE id = ?', id);
-            console.log(result);
             return result;
         } catch (error) {
             console.error('Erro ao buscar estudante por id:', error);
@@ -139,7 +137,6 @@ export class SQLiteService {
     static getClasses = async () => {
         try {
             const result = await db.getAllAsync('SELECT * FROM classes');
-            console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao buscar todas as classes: ' + error);

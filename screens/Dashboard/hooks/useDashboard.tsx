@@ -17,8 +17,19 @@ export function useDashboard() {
         throw error
       })
   }
+  async function getClasses(): Promise<any> {
+    return await SQLiteService.getClasses()
+      .then((result: unknown) => {
+        return result || []
+      })
+      .catch((error) => {
+        console.log(error)
+        throw error
+      })
+  }
 
   return {
     loadingDashboard,
+    getClasses
   }
 }

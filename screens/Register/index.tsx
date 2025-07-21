@@ -1,7 +1,9 @@
 
 import { Loading } from "@/components/_ui/Loading"
+import FormSelectField from "@/components/FormSelectField/FormSelectField"
 import { styles } from "@/constants/styles"
-import { useUserStore } from "@/stores/User/useUserStore"
+import { useClassStore } from "@/stores/class/useClassStore"
+import { useUserStore } from "@/stores/user/useUserStore"
 import { TouchedFields } from "@/types/form"
 import { useFocusEffect } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
@@ -16,23 +18,33 @@ import {
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import FormField from "../../components/FormField/FormField"
+import { useDashboard } from "../Dashboard/hooks/useDashboard"
 import { useFormAuth } from "./hooks/useFormAuth"
 import { IStudentData, registerSchema } from "./interfaces/IStudentData"
 
 export default function StudentFormScreen() {
+  const { getClasses } = useDashboard()
+  const { onRegister } = useFormAuth()
+  const { allClassName, setAllClassName } = useClassStore()
   const {
     id,
     setId,
     name,
     setName,
-    studentClass,
-    setStudentClass,
+    classId,
+    setClassId,
     isEditing,
     setIsEditing,
   } = useUserStore();
-  const { onRegister } = useFormAuth()
+
+  function getAllClasses() {
+    return getClasses().then((classes) => {
+      setAllClassName(classes)
+    })
+  }
 
   function onSubmitHandler(values: IStudentData) {
+    console.log(JSON.stringify(values, null, 2));
     /*
     if (isEditing && id) {
       updateStudent(id, values); // lógica para editar
@@ -46,8 +58,9 @@ export default function StudentFormScreen() {
       Alert.alert(
         "Aluno Registrado!",
         "Nome: " + values.name +
-        "\nClasse: " + values.studentClass,
+        "\nClasse: " + values.classId,
       );
+      handleCancel();
     }).catch(() => {
       Alert.alert(
         "Falha ao registrar aluno!",
@@ -60,17 +73,22 @@ export default function StudentFormScreen() {
     return isValid && Object.keys(touched).length !== 0;
   }
 
+  const handleCancel = () => {
+    setId('');
+    setName('');
+    setClassId('');
+    setIsEditing(false);
+  }
+
   const focusEffectCallback = useCallback(() => {
+    getAllClasses();
     if (isEditing) {
-      if (!name || !studentClass || !id)
+      if (!name || !classId || !id)
         throw new Error('Edição de usuário inválida');
       console.log('Editando user: ' + name);
     }
     return () => {
-      setId('');
-      setName('');
-      setStudentClass('');
-      setIsEditing(false);
+      handleCancel();
     };
   }, []);
 
@@ -98,7 +116,7 @@ export default function StudentFormScreen() {
           <Formik
             initialValues={{
               name: isEditing ? name : "",
-              studentClass: isEditing ? studentClass : "",
+              classId: isEditing ? classId : "",
             }}
             onSubmit={onSubmitHandler}
             validationSchema={registerSchema}
@@ -112,48 +130,55 @@ export default function StudentFormScreen() {
               handleSubmit,
               touched,
               isValid,
+              resetForm,
             }) => (
               <>
-              <View style={styles.containerTxtInput}>
-                <FormField
-                  field="name"
-                  label="Nome"
-                  autoCapitalize="words"
-                  values={values}
-                  touched={touched}
-                  errors={errors}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                />
+                <View style={styles.containerTxtInput}>
+                  <FormField
+                    field="name"
+                    label="Nome"
+                    autoCapitalize="words"
+                    placeholder="Digite seu nome"
+                    values={values}
+                    touched={touched}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                  />
 
-                <FormField
-                  field="studentClass"
-                  label="Classe"
-                  autoCapitalize="words"
-                  values={values}
-                  touched={touched}
-                  errors={errors}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                />
+                  <FormSelectField
+                    field="classId"
+                    label="Classe"
+                    values={values}
+                    touched={touched}
+                    placeholder="Selecione uma classe..."
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                    options={allClassName.map((classes: any) => ({
+                      value: classes.id,
+                      label: classes.name
+                    }))}
+                  />
+
                 </View>
-              <View style={styles.btnDiv}>
-                <TouchableOpacity
-                  // @ts-ignore
-                  onPress={handleSubmit}
-                >
-                  <View
-                    style={[
-                      styles.button,
-                      {
-                        opacity: isFormValid(isValid, touched) ? 1 : 0.5,
-                      },
-                    ]}
+                <View style={styles.btnDiv}>
+                  <TouchableOpacity
+                    // @ts-ignore
+                    onPress={handleSubmit}
                   >
-                    <Text style={styles.buttonText}>{isSubmitting ? <Loading size={24} /> : 'ENVIAR'}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
+                    <View
+                      style={[
+                        styles.button,
+                        {
+                          opacity: isFormValid(isValid, touched) ? 1 : 0.5,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.buttonText}>{isSubmitting ? <Loading size={24} /> : 'ENVIAR'}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </>
             )}
           </Formik>

@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 30,
   },
-  input: {
+  input2: {
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -57,6 +57,17 @@ export const styles = StyleSheet.create({
     borderColor: "#e3e3e3",
     backgroundColor: "#fff",
   },
+  input: {
+  height: 48, // ou maior, como 52
+  borderWidth: 1,
+  borderColor: "#ccc",
+  borderRadius: 8,
+  paddingHorizontal: 12,
+  fontSize: 16,
+  backgroundColor: "#fff",
+  justifyContent: "center",
+},
+
   errorContainer: {
     marginVertical: 5,
   },
@@ -119,13 +130,25 @@ export const styles = StyleSheet.create({
     margin: 5,
   },
   containerTxtInput: {
-    width: 350,
-    padding: 5,
-    margin: 5,
+    flexDirection: 'column',
+    rowGap: 15,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingVertical: 22,
+    marginTop: 5,
   },
   txtInput: {
     width: 350,
     margin: 5,
     backgroundColor: "white",
+    color: 'gray',
+    borderRadius: 20,
   },
+  selectContainer: {
+  borderWidth: 1,
+  borderColor: "#ccc",
+  borderRadius: 8,
+  marginTop: 5,
+  backgroundColor: "#fff",
+},
 });

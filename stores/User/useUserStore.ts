@@ -3,22 +3,22 @@ import { create } from 'zustand';
 interface UserStore {
   id: string;
   name: string;
-  studentClass: string;
+  classId: string;
   isEditing: boolean;
   setId: (id: string) => void;
   setName: (name: string) => void;
-  setStudentClass: (studentClass: string) => void;
+  setClassId: (classId: string) => void;
   setIsEditing: (isEditing: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   id: '',
   name: '',
-  studentClass: '',
+  classId: '',
   isEditing: false,
   setId: (id) => set({ id }),
   setName: (name) => set({ name }),
-  setStudentClass: (studentClass) => set({ studentClass }),
+  setClassId: (classId) => set({ classId }),
   setIsEditing: (isEditing) => set({ isEditing }),
 }));
 
