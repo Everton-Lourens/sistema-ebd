@@ -58,20 +58,20 @@ export class SQLiteService {
 
             INSERT OR IGNORE INTO students (id, name, classId) VALUES
                     ('s1', 'Ana', '1'),
-                    ('s1', 'Carlos', '1'),
-                    ('s2', 'Bruno', '1'),
-                    ('s3', 'Clara', '2'),
-                    ('s4', 'Daniel', '2'),
-                    ('s5', 'Eduardo', '3'),
-                    ('s6', 'Fernanda', '3'),
-                    ('s7', 'Gustavo', '4'),
-                    ('s8', 'Helena', '4'),
-                    ('s9', 'Igor', '5'),
-                    ('s10', 'Maicon', '5'),
-                    ('s11', 'Karina', '6'),
-                    ('s12', 'Julia', '6'),
-                    ('s12', 'Roberta', '6'),
-                    ('s12', 'Amanda', '6');
+                    ('s2', 'Carlos', '1'),
+                    ('s3', 'Bruno', '1'),
+                    ('s4', 'Clara', '2'),
+                    ('s5', 'Daniel', '2'),
+                    ('s6', 'Eduardo', '3'),
+                    ('s7', 'Fernanda', '3'),
+                    ('s8', 'Gustavo', '4'),
+                    ('s9', 'Helena', '4'),
+                    ('s0', 'Igor', '5'),
+                    ('s11', 'Maicon', '5'),
+                    ('s12', 'Karina', '6'),
+                    ('s13', 'Julia', '6'),
+                    ('s14', 'Roberta', '6'),
+                    ('s15', 'Amanda', '6');
 
             INSERT OR IGNORE INTO attendance (id, studentId, present, bible, magazine) VALUES
                 ('a1', 's1', 1, 1, 1),
