@@ -74,7 +74,16 @@ export function ListMobile({
           return (
             <View style={styles.card}>
               <TouchableOpacity
-                onPress={() => handleOpenItem(item.id)}
+                onPress={() => {
+                  const newOpenedItems = { ...itemOpened };
+                  Object.keys(newOpenedItems).forEach((key) => {
+                    if (key !== item.id) {
+                      newOpenedItems[key] = false;
+                    }
+                  });
+                  newOpenedItems[item.id] = !isOpen;
+                  setItemOpened(newOpenedItems);
+                }}
                 style={styles.listItem}
               >
                 {itemFields.map((field, index) => (

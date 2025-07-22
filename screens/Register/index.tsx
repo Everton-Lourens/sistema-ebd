@@ -1,6 +1,6 @@
 
+import FormSelectField from "@/components/_ui/FormSelectField/FormSelectField"
 import { Loading } from "@/components/_ui/Loading"
-import FormSelectField from "@/components/FormSelectField/FormSelectField"
 import { styles } from "@/constants/styles"
 import { useClassStore } from "@/stores/class/useClassStore"
 import { useUserStore } from "@/stores/user/useUserStore"
@@ -17,7 +17,7 @@ import {
   View
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import FormField from "../../components/FormField/FormField"
+import FormField from "../../components/_ui/FormField/FormField"
 import { useDashboard } from "../Dashboard/hooks/useDashboard"
 import { useFormAuth } from "./hooks/useFormAuth"
 import { IStudentData, registerSchema } from "./interfaces/IStudentData"
