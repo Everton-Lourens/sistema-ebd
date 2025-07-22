@@ -102,7 +102,7 @@ export default function StudentFormScreen() {
 
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Register</Text>
+          <Text style={styles.headerText}>Cadastrar</Text>
         </View>
 
         {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}

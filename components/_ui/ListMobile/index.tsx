@@ -24,6 +24,8 @@ type CollapseItem = {
 type Props = {
   items: any[];
   itemFields: Field[];
+  onSubmit?: (item: any) => void | undefined;
+  textButton?: string;
   collapseItems: CollapseItem[];
   emptyText?: string;
   loading?: boolean;
@@ -32,6 +34,8 @@ type Props = {
 export function ListMobile({
   items,
   itemFields,
+  onSubmit,
+  textButton = 'Enviar',
   collapseItems,
   emptyText = 'Nenhum item encontrado',
   loading = false,
@@ -106,6 +110,13 @@ export function ListMobile({
                       </View>
                     </View>
                   ))}
+                  {onSubmit &&
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {onSubmit(item)}}
+                  >
+                    <Text style={styles.buttonText}>{textButton}</Text>
+                  </TouchableOpacity>}
                 </View>
               )}
             </View>
@@ -150,5 +161,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '30%',
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  button: {
+    marginTop: 20,
+    backgroundColor: "#2980b9",
+    padding: 15,
+    borderRadius: 15,
   },
 });

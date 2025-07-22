@@ -12,7 +12,8 @@ export class SQLiteService {
     };
 
     private static createTable = async () => {
-        await db.execAsync(`
+        try {
+            await db.execAsync(`
             PRAGMA foreign_keys = ON;
 
             CREATE TABLE IF NOT EXISTS classes (
@@ -82,10 +83,7 @@ export class SQLiteService {
                 ('a6', 's6', 1, 1, 1),
                 ('a7', 's7', 1, 1, 1),
                 ('a8', 's8', 1, 1, 1),
-                ('a9', 's9', 0, 0, 0),
-                ('a10', 's10', 0, 0, 0),
-                ('a11', 's11', 1, 1, 1),
-                ('a12', 's12', 1, 1, 1);
+                ('a9', 's9', 0, 0, 0);
 
             INSERT OR IGNORE INTO detailsClasses (id, offer, visitors, classId) VALUES
                 ('dc1', 'R$ 1,00', 1, '1'),
@@ -95,7 +93,10 @@ export class SQLiteService {
                 ('dc5', 'R$ 5,00', 0, '5'),
                 ('dc6', 'R$ 1,00', 3, '6');
         `);
-
+        } catch (error) {
+            logger.error(error);
+            throw error;
+        }
     };
 
     static insertStudent = async ({ name, classId }: IStudentData) => {
@@ -170,6 +171,7 @@ export class SQLiteService {
                 LEFT JOIN detailsClasses dc ON dc.classId = s.classId
                 GROUP BY s.classId, c.name, dc.visitors
             `);
+            //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao contar alunos por classe: ' + error);
