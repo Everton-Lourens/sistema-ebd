@@ -171,7 +171,7 @@ export default function StudentFormScreen() {
                       style={[
                         styles.button,
                         {
-                          opacity: isFormValid(isValid, touched) ? 1 : 0.5,
+                          opacity: 1,
                         },
                       ]}
                     >
