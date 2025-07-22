@@ -140,9 +140,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     marginBottom: 12,
-    padding: 15,
+    padding: 18,
     borderRadius: 8,
-    elevation: 2,
+    elevation: 5,
   },
   listItem: {
     flexDirection: 'row',
