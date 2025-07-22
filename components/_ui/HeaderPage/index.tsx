@@ -1,33 +1,38 @@
-import { ReactNode } from 'react'
-import style from './HeaderPage.module.scss'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { styles } from "@/constants/styles"
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
+import { Text, TouchableOpacity, View } from 'react-native'
+import { IconSymbol } from "../IconSymbol"
 
 type Props = {
-  buttonText: string
+  HeaderText: string
   onClickFunction: () => void
-  InputFilter?: ReactNode
+  disabled?: boolean
 }
 
 export function HeaderPage({
-  buttonText,
+  HeaderText = 'ERRO',
   onClickFunction,
-  InputFilter = <></>,
   disabled = false,
-}: Props & { disabled?: boolean }) {
+}: Props) {
   return (
-    <header className={style.headerContainer}>
-      <div className={style.filters}>{InputFilter && InputFilter}</div>
-      <div className={style.buttonsContainer}>
-        <button
-          className={style.createNewButton}
-          onClick={onClickFunction}
+    <>
+      <View style={styles.header}>
+        <StatusBar style="light" />
+
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={onClickFunction}
           disabled={disabled}
         >
-          <FontAwesomeIcon className={style.icon} icon={faPlus} />
-          {buttonText || 'Cadastrar'}
-        </button>
-      </div>
-    </header>
+            {disabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
+        </TouchableOpacity>
+
+        <Text style={styles.headerText}>
+          {HeaderText}
+        </Text>
+      </View>
+    </>
   )
 }
+

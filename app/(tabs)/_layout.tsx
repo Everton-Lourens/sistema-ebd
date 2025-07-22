@@ -31,7 +31,16 @@ export default function TabLayout() {
         options={{
           title: 'Dashboard',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.3.fill" color={color} />
+            <IconSymbol size={28} name="house.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="report"
+        options={{
+          title: 'Relatório',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="chart.bar.fill" color={color} />
           ),
         }}
       />
@@ -40,7 +49,7 @@ export default function TabLayout() {
         options={{
           title: 'Adicionar aluno',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chart.bar.fill" color={color} />
+            <IconSymbol size={28} name="person.3.fill" color={color} />
           ),
         }}
       />

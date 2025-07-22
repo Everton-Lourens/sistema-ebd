@@ -1,11 +1,13 @@
 
 import FormSelectField from "@/components/_ui/FormSelectField/FormSelectField"
+import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { Loading } from "@/components/_ui/Loading"
 import { styles } from "@/constants/styles"
 import { useClassStore } from "@/stores/class/useClassStore"
 import { useUserStore } from "@/stores/user/useUserStore"
 import { TouchedFields } from "@/types/form"
 import { useFocusEffect } from "@react-navigation/native"
+import { router } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { Formik } from "formik"
 import { useCallback } from "react"
@@ -101,9 +103,11 @@ export default function StudentFormScreen() {
       <StatusBar style="light" />
 
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Cadastrar</Text>
-        </View>
+        <HeaderPage
+          HeaderText="Cadastro"
+          onClickFunction={() => router.back()}
+          disabled={false}
+        />
 
         {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}
         <KeyboardAwareScrollView

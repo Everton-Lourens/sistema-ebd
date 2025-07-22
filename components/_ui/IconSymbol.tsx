@@ -19,10 +19,11 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
 
-  // Novos ícones:
   'person.3.fill': 'group',
   'chart.bar.fill': 'bar-chart',
   'square.grid.2x2.fill': 'grid-view',
+
+  'chevron.left': 'chevron-left',
 } as IconMapping;
 
 
