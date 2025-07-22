@@ -1,8 +1,8 @@
 
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { useDashboardStore } from "@/constants/dashboard"
+import { copyResumeToClipboard } from "@/constants/dashboard/clipboard"
 import { styles } from "@/constants/styles"
-import * as Clipboard from 'expo-clipboard'
 import { useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
@@ -36,29 +36,6 @@ export default function Dashboard() {
     });
   }
 
-
-  const copyToClipboard = (data: any) => {
-    if (data === undefined) throw new Error('Erro ao copiar dados');
-    const formatted = `
-*CLASSE: ${data.className}*
---------------
-Matriculados: *${data.enrolled}*
-Ausentes: *${data.absent}*
-Presentes: *${data.present}*
-Visitantes: *${data.visitors}*
-Total: *${data.total}*
-Bíblias: *${data.bible}*
-Revistas: *${data.magazine}*
-Oferta: *${Number(data.offer.replace(/[^\d]/g, '')) > 0 ? data.offer : 'Não houve'}*
---------------
-Presença: *${data.attendancePercentage}*
-Bíblia: *${data.biblePercentage}*
-Revista: *${data.magazinePercentage}*
-  `.trim();
-    Clipboard.setStringAsync(formatted);
-  };
-
-
   return (
     <>
       <SafeAreaView style={styles.topSafeArea} />
@@ -75,7 +52,7 @@ Revista: *${data.magazinePercentage}*
             loading={loading}
             emptyText="Nenhum registro disponível!"
             items={arrayDashboardData}
-            onSubmit={copyToClipboard}
+            onSubmit={copyResumeToClipboard}
             textButton="Copiar"
             itemFields={[
               { field: 'className', valueFormatter: undefined },
