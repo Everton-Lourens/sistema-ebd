@@ -15,23 +15,42 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { useDashboard } from "./hooks/useDashboard"
 
-const fakeColumns: Column[] = [
+const fakeColumnsPresent: Column[] = [
   {
-    headerName: 'Classe',
+    headerName: 'Presença',
     field: 'className',
     flex: 2,
   },
   {
-    headerName: 'Percentual',
+    headerName: '%',
     field: 'percent',
     flex: 2,
   },
 ];
 
-const fakeRows = [
-  { className: 'Senhores', percent: '50%' },
-  { className: 'Jovens', percent: '70%' },
-  { className: 'Adolescentes', percent: '20%' },
+const fakeRowsPresent = [
+  { id: '1', className: 'Senhores', percent: '50%' },
+  { id: '2', className: 'Jovens', percent: '70%' },
+  { id: '3', className: 'Adolescentes', percent: '20%' },
+];
+
+const fakeColumnsOffer: Column[] = [
+  {
+    headerName: 'Oferta',
+    field: 'className',
+    flex: 2,
+  },
+  {
+    headerName: 'R$',
+    field: 'offer',
+    flex: 2,
+  },
+];
+
+const fakeRowsOffer = [
+  { id: '1', className: 'Adolescentes', offer: 'R$ 5,00' },
+  { id: '2', className: 'Senhoras', offer: 'R$ 2,50' },
+  { id: '3', className: 'Senhores', offer: 'R$ 0,00' },
 ];
 
 export default function Report() {
@@ -77,33 +96,33 @@ export default function Report() {
           extraScrollHeight={150}
         >
 
+          <Text style={{ color: 'gray', fontSize: 20, alignSelf: 'center' }}>Relatório Geral</Text>
+
+          {/*<TableComponent
+            columns={fakeColumnsPresent}
+            rows={fakeRowsPresent}
+            loading={loading}
+            emptyText="Sem registros disponíveis"
+            heightSkeleton={40}
+          />*/}
 
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
+            <TableComponent
+              columns={fakeColumnsPresent}
+              rows={fakeRowsPresent}
+              loading={loading}
+              emptyText="Sem registros disponíveis"
+              heightSkeleton={40}
+            />
 
-            <Text style={{ color: 'gray', fontSize: 20, alignSelf: 'center' }}>Vencedores em presença</Text>
             <TableComponent
-              columns={fakeColumns}
-              rows={fakeRows}
+              columns={fakeColumnsOffer}
+              rows={fakeRowsOffer}
               loading={loading}
               emptyText="Sem registros disponíveis"
               heightSkeleton={40}
             />
-            <Text style={{ color: 'gray', fontSize: 20, alignSelf: 'center' }}>Vencedores em Oferta</Text>
-            <TableComponent
-              columns={fakeColumns}
-              rows={fakeRows}
-              loading={loading}
-              emptyText="Sem registros disponíveis"
-              heightSkeleton={40}
-            />
-            <Text style={{ color: 'gray', fontSize: 20, alignSelf: 'center' }}>Relatório Geral</Text>
-            <TableComponent
-              columns={fakeColumns}
-              rows={fakeRows}
-              loading={loading}
-              emptyText="Sem registros disponíveis"
-              heightSkeleton={40}
-            />
+
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>

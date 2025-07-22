@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface Column {
   field: string;
@@ -36,56 +36,54 @@ export function TableComponent({
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal>
-        <View>
-          {/* Cabeçalho */}
-          <View style={styles.headerRow}>
-            {columns.map((column) => (
-              <View key={column.field} style={styles.headerCell}>
-                <Text style={styles.headerText}>{column.headerName || ''}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Linhas */}
-          {!loading && rows.length > 0 && rows.map((row) => (
-            <View key={row._id} style={styles.dataRow}>
-              {columns.map((column) => (
-                <View key={column.field} style={styles.cell}>
-                  {column.cellRenderer
-                    ? column.cellRenderer({ value: row[column.field], data: row })
-                    : column.valueFormatter
-                    ? column.valueFormatter({ value: row[column.field], data: row })
-                    : <Text>{String(row[column.field])}</Text>}
-                </View>
-              ))}
-            </View>
-          ))}
-
-          {/* Vazio */}
-          {!loading && rows.length === 0 && (
-            <View style={styles.emptyRow}>
-              <Text style={styles.emptyText}>{emptyText}</Text>
-            </View>
-          )}
-
-          {/* Skeleton */}
-          {loading && skeletonRows.map((item) => (
-            <View key={item} style={styles.dataRow}>
-              {columns.map((column) => (
-                <View key={column.field} style={styles.skeletonCell}>
-                  <View
-                    style={[
-                      styles.skeletonBox,
-                      { height: heightSkeleton }
-                    ]}
-                  />
-                </View>
-              ))}
+      <View>
+        {/* Cabeçalho */}
+        <View style={styles.headerRow}>
+          {columns.map((column) => (
+            <View key={column.field} style={styles.headerCell}>
+              <Text style={styles.headerText}>{column.headerName || ''}</Text>
             </View>
           ))}
         </View>
-      </ScrollView>
+
+        {/* Linhas */}
+        {!loading && rows.length > 0 && rows.map((row) => (
+          <View key={row.id} style={styles.dataRow}>
+            {columns.map((column) => (
+              <View key={column.field} style={styles.cell}>
+                {column.cellRenderer
+                  ? column.cellRenderer({ value: row[column.field], data: row })
+                  : column.valueFormatter
+                    ? column.valueFormatter({ value: row[column.field], data: row })
+                    : <Text>{String(row[column.field])}</Text>}
+              </View>
+            ))}
+          </View>
+        ))}
+
+        {/* Vazio */}
+        {!loading && rows.length === 0 && (
+          <View style={styles.emptyRow}>
+            <Text style={styles.emptyText}>{emptyText}</Text>
+          </View>
+        )}
+
+        {/* Skeleton */}
+        {loading && skeletonRows.map((item) => (
+          <View key={item} style={styles.dataRow}>
+            {columns.map((column) => (
+              <View key={column.field} style={styles.skeletonCell}>
+                <View
+                  style={[
+                    styles.skeletonBox,
+                    { height: heightSkeleton }
+                  ]}
+                />
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -96,6 +94,9 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
+    borderBottomWidth: 3,
+    justifyContent: 'space-between',
+    borderColor: '#ccc',
     backgroundColor: '#f1f1f1',
   },
   headerCell: {
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
   },
   dataRow: {
     flexDirection: 'row',
+        justifyContent: 'space-between',
   },
   cell: {
     padding: 10,
