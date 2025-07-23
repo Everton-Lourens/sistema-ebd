@@ -1,8 +1,9 @@
+import { IClassesData } from '@/screens/Classes/interfaces/IStudentData';
 import * as Clipboard from 'expo-clipboard';
 
-export const copyResumeToClipboard = (data: any) => {
-    if (data === undefined) throw new Error('Erro ao copiar dados');
-    const formatted = `
+export const copyResumeToClipboard = (data: IClassesData) => {
+  if (data === undefined) throw new Error('Erro ao copiar dados');
+  const formatted = `
 *CLASSE: ${data.className}*
 --------------
 Matriculados: *${data.enrolled}*
@@ -18,5 +19,5 @@ Presença: *${data.attendancePercentage}*
 Bíblia: *${data.biblePercentage}*
 Revista: *${data.magazinePercentage}*
   `.trim();
-    Clipboard.setStringAsync(formatted);
+  Clipboard.setStringAsync(formatted);
 };

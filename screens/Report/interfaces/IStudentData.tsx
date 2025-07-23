@@ -16,7 +16,7 @@ export const deshboardSchema = Yup.object().shape({
   total: Yup.number()
     .required("Total é obrigatório")
     .min(0, "Total não pode ser negativo"),
-  offers: Yup.string().required("Ofertas são obrigatórias"),
+  offer: Yup.string().required("Ofertas são obrigatórias"),
   attendancePercentage: Yup.string().required("Percentual de presença é obrigatório"),
 });
 

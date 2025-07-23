@@ -1,16 +1,16 @@
 import { SQLiteService } from '@/database/db';
-import { IDashboardData } from '../interfaces/IStudentData';
+import { IClassesData } from '../interfaces/IStudentData';
 
-export function useDashboard() {
-  async function loadingDashboard(): Promise<[IDashboardData] | void> {
+export function useClasses() {
+  async function loadingClasses(): Promise<[IClassesData] | void> {
     return await SQLiteService.getDashboardData()
       .then((result: unknown) => {
         // If result is an array, extract the first element or map as needed
         if (Array.isArray(result) && result.length > 0) {
-          return result as [IDashboardData];
+          return result as [IClassesData];
         }
         // If result is already an object, cast it
-        return result as [IDashboardData];
+        return result as [IClassesData];
       })
       .catch((error) => {
         console.log(error)
@@ -29,7 +29,7 @@ export function useDashboard() {
   }
 
   return {
-    loadingDashboard,
+    loadingClasses,
     getClasses
   }
 }

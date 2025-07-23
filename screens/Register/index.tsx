@@ -20,12 +20,12 @@ import {
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import FormField from "../../components/_ui/FormField/FormField"
-import { useDashboard } from "../Dashboard/hooks/useDashboard"
+import { useClasses } from "../Classes/hooks/useClasses"
 import { useFormAuth } from "./hooks/useFormAuth"
 import { IStudentData, registerSchema } from "./interfaces/IStudentData"
 
 export default function StudentFormScreen() {
-  const { getClasses } = useDashboard()
+  const { getClasses } = useClasses()
   const { onRegister } = useFormAuth()
   const { allClassName, setAllClassName } = useClassStore()
   const {

@@ -2,8 +2,8 @@
 import { Column } from "@/components/_ui/ChatTableComponent/interfaces"
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
-import { useDashboardStore } from "@/constants/dashboard"
-import { copyResumeToClipboard } from "@/constants/dashboard/clipboard"
+import { useClassesStore } from "@/constants/classes"
+import { copyResumeToClipboard } from "@/constants/classes/clipboard"
 import { styles } from "@/constants/styles"
 import { useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
@@ -12,7 +12,7 @@ import {
   SafeAreaView,
   View
 } from "react-native"
-import { useDashboard } from "./hooks/useDashboard"
+import { useClasses } from "./hooks/useClasses"
 
 const fakeColumns: Column[] = [
   {
@@ -34,8 +34,8 @@ const fakeRows = [
 ];
 
 export default function Dashboard() {
-  const { loadingDashboard } = useDashboard()
-  const { arrayDashboardData, setDashboardData, clearDashboardData } = useDashboardStore();
+  const { loadingClasses } = useClasses()
+  const { arrayDashboardData, setDashboardData, clearDashboardData } = useClassesStore();
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
@@ -50,7 +50,7 @@ export default function Dashboard() {
   const onRefresh = () => {
     setLoading(true);
     clearDashboardData();
-    loadingDashboard().then((data: any) => {
+    loadingClasses().then((data: any) => {
       setDashboardData(data)
       setLoading(false);
     });
@@ -64,9 +64,9 @@ export default function Dashboard() {
 
       <SafeAreaView style={styles.container}>
         <HeaderPage
-          HeaderText="Dashboard"
+          HeaderText="Classes"
           onClickFunction={() => {}}
-          disabled={true}
+          disabled={false}
         />
         <View style={{ flex: 1 }}>
           <ListMobile

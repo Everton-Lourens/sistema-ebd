@@ -1,5 +1,5 @@
-import DashboardScreen from '@/screens/Dashboard';
+import ReportScreen from '@/screens/Report';
 
-export default function Dashboard() {
-    return <DashboardScreen />;
+export default function Report() {
+    return <ReportScreen />;
 }

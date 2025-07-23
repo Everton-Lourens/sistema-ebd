@@ -1,3 +1,4 @@
-import './Dashboard'
+import './Classes'
 import './Register'
+import './Report'
 

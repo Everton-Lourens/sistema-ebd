@@ -5,7 +5,7 @@ type ClassDashboard = {
     name: string;
 };
 
-type ClassDashboardStore = {
+type ClassesStoreType = {
     arrayDashboardData: ClassDashboard[];
     setDashboardData: (data: ClassDashboard[]) => void;
     addToDashboardData: (item: ClassDashboard) => void;
@@ -13,7 +13,7 @@ type ClassDashboardStore = {
 };
 
 
-export interface ClassStore {
+export interface ClassesStore {
     id: string;
     present: number;
     bible: number;
@@ -27,7 +27,7 @@ export interface ClassStore {
     attendancePercentage: string;
 }
 
-export const useClassStore: ClassStore = {
+export const useClassStore: ClassesStore = {
     id: '',
     present: 0,
     bible: 0,
@@ -52,7 +52,7 @@ type RawClassData = {
     offers: string;
 };
 
-export const createClassStore = (raw: RawClassData): ClassStore => {
+export const createClassStore = (raw: RawClassData): ClassesStore => {
     const absent = raw.enrolled - raw.present;
     const total = raw.present + raw.visitors;
     const attendancePercentage = raw.enrolled > 0
@@ -74,7 +74,7 @@ export const createClassStore = (raw: RawClassData): ClassStore => {
     };
 };
 
-export const useDashboardStore = create<ClassDashboardStore>((set) => ({
+export const useClassesStore = create<ClassesStoreType>((set) => ({
     arrayDashboardData: [],
     setDashboardData: (data) => set({ arrayDashboardData: data }),
     addToDashboardData: (item) =>

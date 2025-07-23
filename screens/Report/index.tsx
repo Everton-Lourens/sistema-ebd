@@ -2,14 +2,13 @@
 import { Column } from "@/components/_ui/ChatTableComponent/interfaces"
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { TableComponent } from "@/components/_ui/TableComponent"
-import { useDashboardStore } from "@/constants/dashboard"
+import { useClassesStore } from "@/constants/classes"
 import { styles } from "@/constants/styles"
 import { router, useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
 import {
   SafeAreaView,
-  Text,
   View
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -55,7 +54,7 @@ const fakeRowsOffer = [
 
 export default function Report() {
   const { loadingDashboard } = useDashboard()
-  const { arrayDashboardData, setDashboardData, clearDashboardData } = useDashboardStore();
+  const { arrayDashboardData, setDashboardData, clearDashboardData } = useClassesStore();
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
@@ -84,9 +83,9 @@ export default function Report() {
 
       <SafeAreaView style={styles.container}>
         <HeaderPage
-          HeaderText="Relatório"
+          HeaderText="Relatório Geral"
           onClickFunction={() => router.back()}
-          disabled={false}
+          disabled={true}
         />
         {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}
         <KeyboardAwareScrollView
@@ -95,8 +94,6 @@ export default function Report() {
           keyboardShouldPersistTaps="handled"
           extraScrollHeight={150}
         >
-
-          <Text style={{ color: 'gray', fontSize: 20, alignSelf: 'center' }}>Relatório Geral</Text>
 
           {/*<TableComponent
             columns={fakeColumnsPresent}
