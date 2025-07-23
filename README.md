@@ -49,38 +49,32 @@ Pensando nessa necessidade, desenvolvi este aplicativo com foco em **facilidade*
 ## 📷 Imagens do aplicativo
 
 ### Tela inicial  
-Selecione a turma para iniciar a chamada.  
-![Tela inicial](https://ibb.co/DMVvNSr)
+Rankings de presença e oferta das turmas.  
+![Tela inicial](assets/images/exemple1.jpg)
 
 ---
 
-### Chamada de alunos (manual)  
-Como era feito antes, no papel.  
-![Chamada manual](exemple1.png)
+### Tela inicial
+Relatório geral somado de todas as turmas.  
+![Chamada digital](assets/images/exemple2.jpg)
 
 ---
 
-### Chamada de alunos (pelo app)  
-Registre presença, Bíblia e revista por aluno.  
-![Chamada digital](exemple2.png)
+### Tela de cadastro  
+Cadastro de alunos.  
+![Tela de cadastro](assets/images/exemple3.jpg)  
 
 ---
 
-### Cálculo parcial por turma  
-Feito automaticamente após o preenchimento da chamada.  
-![Cálculo parcial](exemple3.png)
+### Calculo parcial de cada classe 
+Cada classe tem seu cálculo de presença, bíblia e revista etc.
+![Cálculo parcial](assets/images/exemple4.jpg)
 
 ---
 
 ### Relatório geral (manual)  
 Antes feito na mão, com muito trabalho.  
-![Relatório manual](exemple4.png)
-
----
-
-### Relatório geral (automático)  
-Mostra o total por turma e o ranking da melhor.  
-![Relatório automático](exemple5.png)
+![Relatório manual](assets/images/exemple5.jpg)
 
 ---
 
