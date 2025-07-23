@@ -13,6 +13,7 @@ import { Formik } from "formik"
 import { useCallback } from "react"
 import {
   Alert,
+  Keyboard,
   SafeAreaView,
   Text,
   TouchableOpacity,
@@ -62,6 +63,7 @@ export default function StudentFormScreen() {
         "Nome: " + values.name +
         "\nClasse: " + values.classId,
       );
+      Keyboard.dismiss();
       handleCancel();
     }).catch(() => {
       Alert.alert(

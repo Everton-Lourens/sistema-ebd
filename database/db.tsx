@@ -228,25 +228,25 @@ export class SQLiteService {
     static getRankingPresentData = async () => {
         try {
             const result = await db.getAllAsync(`
-SELECT
-    c.name AS className,
-    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
-    CONCAT(
-        ROUND(
-            (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / 
-            COUNT(s.id), 
-        2),
-        '%'
-    ) AS attendancePercentage
-FROM students s
-LEFT JOIN classes c ON c.id = s.classId
-LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
-GROUP BY c.id, c.name
-ORDER BY
-    (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC
-LIMIT 5;
+                SELECT
+                    c.name AS className,
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
+                    CONCAT(
+                        ROUND(
+                            (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / 
+                            COUNT(s.id), 
+                        2),
+                        '%'
+                    ) AS attendancePercentage
+                FROM students s
+                LEFT JOIN classes c ON c.id = s.classId
+                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+                GROUP BY c.id, c.name
+                ORDER BY
+                    (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC
+                LIMIT 5;
             `);
-            console.log(JSON.stringify(result, null, 2));
+            //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro no total geral das classes: ' + error);
