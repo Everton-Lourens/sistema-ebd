@@ -3,7 +3,7 @@ import { IClassesData } from '../interfaces/IStudentData';
 
 export function useClasses() {
   async function loadingClasses(): Promise<[IClassesData] | void> {
-    return await SQLiteService.getReportData()
+    return await SQLiteService.getClassesReportData()
       .then((result: unknown) => {
         if (Array.isArray(result) && result.length > 0) {
           return result as [IClassesData];
