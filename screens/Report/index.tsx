@@ -16,27 +16,57 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useReport } from "./hooks/useReport"
 
 export default function Report() {
-  const { loadingGeneralReport, getRankingClasses } = useReport()
+  const { loadingGeneralReport, loadingRankingPresent, loadingRankingOffer } = useReport()
   const { arrayReportGeneralData, setReportGeneralData, clearReportGeneralData } = useReportStore();
+  const { arrayPresentRankingData, setPresentRankingData, clearPresentRankingData } = useReportStore();
+  const { arrayOfferRankingData, setOfferRankingData, clearOfferRankingData } = useReportStore();
 
-  const [loading, setLoading] = useState(false);
+  const [loadingGeneral, setLoadingGeneral] = useState(false);
+  const [loadingPresent, setLoadingPresent] = useState(false);
+  const [loadingOffer, setLoadingOffer] = useState(false);
+
+  const getLoadingGeneralReport = () => {
+    setLoadingGeneral(true);
+    clearReportGeneralData();
+    loadingGeneralReport().then((data: any) => {
+      setReportGeneralData(data)
+      setLoadingGeneral(false);
+    });
+  }
+
+  const getLoadingPresentRanking = () => {
+    setLoadingPresent(true);
+    clearPresentRankingData();
+    loadingRankingPresent().then((data: any) => {
+      setPresentRankingData(data)
+      setLoadingPresent(false);
+    });
+  }
+
+  const getLoadingOfferRanking = () => {
+    setLoadingOffer(true);
+    clearOfferRankingData();
+    loadingRankingOffer().then((data: any) => {
+      setOfferRankingData(data)
+      setLoadingOffer(false);
+    });
+  }
 
   const focusEffectCallback = useCallback(() => {
     onRefresh();
     return () => {
       clearReportGeneralData();
+      clearPresentRankingData();
+      clearOfferRankingData();
     };
   }, []);
 
   useFocusEffect(focusEffectCallback);
 
   const onRefresh = () => {
-    setLoading(true);
-    clearReportGeneralData();
-    loadingGeneralReport().then((data: any) => {
-      setReportGeneralData(data)
-      setLoading(false);
-    });
+    getLoadingGeneralReport();
+    getLoadingPresentRanking();
+    getLoadingOfferRanking();
   }
 
   return (
@@ -54,7 +84,7 @@ export default function Report() {
         />
 
         <ListMobile
-          loading={loading}
+          loading={loadingGeneral}
           emptyText="Nenhum registro disponível!"
           items={arrayReportGeneralData}
           onSubmit={copyResumeToClipboard}
@@ -87,16 +117,16 @@ export default function Report() {
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <TableComponent
               columns={columnsPresent}
-              rows={arrayReportGeneralData}
-              loading={loading}
+              rows={arrayPresentRankingData}
+              loading={loadingPresent}
               emptyText="Sem registros disponíveis"
               heightSkeleton={40}
             />
 
             <TableComponent
               columns={columnsOffer}
-              rows={arrayReportGeneralData}
-              loading={loading}
+              rows={arrayOfferRankingData}
+              loading={loadingOffer}
               emptyText="Sem registros disponíveis"
               heightSkeleton={40}
             />

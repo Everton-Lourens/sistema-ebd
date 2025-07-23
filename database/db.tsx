@@ -224,6 +224,55 @@ export class SQLiteService {
             throw error;
         }
     };
+
+    static getRankingPresentData = async () => {
+        try {
+            const result = await db.getAllAsync(`
+SELECT
+    c.name AS className,
+    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
+    CONCAT(
+        ROUND(
+            (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / 
+            COUNT(s.id), 
+        2),
+        '%'
+    ) AS attendancePercentage
+FROM students s
+LEFT JOIN classes c ON c.id = s.classId
+LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+GROUP BY c.id, c.name
+ORDER BY
+    (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC
+LIMIT 5;
+            `);
+            console.log(JSON.stringify(result, null, 2));
+            return result;
+        } catch (error) {
+            logger.error('Erro no total geral das classes: ' + error);
+            throw error;
+        }
+    };
+
+    static getRankingOfferData = async () => {
+        try {
+            const result = await db.getAllAsync(`
+                SELECT
+                    c.name AS className,
+                    'R$ ' || REPLACE(printf('%.2f', COALESCE(dc.offer, 0) / 100.0), '.', ',') AS offer
+                FROM detailsClasses dc
+                LEFT JOIN classes c ON c.id = dc.classId
+                WHERE dc.date = CURRENT_DATE
+                GROUP BY c.id, c.name, dc.offer
+                ORDER BY dc.offer DESC;
+            `);
+            //console.log(JSON.stringify(result, null, 2));
+            return result;
+        } catch (error) {
+            logger.error('Erro no total geral das classes: ' + error);
+            throw error;
+        }
+    };
 }
 
 SQLiteService.init();

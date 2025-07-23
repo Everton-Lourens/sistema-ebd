@@ -6,20 +6,28 @@ type Report = {
     name: string;
 };
 
-type Ranking = {
+type RankingPresent = {
     className: string;
     present: string;
-    offer: string;
 };
+
+type RankingOffer = {
+    className: string;
+    offer: string;
+}
 type ReportStoreType = {
     arrayReportGeneralData: Report[];
-    arrayReportRankingData: Ranking[];
+    arrayPresentRankingData: RankingPresent[];
+    arrayOfferRankingData: RankingOffer[];
     setReportGeneralData: (data: Report[]) => void;
-    setReportRankingData: (data: Ranking[]) => void;
+    setPresentRankingData: (data: RankingPresent[]) => void;
+    setOfferRankingData: (data: RankingOffer[]) => void;
     addToReportGeneralData: (item: Report) => void;
-    addToReportRankingData: (item: Ranking) => void;
+    addToPresentRankingData: (item: RankingPresent) => void;
+    addToofferRankingData: (item: RankingOffer) => void;
     clearReportGeneralData: () => void;
-    clearReportRankingData: () => void;
+    clearPresentRankingData: () => void;
+    clearOfferRankingData: () => void;
 };
 
 
@@ -123,18 +131,30 @@ export const createClassStore = (raw: RawClassData): ReportStore => {
 };
 
 export const useReportStore = create<ReportStoreType>((set) => ({
-    arrayReportGeneralData: [],
-    arrayReportRankingData: [],
-    setReportGeneralData: (data) => set({ arrayReportGeneralData: data }),
-    setReportRankingData: (data) => set({ arrayReportRankingData: data }),
-    addToReportGeneralData: (item) =>
-        set((state) => ({
-            arrayReportGeneralData: [...state.arrayReportGeneralData, item],
-        })),
-    addToReportRankingData: (item) =>
-        set((state) => ({
-            arrayReportRankingData: [...state.arrayReportRankingData, item],
-        })),
-    clearReportGeneralData: () => set({ arrayReportGeneralData: [] }),
-    clearReportRankingData: () => set({ arrayReportRankingData: [] }),
+  arrayReportGeneralData: [],
+  arrayPresentRankingData: [],
+  arrayOfferRankingData: [],
+
+  setReportGeneralData: (data) => set({ arrayReportGeneralData: data }),
+  setPresentRankingData: (data) => set({ arrayPresentRankingData: data }),
+  setOfferRankingData: (data) => set({ arrayOfferRankingData: data }),
+
+  addToReportGeneralData: (item) =>
+    set((state) => ({
+      arrayReportGeneralData: [...state.arrayReportGeneralData, item],
+    })),
+
+  addToPresentRankingData: (item) =>
+    set((state) => ({
+      arrayPresentRankingData: [...state.arrayPresentRankingData, item],
+    })),
+
+  addToofferRankingData: (item) =>
+    set((state) => ({
+      arrayOfferRankingData: [...state.arrayOfferRankingData, item],
+    })),
+
+  clearReportGeneralData: () => set({ arrayReportGeneralData: [] }),
+  clearPresentRankingData: () => set({ arrayPresentRankingData: [] }),
+  clearOfferRankingData: () => set({ arrayOfferRankingData: [] }),
 }));

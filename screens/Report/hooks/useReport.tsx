@@ -15,8 +15,19 @@ export function useReport() {
         throw error
       })
   }
-  async function getRankingClasses(): Promise<any> {
-    return await SQLiteService.getClasses()
+  async function loadingRankingPresent(): Promise<any> {
+    return await SQLiteService.getRankingPresentData()
+      .then((result: unknown) => {
+        return result || []
+      })
+      .catch((error) => {
+        console.log(error)
+        throw error
+      })
+  }
+
+  async function loadingRankingOffer(): Promise<any> {
+    return await SQLiteService.getRankingOfferData()
       .then((result: unknown) => {
         return result || []
       })
@@ -28,6 +39,7 @@ export function useReport() {
 
   return {
     loadingGeneralReport,
-    getRankingClasses
+    loadingRankingPresent,
+    loadingRankingOffer
   }
 }
