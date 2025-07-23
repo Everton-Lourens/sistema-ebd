@@ -1,16 +1,25 @@
 import { Column } from "@/components/_ui/TableComponent/interfaces";
 import { create } from "zustand";
 
-type RpoertType = {
+type Report = {
     id: string;
     name: string;
 };
 
+type Ranking = {
+    className: string;
+    present: string;
+    offer: string;
+};
 type ReportStoreType = {
-    arrayReportData: RpoertType[];
-    setReportData: (data: RpoertType[]) => void;
-    addToReportData: (item: RpoertType) => void;
-    clearReportData: () => void;
+    arrayReportGeneralData: Report[];
+    arrayReportRankingData: Ranking[];
+    setReportGeneralData: (data: Report[]) => void;
+    setReportRankingData: (data: Ranking[]) => void;
+    addToReportGeneralData: (item: Report) => void;
+    addToReportRankingData: (item: Ranking) => void;
+    clearReportGeneralData: () => void;
+    clearReportRankingData: () => void;
 };
 
 
@@ -114,11 +123,18 @@ export const createClassStore = (raw: RawClassData): ReportStore => {
 };
 
 export const useReportStore = create<ReportStoreType>((set) => ({
-    arrayReportData: [],
-    setReportData: (data) => set({ arrayReportData: data }),
-    addToReportData: (item) =>
+    arrayReportGeneralData: [],
+    arrayReportRankingData: [],
+    setReportGeneralData: (data) => set({ arrayReportGeneralData: data }),
+    setReportRankingData: (data) => set({ arrayReportRankingData: data }),
+    addToReportGeneralData: (item) =>
         set((state) => ({
-            arrayReportData: [...state.arrayReportData, item],
+            arrayReportGeneralData: [...state.arrayReportGeneralData, item],
         })),
-    clearReportData: () => set({ arrayReportData: [] }),
+    addToReportRankingData: (item) =>
+        set((state) => ({
+            arrayReportRankingData: [...state.arrayReportRankingData, item],
+        })),
+    clearReportGeneralData: () => set({ arrayReportGeneralData: [] }),
+    clearReportRankingData: () => set({ arrayReportRankingData: [] }),
 }));

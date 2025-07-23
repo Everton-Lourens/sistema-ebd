@@ -2,7 +2,7 @@
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { TableComponent } from "@/components/_ui/TableComponent"
-import { columnsOffer, useReportStore } from "@/constants/report"
+import { columnsOffer, columnsPresent, useReportStore } from "@/constants/report"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
 import { router, useFocusEffect } from "expo-router"
@@ -17,13 +17,14 @@ import { useReport } from "./hooks/useReport"
 
 export default function Report() {
   const { loadingGeneralReport, getRankingClasses } = useReport()
-  const { arrayReportData, setReportData, clearReportData } = useReportStore();
+  const { arrayReportGeneralData, setReportGeneralData, clearReportGeneralData } = useReportStore();
+
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
     onRefresh();
     return () => {
-      clearReportData();
+      clearReportGeneralData();
     };
   }, []);
 
@@ -31,9 +32,9 @@ export default function Report() {
 
   const onRefresh = () => {
     setLoading(true);
-    clearReportData();
+    clearReportGeneralData();
     loadingGeneralReport().then((data: any) => {
-      setReportData(data)
+      setReportGeneralData(data)
       setLoading(false);
     });
   }
@@ -55,7 +56,7 @@ export default function Report() {
         <ListMobile
           loading={loading}
           emptyText="Nenhum registro disponível!"
-          items={arrayReportData}
+          items={arrayReportGeneralData}
           onSubmit={copyResumeToClipboard}
           textButton="Copiar"
           itemFields={[
@@ -85,8 +86,16 @@ export default function Report() {
         >
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <TableComponent
+              columns={columnsPresent}
+              rows={arrayReportGeneralData}
+              loading={loading}
+              emptyText="Sem registros disponíveis"
+              heightSkeleton={40}
+            />
+
+            <TableComponent
               columns={columnsOffer}
-              rows={arrayReportData}
+              rows={arrayReportGeneralData}
               loading={loading}
               emptyText="Sem registros disponíveis"
               heightSkeleton={40}
