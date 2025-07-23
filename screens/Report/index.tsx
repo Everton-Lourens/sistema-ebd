@@ -12,7 +12,7 @@ import {
   View
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { useDashboard } from "./hooks/useDashboard"
+import { useReport } from "./hooks/useReport"
 
 const fakeColumnsPresent: Column[] = [
   {
@@ -53,14 +53,17 @@ const fakeRowsOffer = [
 ];
 
 export default function Report() {
-  const { loadingDashboard } = useDashboard()
-  const { arrayDashboardData, setDashboardData, clearDashboardData } = useClassesStore();
+  const { loadingGeneralReport, getRankingClasses } = useReport()
+  const { arrayClassesData, setClassesData, clearClassesData } = useClassesStore();
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
+    loadingGeneralReport().then((data: any) => {
+      setClassesData(data)
+    })
     onRefresh();
     return () => {
-      clearDashboardData();
+      clearClassesData();
     };
   }, []);
 
@@ -68,9 +71,9 @@ export default function Report() {
 
   const onRefresh = () => {
     setLoading(true);
-    clearDashboardData();
-    loadingDashboard().then((data: any) => {
-      setDashboardData(data)
+    clearClassesData();
+    loadingGeneralReport().then((data: any) => {
+      setClassesData(data)
       setLoading(false);
     });
   }

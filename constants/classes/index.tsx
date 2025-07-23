@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
-type ClassDashboard = {
+type ClassType = {
     id: string;
     name: string;
 };
 
 type ClassesStoreType = {
-    arrayDashboardData: ClassDashboard[];
-    setDashboardData: (data: ClassDashboard[]) => void;
-    addToDashboardData: (item: ClassDashboard) => void;
-    clearDashboardData: () => void;
+    arrayClassesData: ClassType[];
+    setClassesData: (data: ClassType[]) => void;
+    addToClassesData: (item: ClassType) => void;
+    clearClassesData: () => void;
 };
 
 
@@ -75,11 +75,11 @@ export const createClassStore = (raw: RawClassData): ClassesStore => {
 };
 
 export const useClassesStore = create<ClassesStoreType>((set) => ({
-    arrayDashboardData: [],
-    setDashboardData: (data) => set({ arrayDashboardData: data }),
-    addToDashboardData: (item) =>
+    arrayClassesData: [],
+    setClassesData: (data) => set({ arrayClassesData: data }),
+    addToClassesData: (item) =>
         set((state) => ({
-            arrayDashboardData: [...state.arrayDashboardData, item],
+            arrayClassesData: [...state.arrayClassesData, item],
         })),
-    clearDashboardData: () => set({ arrayDashboardData: [] }),
+    clearClassesData: () => set({ arrayClassesData: [] }),
 }));

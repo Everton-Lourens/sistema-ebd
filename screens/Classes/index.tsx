@@ -1,5 +1,4 @@
 
-import { Column } from "@/components/_ui/ChatTableComponent/interfaces"
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { useClassesStore } from "@/constants/classes"
@@ -14,34 +13,15 @@ import {
 } from "react-native"
 import { useClasses } from "./hooks/useClasses"
 
-const fakeColumns: Column[] = [
-  {
-    headerName: 'Classe',
-    field: 'className',
-    flex: 2,
-  },
-  {
-    headerName: 'Percentual',
-    field: 'percent',
-    flex: 2,
-  },
-];
-
-const fakeRows = [
-  { className: 'Senhores', percent: '50%' },
-  { className: 'Jovens', percent: '70%' },
-  { className: 'Adolescentes', percent: '20%' },
-];
-
-export default function Dashboard() {
+export default function Classes() {
   const { loadingClasses } = useClasses()
-  const { arrayDashboardData, setDashboardData, clearDashboardData } = useClassesStore();
+  const { arrayClassesData, setClassesData, clearClassesData } = useClassesStore();
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
     onRefresh();
     return () => {
-      clearDashboardData();
+      clearClassesData();
     };
   }, []);
 
@@ -49,9 +29,9 @@ export default function Dashboard() {
 
   const onRefresh = () => {
     setLoading(true);
-    clearDashboardData();
+    clearClassesData();
     loadingClasses().then((data: any) => {
-      setDashboardData(data)
+      setClassesData(data)
       setLoading(false);
     });
   }
@@ -72,7 +52,7 @@ export default function Dashboard() {
           <ListMobile
             loading={loading}
             emptyText="Nenhum registro disponível!"
-            items={arrayDashboardData}
+            items={arrayClassesData}
             onSubmit={copyResumeToClipboard}
             textButton="Copiar"
             itemFields={[

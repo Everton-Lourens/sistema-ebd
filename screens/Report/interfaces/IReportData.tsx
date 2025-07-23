@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-export const deshboardSchema = Yup.object().shape({
+export const reportSchema = Yup.object().shape({
   id: Yup.string().required("ID é obrigatório"),
   present: Yup.number().required("Presença é obrigatória"),
   bible: Yup.number().required("Bíblia é obrigatória"),
@@ -20,4 +20,4 @@ export const deshboardSchema = Yup.object().shape({
   attendancePercentage: Yup.string().required("Percentual de presença é obrigatório"),
 });
 
-export type IDashboardData = Yup.InferType<typeof deshboardSchema>;
+export type IReportData = Yup.InferType<typeof reportSchema>;

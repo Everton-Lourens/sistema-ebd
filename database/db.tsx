@@ -148,7 +148,7 @@ export class SQLiteService {
         }
     };
 
-    static getDashboardData = async () => {
+    static getReportData = async () => {
         try {
             const result = await db.getAllAsync(`
                 SELECT
@@ -179,6 +179,35 @@ export class SQLiteService {
         }
     };
 
+    static getGeneralReportData = async () => {
+        try {
+            const result = await db.getAllAsync(`
+        -- Totais gerais
+                SELECT
+                    'total' AS id,
+                    'Total Geral' AS className,
+                    COUNT(s.id) AS enrolled,
+                    (COUNT(s.id) - SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END)) AS absent,
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present,
+                    COALESCE(SUM(dc.visitors), 0) AS visitors,
+                    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) + COALESCE(SUM(dc.visitors), 0) AS total,
+                    SUM(COALESCE(a.bible, 0)) AS bible,
+                    SUM(COALESCE(a.magazine, 0)) AS magazine,
+                    SUM(dc.offer) AS offer,
+                    CONCAT(ROUND((SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id), 2), '%') AS attendancePercentage,
+                    CONCAT(ROUND((SUM(COALESCE(a.bible, 0)) * 100.0) / COUNT(s.id), 2), '%') AS biblePercentage,
+                    CONCAT(ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2), '%') AS magazinePercentage
+                FROM students s
+                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+                LEFT JOIN detailsClasses dc ON dc.classId = s.classId;
+            `);
+            //console.log(JSON.stringify(result, null, 2));
+            return result;
+        } catch (error) {
+            logger.error('Erro ao contar alunos por classe: ' + error);
+            throw error;
+        }
+    };
 }
 
 SQLiteService.init();
