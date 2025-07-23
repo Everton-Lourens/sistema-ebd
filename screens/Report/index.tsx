@@ -3,8 +3,8 @@ import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { TableComponent } from "@/components/_ui/TableComponent"
 import { columnsOffer, useReportStore } from "@/constants/report"
-import { copyResumeToClipboard } from "@/constants/report/clipboard"
 import { styles } from "@/constants/styles"
+import { copyResumeToClipboard } from "@/helpers/clipboard"
 import { router, useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
@@ -49,6 +49,7 @@ export default function Report() {
           HeaderText="Relatório Geral"
           onClickFunction={() => router.back()}
           disabled={true}
+          showDate={true}
         />
 
         <ListMobile

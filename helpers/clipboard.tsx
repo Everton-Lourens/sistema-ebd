@@ -1,10 +1,11 @@
-import { IClassesData } from '@/screens/Classes/interfaces/IStudentData';
+import { IReportData } from '@/screens/Report/interfaces/IReportData';
 import * as Clipboard from 'expo-clipboard';
+import { getToday } from './format';
 
-export const copyResumeToClipboard = (data: IClassesData) => {
+export const copyResumeToClipboard = (data: IReportData) => {
   if (data === undefined) throw new Error('Erro ao copiar dados');
   const formatted = `
-*CLASSE: ${data.className}*
+*${data.className} - ${getToday()}*
 --------------
 Matriculados: *${data.enrolled}*
 Ausentes: *${data.absent}*

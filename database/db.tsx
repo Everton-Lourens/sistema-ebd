@@ -1,4 +1,4 @@
-import { logger } from '@/helper/logger';
+import { logger } from '@/helpers/logger';
 import { IStudentData } from '@/screens/Register/interfaces/IStudentData';
 import * as Crypto from 'expo-crypto';
 import * as SQLite from 'expo-sqlite';
@@ -217,7 +217,7 @@ export class SQLiteService {
                 FROM student_data sd
                 CROSS JOIN details_data dd;
             `);
-            console.log(JSON.stringify(result, null, 2));
+            //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro no total geral das classes: ' + error);

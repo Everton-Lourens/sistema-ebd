@@ -2,8 +2,8 @@
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { useClassesStore } from "@/constants/classes"
-import { copyResumeToClipboard } from "@/constants/classes/clipboard"
 import { styles } from "@/constants/styles"
+import { copyResumeToClipboard } from "@/helpers/clipboard"
 import { useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
@@ -45,8 +45,9 @@ export default function Classes() {
       <SafeAreaView style={styles.container}>
         <HeaderPage
           HeaderText="Classes"
-          onClickFunction={() => {}}
+          onClickFunction={() => { }}
           disabled={false}
+          showDate={true}
         />
         <View style={{ flex: 1 }}>
           <ListMobile
