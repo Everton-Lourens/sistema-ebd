@@ -161,7 +161,7 @@ export class SQLiteService {
                     SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) + COALESCE(dc.visitors, 0) AS total,
                     SUM(COALESCE(a.bible, 0)) AS bible,
                     SUM(COALESCE(a.magazine, 0)) AS magazine,
-                    dc.offer,
+                    'R$ ' || REPLACE(printf('%.2f', COALESCE(dc.offer, 0) / 100.0), '.', ',') AS offer,
                     CONCAT(ROUND((SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id), 2), '%') AS attendancePercentage,
                     CONCAT(ROUND((SUM(COALESCE(a.bible, 0)) * 100.0) / COUNT(s.id), 2), '%') AS biblePercentage,
                     CONCAT(ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2), '%') AS magazinePercentage
@@ -171,7 +171,7 @@ export class SQLiteService {
                 LEFT JOIN detailsClasses dc ON dc.classId = s.classId
                 GROUP BY s.classId, c.name, dc.visitors;
             `);
-            console.log(JSON.stringify(result, null, 2));
+            //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao contar alunos por classe: ' + error);
@@ -210,7 +210,7 @@ export class SQLiteService {
                     sd.present + COALESCE(dd.visitors, 0) AS total,
                     sd.bible,
                     sd.magazine,
-                    COALESCE(dd.offer, 0) AS offer,
+                    'R$ ' || REPLACE(printf('%.2f', COALESCE(dd.offer, 0) / 100.0), '.', ',') AS offer,
                     CONCAT(ROUND((sd.present * 100.0) / sd.enrolled, 2), '%') AS attendancePercentage,
                     CONCAT(ROUND((sd.bible * 100.0) / sd.enrolled, 2), '%') AS biblePercentage,
                     CONCAT(ROUND((sd.magazine * 100.0) / sd.enrolled, 2), '%') AS magazinePercentage

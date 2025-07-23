@@ -18,6 +18,8 @@ export const reportSchema = Yup.object().shape({
     .min(0, "Total não pode ser negativo"),
   offer: Yup.string().required("Ofertas são obrigatórias"),
   attendancePercentage: Yup.string().required("Percentual de presença é obrigatório"),
+  biblePercentage: Yup.string().required("Percentual de bíblia é obrigatório"),
+  magazinePercentage: Yup.string().required("Percentual de revista é obrigatório"),
 });
 
 export type IReportData = Yup.InferType<typeof reportSchema>;

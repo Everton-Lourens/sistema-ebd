@@ -1,8 +1,9 @@
 
-import { Column } from "@/components/_ui/ChatTableComponent/interfaces"
 import { HeaderPage } from "@/components/_ui/HeaderPage"
+import { ListMobile } from "@/components/_ui/ListMobile"
 import { TableComponent } from "@/components/_ui/TableComponent"
-import { useClassesStore } from "@/constants/classes"
+import { columnsOffer, useReportStore } from "@/constants/report"
+import { copyResumeToClipboard } from "@/constants/report/clipboard"
 import { styles } from "@/constants/styles"
 import { router, useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
@@ -14,56 +15,15 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { useReport } from "./hooks/useReport"
 
-const fakeColumnsPresent: Column[] = [
-  {
-    headerName: 'Presença',
-    field: 'className',
-    flex: 2,
-  },
-  {
-    headerName: '%',
-    field: 'percent',
-    flex: 2,
-  },
-];
-
-const fakeRowsPresent = [
-  { id: '1', className: 'Senhores', percent: '50%' },
-  { id: '2', className: 'Jovens', percent: '70%' },
-  { id: '3', className: 'Adolescentes', percent: '20%' },
-];
-
-const fakeColumnsOffer: Column[] = [
-  {
-    headerName: 'Oferta',
-    field: 'className',
-    flex: 2,
-  },
-  {
-    headerName: 'R$',
-    field: 'offer',
-    flex: 2,
-  },
-];
-
-const fakeRowsOffer = [
-  { id: '1', className: 'Adolescentes', offer: 'R$ 5,00' },
-  { id: '2', className: 'Senhoras', offer: 'R$ 2,50' },
-  { id: '3', className: 'Senhores', offer: 'R$ 0,00' },
-];
-
 export default function Report() {
   const { loadingGeneralReport, getRankingClasses } = useReport()
-  const { arrayClassesData, setClassesData, clearClassesData } = useClassesStore();
+  const { arrayReportData, setReportData, clearReportData } = useReportStore();
   const [loading, setLoading] = useState(false);
 
   const focusEffectCallback = useCallback(() => {
-    loadingGeneralReport().then((data: any) => {
-      setClassesData(data)
-    })
     onRefresh();
     return () => {
-      clearClassesData();
+      clearReportData();
     };
   }, []);
 
@@ -71,9 +31,9 @@ export default function Report() {
 
   const onRefresh = () => {
     setLoading(true);
-    clearClassesData();
+    clearReportData();
     loadingGeneralReport().then((data: any) => {
-      setClassesData(data)
+      setReportData(data)
       setLoading(false);
     });
   }
@@ -90,6 +50,31 @@ export default function Report() {
           onClickFunction={() => router.back()}
           disabled={true}
         />
+
+        <ListMobile
+          loading={loading}
+          emptyText="Nenhum registro disponível!"
+          items={arrayReportData}
+          onSubmit={copyResumeToClipboard}
+          textButton="Copiar"
+          itemFields={[
+            { field: 'className', valueFormatter: undefined },
+            { field: 'enrolled', valueFormatter: undefined },
+          ]}
+          collapseItems={[
+            { field: 'enrolled', headerName: 'Matriculados', type: 'text' },
+            { field: 'absent', headerName: 'Ausentes', type: 'text' },
+            { field: 'present', headerName: 'Presentes', type: 'text' },
+            { field: 'visitors', headerName: 'Visitantes', type: 'text' },
+            { field: 'total', headerName: 'Total', type: 'text' },
+            { field: 'bible', headerName: 'Bíblia', type: 'text' },
+            { field: 'magazine', headerName: 'Revista', type: 'text' },
+            { field: 'offer', headerName: 'Oferta', type: 'text' },
+            { field: 'attendancePercentage', headerName: 'Percentual de Presença', type: 'text' },
+            { field: 'biblePercentage', headerName: 'Percentual de Bíblia', type: 'text' },
+            { field: 'magazinePercentage', headerName: 'Percentual de Revista', type: 'text' },
+          ]}
+        />
         {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}
         <KeyboardAwareScrollView
           style={styles.content}
@@ -97,27 +82,10 @@ export default function Report() {
           keyboardShouldPersistTaps="handled"
           extraScrollHeight={150}
         >
-
-          {/*<TableComponent
-            columns={fakeColumnsPresent}
-            rows={fakeRowsPresent}
-            loading={loading}
-            emptyText="Sem registros disponíveis"
-            heightSkeleton={40}
-          />*/}
-
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <TableComponent
-              columns={fakeColumnsPresent}
-              rows={fakeRowsPresent}
-              loading={loading}
-              emptyText="Sem registros disponíveis"
-              heightSkeleton={40}
-            />
-
-            <TableComponent
-              columns={fakeColumnsOffer}
-              rows={fakeRowsOffer}
+              columns={columnsOffer}
+              rows={arrayReportData}
               loading={loading}
               emptyText="Sem registros disponíveis"
               heightSkeleton={40}
@@ -125,7 +93,7 @@ export default function Report() {
 
           </View>
         </KeyboardAwareScrollView>
-      </SafeAreaView>
+      </SafeAreaView >
     </>
   );
 }

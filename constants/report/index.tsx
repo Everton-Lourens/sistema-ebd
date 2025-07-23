@@ -1,44 +1,71 @@
+import { Column } from "@/components/_ui/TableComponent/interfaces";
 import { create } from "zustand";
 
-type ClassType = {
+type RpoertType = {
     id: string;
     name: string;
 };
 
-type ClassesStoreType = {
-    arrayClassesData: ClassType[];
-    setClassesData: (data: ClassType[]) => void;
-    addToClassesData: (item: ClassType) => void;
-    clearClassesData: () => void;
+type ReportStoreType = {
+    arrayReportData: RpoertType[];
+    setReportData: (data: RpoertType[]) => void;
+    addToReportData: (item: RpoertType) => void;
+    clearReportData: () => void;
 };
 
 
-export interface ClassesStore {
+export interface ReportStore {
     id: string;
-    present: number;
-    bible: number;
-    magazine: number;
     className: string;
     enrolled: number;
     absent: number;
     visitors: number;
+    present: number;
     total: number;
+    bible: number;
+    magazine: number;
     offers: string;
     attendancePercentage: string;
     biblePercentage: string;
     magazinePercentage: string;
 }
 
-export const useClassStore: ClassesStore = {
+export const columnsPresent: Column[] = [
+    {
+        headerName: 'Presença',
+        field: 'className',
+        flex: 2,
+    },
+    {
+        headerName: '%',
+        field: 'attendancePercentage',
+        flex: 2,
+    },
+];
+
+export const columnsOffer: Column[] = [
+    {
+        headerName: 'Oferta',
+        field: 'className',
+        flex: 2,
+    },
+    {
+        headerName: 'R$',
+        field: 'offer',
+        flex: 2,
+    },
+];
+
+export const useClassStore: ReportStore = {
     id: '',
-    present: 0,
-    bible: 0,
-    magazine: 0,
     className: '',
     enrolled: 0,
     absent: 0,
+    present: 0,
     visitors: 0,
     total: 0,
+    bible: 0,
+    magazine: 0,
     offers: '',
     attendancePercentage: '',
     biblePercentage: '',
@@ -56,7 +83,7 @@ type RawClassData = {
     offers: string;
 };
 
-export const createClassStore = (raw: RawClassData): ClassesStore => {
+export const createClassStore = (raw: RawClassData): ReportStore => {
     const absent = raw.enrolled - raw.present;
     const total = raw.present + raw.visitors;
     const attendancePercentage = raw.enrolled > 0
@@ -86,12 +113,12 @@ export const createClassStore = (raw: RawClassData): ClassesStore => {
     };
 };
 
-export const useClassesStore = create<ClassesStoreType>((set) => ({
-    arrayClassesData: [],
-    setClassesData: (data) => set({ arrayClassesData: data }),
-    addToClassesData: (item) =>
+export const useReportStore = create<ReportStoreType>((set) => ({
+    arrayReportData: [],
+    setReportData: (data) => set({ arrayReportData: data }),
+    addToReportData: (item) =>
         set((state) => ({
-            arrayClassesData: [...state.arrayClassesData, item],
+            arrayReportData: [...state.arrayReportData, item],
         })),
-    clearClassesData: () => set({ arrayClassesData: [] }),
+    clearReportData: () => set({ arrayReportData: [] }),
 }));
