@@ -243,8 +243,7 @@ export class SQLiteService {
                 LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
                 GROUP BY c.id, c.name
                 ORDER BY
-                    (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC
-                LIMIT 5;
+                    (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC;
             `);
             //console.log(JSON.stringify(result, null, 2));
             return result;
