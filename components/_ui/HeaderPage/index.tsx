@@ -7,15 +7,19 @@ import { IconSymbol } from "../IconSymbol"
 
 type Props = {
   HeaderText: string
-  onClickFunction: () => void
-  disabled?: boolean
+  onClickFunctionLeft?: () => void
+  onClickFunctionRight?: () => void
+  buttonLeftDisabled?: boolean
+  buttonRightDisabled?: boolean
   showDate?: boolean
 }
 
 export function HeaderPage({
   HeaderText = 'ERRO',
-  onClickFunction,
-  disabled = false,
+  onClickFunctionLeft,
+  onClickFunctionRight,
+  buttonLeftDisabled = false,
+  buttonRightDisabled = false,
   showDate = false
 }: Props) {
   return (
@@ -24,11 +28,11 @@ export function HeaderPage({
         <StatusBar style="light" />
 
         <TouchableOpacity
-          style={styles.backButton}
-          onPress={onClickFunction}
-          disabled={disabled}
+          style={styles.leftButton}
+          onPress={onClickFunctionLeft}
+          disabled={buttonLeftDisabled}
         >
-          {disabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
+          {buttonLeftDisabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
         </TouchableOpacity>
 
         <Text style={[styles.headerText, showDate && { marginTop: 10 }]}>
@@ -37,6 +41,14 @@ export function HeaderPage({
         {showDate && <Text style={[styles.headerText, { marginTop: 60, fontSize: 15 }]}>
           {getToday()}
         </Text>}
+
+        <TouchableOpacity
+          style={styles.rightButton}
+          onPress={onClickFunctionRight}
+          disabled={buttonRightDisabled}
+        >
+          {buttonRightDisabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
+        </TouchableOpacity>
       </View>
     </>
   )

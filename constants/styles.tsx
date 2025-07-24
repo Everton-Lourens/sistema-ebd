@@ -27,6 +27,7 @@ export const styles = StyleSheet.create({
   header: {
     height: 85,
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: HEADER_BACKGROUND,
   },
@@ -170,7 +171,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  backButton: {
+  leftButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -178,7 +179,19 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     marginTop: 30,
-    left: 5,
+    left: -150,
+    minHeight: 44,
+    minWidth: 44,
+  },
+  rightButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 30,
+    right: -160,
     minHeight: 44,
     minWidth: 44,
   },
