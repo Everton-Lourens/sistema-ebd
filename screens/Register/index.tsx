@@ -106,9 +106,10 @@ export default function StudentFormScreen() {
 
       <SafeAreaView style={styles.container}>
         <HeaderPage
-          HeaderText="Cadastro"
-          onClickFunction={() => router.back()}
-          disabled={false}
+          HeaderText="Adicionar Aluno"
+          onClickFunctionLeft={() => router.back()}
+          buttonLeftDisabled={false}
+          buttonRightDisabled={true}
         />
 
         {/* https://github.com/APSL/react-native-keyboard-aware-scroll-view */}

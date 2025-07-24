@@ -24,6 +24,7 @@ const MAPPING = {
   'square.grid.2x2.fill': 'grid-view',
 
   'chevron.left': 'chevron-left',
+  'plus': 'add',
 } as IconMapping;
 
 

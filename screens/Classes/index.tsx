@@ -1,10 +1,11 @@
 
+import { FloatingButton } from "@/components/_ui/FloatingButton"
 import { HeaderPage } from "@/components/_ui/HeaderPage"
 import { ListMobile } from "@/components/_ui/ListMobile"
 import { useClassesStore } from "@/constants/classes"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
-import { useFocusEffect } from "expo-router"
+import { router, useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
 import {
@@ -45,14 +46,19 @@ export default function Classes() {
       <SafeAreaView style={styles.container}>
         <HeaderPage
           HeaderText="Classes"
-          onClickFunction={() => { }}
-          disabled={false}
+          buttonLeftDisabled={true}
+          onClickFunctionLeft={() => router.back()}
+          buttonRightDisabled={true}
+          onClickFunctionRight={() => router.push('/register')}
           showDate={true}
         />
         <View style={{ flex: 1 }}>
+
+          <FloatingButton onClickFunction={() => {router.push('/register')}} />
+
           <ListMobile
             loading={loading}
-            emptyText="Nenhum registro disponível!"
+            emptyText="Carregando..."
             items={arrayClassesData}
             onSubmit={copyResumeToClipboard}
             textButton="Copiar"

@@ -1,7 +1,7 @@
 import { styles } from "@/constants/styles"
 import { getToday } from "@/helpers/format"
 import { StatusBar } from 'expo-status-bar'
-import React from 'react'
+import React, { JSX } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { IconSymbol } from "../IconSymbol"
 
@@ -11,6 +11,8 @@ type Props = {
   onClickFunctionRight?: () => void
   buttonLeftDisabled?: boolean
   buttonRightDisabled?: boolean
+  iconLeftComponent?: JSX.Element
+  iconRightComponent?: JSX.Element
   showDate?: boolean
 }
 
@@ -20,6 +22,8 @@ export function HeaderPage({
   onClickFunctionRight,
   buttonLeftDisabled = false,
   buttonRightDisabled = false,
+  iconLeftComponent = <IconSymbol style={styles.icon} size={40} name="chevron.left" color="white" />,
+  iconRightComponent = <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />,
   showDate = false
 }: Props) {
   return (
@@ -32,7 +36,7 @@ export function HeaderPage({
           onPress={onClickFunctionLeft}
           disabled={buttonLeftDisabled}
         >
-          {buttonLeftDisabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
+          {buttonLeftDisabled ? null : iconLeftComponent}
         </TouchableOpacity>
 
         <Text style={[styles.headerText, showDate && { marginTop: 10 }]}>
@@ -47,7 +51,7 @@ export function HeaderPage({
           onPress={onClickFunctionRight}
           disabled={buttonRightDisabled}
         >
-          {buttonRightDisabled ? null : <IconSymbol style={styles.icon} size={40} name="house.fill" color="white" />}
+          {buttonRightDisabled ? null : iconRightComponent}
         </TouchableOpacity>
       </View>
     </>

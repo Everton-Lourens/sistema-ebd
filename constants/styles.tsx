@@ -84,6 +84,16 @@ export const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
   },
+buttonAdd: {
+  position: "absolute",
+  bottom: 20,
+  right: 20,
+  backgroundColor: "#2980b9",
+  padding: 15,
+  borderRadius: 15,
+  zIndex: 999,
+  elevation: 10,
+},
   buttonText: {
     color: "#fff",
     fontWeight: "bold",

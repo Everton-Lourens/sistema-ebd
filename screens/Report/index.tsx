@@ -5,7 +5,7 @@ import { TableComponent } from "@/components/_ui/TableComponent"
 import { columnsOffer, columnsPresent, useReportStore } from "@/constants/report"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
-import { router, useFocusEffect } from "expo-router"
+import { useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
 import {
@@ -77,8 +77,8 @@ export default function Report() {
       <SafeAreaView style={{ flex: 1 }}>
         <HeaderPage
           HeaderText="Relatório Geral"
-          onClickFunction={() => router.back()}
-          disabled={true}
+          buttonLeftDisabled={true}
+          buttonRightDisabled={true}
           showDate={true}
         />
 

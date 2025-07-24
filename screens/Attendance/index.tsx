@@ -45,8 +45,9 @@ export default function Attendance() {
       <SafeAreaView style={styles.container}>
         <HeaderPage
           HeaderText="Attendance"
-          onClickFunction={() => { }}
-          disabled={false}
+          onClickFunctionLeft={() => { }}
+          buttonLeftDisabled={true}
+          buttonRightDisabled={true}
           showDate={true}
         />
         <View style={{ flex: 1 }}>
