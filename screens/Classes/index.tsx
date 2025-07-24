@@ -47,14 +47,12 @@ export default function Classes() {
         <HeaderPage
           HeaderText="Classes"
           buttonLeftDisabled={true}
-          onClickFunctionLeft={() => router.back()}
           buttonRightDisabled={true}
-          onClickFunctionRight={() => router.push('/register')}
           showDate={true}
         />
         <View style={{ flex: 1 }}>
 
-          <FloatingButton onClickFunction={() => {router.push('/register')}} />
+          <FloatingButton onClickFunction={() => { router.push('/register') }} />
 
           <ListMobile
             loading={loading}

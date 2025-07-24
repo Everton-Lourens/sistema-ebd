@@ -189,7 +189,7 @@ buttonAdd: {
     paddingHorizontal: 20,
     borderRadius: 8,
     marginTop: 30,
-    left: -150,
+    left: -170,
     minHeight: 44,
     minWidth: 44,
   },
