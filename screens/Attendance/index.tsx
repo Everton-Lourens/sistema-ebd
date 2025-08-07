@@ -4,7 +4,7 @@ import { Switch } from "@/components/_ui/Switch"
 import { useAttendanceStore } from "@/constants/attendance"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
-import { useFocusEffect, useLocalSearchParams } from "expo-router"
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router"
 
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
@@ -50,8 +50,9 @@ export default function Attendance() {
         <HeaderPage
           //HeaderText={item ? item.className : 'Controle de Presença'}
           HeaderText={'Controle de Presença'}
-          onClickFunctionLeft={() => { }}
-          buttonLeftDisabled={true}
+          onClickFunctionLeft={() => router.back()}
+          onClickFunctionRight={() => {}}
+          buttonLeftDisabled={false}
           buttonRightDisabled={true}
           showDate={true}
         />
