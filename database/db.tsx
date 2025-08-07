@@ -168,10 +168,10 @@ export class SQLiteService {
                 FROM students s
                 LEFT JOIN classes c ON c.id = s.classId
                 LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
-                LEFT JOIN detailsClasses dc ON dc.classId = s.classId
+                LEFT JOIN detailsClasses dc ON dc.classId = s.classId AND dc.date = CURRENT_DATE
                 GROUP BY s.classId, c.name, dc.visitors;
             `);
-            //console.log(JSON.stringify(result, null, 2));
+            console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao contar alunos por classe: ' + error);

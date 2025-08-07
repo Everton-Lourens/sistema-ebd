@@ -1,6 +1,6 @@
 
 import { HeaderPage } from "@/components/_ui/HeaderPage"
-import { ListMobile } from "@/components/_ui/ListMobile"
+import { Switch } from "@/components/_ui/Switch"
 import { useAttendanceStore } from "@/constants/attendance"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
@@ -31,6 +31,7 @@ export default function Attendance() {
     setLoading(true);
     clearAttendanceData();
     loadingAttendance().then((data: any) => {
+      //console.log(JSON.stringify(data, null, 2));
       setAttendanceData(data)
       setLoading(false);
     });
@@ -51,7 +52,7 @@ export default function Attendance() {
           showDate={true}
         />
         <View style={{ flex: 1 }}>
-          <ListMobile
+          <Switch
             loading={loading}
             emptyText="Nenhum registro disponível!"
             items={arrayAttendanceData}
