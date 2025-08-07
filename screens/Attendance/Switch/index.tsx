@@ -195,7 +195,7 @@ export function Switch({
                     style={{ marginRight: 10 }}
                   />
 
-                  <Text style={styles.collapseTitle}>Bíblia</Text>
+                  <Text style={item.present ? styles.collapseTitle : null}>Bíblia</Text>
                 </View>
 
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
@@ -209,7 +209,7 @@ export function Switch({
                     color={item.present && item.magazine ? 'green' : undefined}
                     style={{ marginRight: 10 }}
                   />
-                  <Text style={styles.collapseTitle}>Revista</Text>
+                  <Text style={item.present ? styles.collapseTitle : null}>Revista</Text>
                 </View>
               </>
 
