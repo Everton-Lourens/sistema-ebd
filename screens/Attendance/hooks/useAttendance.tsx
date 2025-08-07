@@ -2,8 +2,8 @@ import { SQLiteService } from '@/database/db';
 import { IAttendanceData } from '../interfaces/IAttendanceData';
 
 export function useAttendance() {
-  async function loadingAttendance(): Promise<[IAttendanceData] | void> {
-    return await SQLiteService.getClassesReportData()
+  async function loadingAttendance(classId: number): Promise<[IAttendanceData] | void> {
+    return await SQLiteService.getStudentByClassId(classId)
       .then((result: unknown) => {
         if (Array.isArray(result) && result.length > 0) {
           return result as [IAttendanceData];

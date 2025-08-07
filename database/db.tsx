@@ -127,9 +127,38 @@ export class SQLiteService {
     };
 
 
-    static getStudentById = async (id: string) => {
+    static getStudentById = async (id: number) => {
         try {
             const result = await db.getAllSync('SELECT * FROM students WHERE id = ?', id);
+            return result;
+        } catch (error) {
+            console.error('Erro ao buscar estudante por id:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
+
+    static getStudentByClassId = async (classId: number) => {
+        if (!classId) {
+            throw new Error('Class ID is required');
+        }
+        try {
+            const result = await db.getAllSync(`
+                SELECT 
+                    s.id,
+                    CASE 
+                        WHEN instr(s.name, ' ') > 0 THEN substr(s.name, 1, instr(s.name, ' ', instr(s.name, ' ') + 1) - 1)
+                        ELSE s.name
+                    END AS name,
+                    s.name AS fullName,
+                    strftime('%d/%m/%Y', s.date) AS date,
+                    s.classId,
+                    c.name AS className
+                FROM students s
+                INNER JOIN classes c ON s.classId = c.id
+                WHERE s.classId = ?
+                ORDER BY s.name
+            `, classId);
             return result;
         } catch (error) {
             console.error('Erro ao buscar estudante por id:', error);

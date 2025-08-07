@@ -30,8 +30,8 @@ export default function Attendance() {
   const onRefresh = () => {
     setLoading(true);
     clearAttendanceData();
-    loadingAttendance().then((data: any) => {
-      //console.log(JSON.stringify(data, null, 2));
+    loadingAttendance(1).then((data: any) => {
+      console.log(JSON.stringify(data, null, 2));
       setAttendanceData(data)
       setLoading(false);
     });
@@ -59,21 +59,12 @@ export default function Attendance() {
             onSubmit={copyResumeToClipboard}
             textButton="Copiar"
             itemFields={[
-              { field: 'className', valueFormatter: undefined },
-              { field: 'enrolled', valueFormatter: undefined },
+              { field: 'name', valueFormatter: undefined },
             ]}
             collapseItems={[
-              { field: 'enrolled', headerName: 'Matriculados', type: 'text' },
-              { field: 'absent', headerName: 'Ausentes', type: 'text' },
-              { field: 'present', headerName: 'Presentes', type: 'text' },
-              { field: 'visitors', headerName: 'Visitantes', type: 'text' },
-              { field: 'total', headerName: 'Total', type: 'text' },
-              { field: 'bible', headerName: 'Bíblia', type: 'text' },
-              { field: 'magazine', headerName: 'Revista', type: 'text' },
-              { field: 'offer', headerName: 'Oferta', type: 'text' },
-              { field: 'attendancePercentage', headerName: 'Percentual de Presença', type: 'text' },
-              { field: 'biblePercentage', headerName: 'Percentual de Bíblia', type: 'text' },
-              { field: 'magazinePercentage', headerName: 'Percentual de Revista', type: 'text' },
+              { field: 'className', headerName: 'Classe', type: 'text' },
+              { field: 'fullName', headerName: 'Nome Completo', type: 'text' },
+              { field: 'date', headerName: 'Data de Cadastro', type: 'text' },
             ]}
           />
         </View>
