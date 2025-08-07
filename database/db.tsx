@@ -170,6 +170,33 @@ export class SQLiteService {
         }
     };
 
+    static getAttendance = async (classId: number) => {
+        const date = getToday();
+        try {
+            const result = await db.getAllAsync(`
+                SELECT 
+                    a.id,
+                    a.studentId,
+                    s.name,
+                    a.present,
+                    a.bible,
+                    a.magazine
+                FROM attendance a
+                INNER JOIN students s ON a.studentId = s.id
+                WHERE s.classId = ? AND a.date = ?
+                ORDER BY s.name
+            `,
+                classId,
+                date
+            );
+            return result;
+        } catch (error) {
+            console.error('@@@ -- @@@ Erro ao buscar todos os estudantes:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
+
     static getStudentById = async (id: number) => {
         try {
             const result = await db.getAllSync('SELECT * FROM students WHERE id = ?', id);
