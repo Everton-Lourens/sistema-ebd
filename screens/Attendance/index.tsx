@@ -1,9 +1,9 @@
 
 import { HeaderPage } from "@/components/_ui/HeaderPage"
-import { Switch } from "@/components/_ui/Switch"
 import { useAttendanceStore } from "@/constants/attendance"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
+import { Switch } from "@/screens/Attendance/Switch"
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router"
 
 import { StatusBar } from "expo-status-bar"
@@ -18,6 +18,7 @@ export default function Attendance() {
   const { loadingAttendance } = useAttendance()
   const { arrayAttendanceData, setAttendanceData, clearAttendanceData } = useAttendanceStore();
   const [loading, setLoading] = useState(false);
+  const [className, setClassName] = useState<string | null>(null);
   const { id } = useLocalSearchParams();
 
   const focusEffectCallback = useCallback(() => {
@@ -35,6 +36,7 @@ export default function Attendance() {
     console.log(Number(id));
     loadingAttendance(Number(id)).then((data: any) => {
       //console.log(JSON.stringify(data, null, 2));
+      setClassName(data[0]?.className || null);
       setAttendanceData(data)
       setLoading(false);
     });
@@ -48,10 +50,9 @@ export default function Attendance() {
 
       <SafeAreaView style={styles.container}>
         <HeaderPage
-          //HeaderText={item ? item.className : 'Controle de Presença'}
-          HeaderText={'Controle de Presença'}
+          HeaderText={className || 'Controle de Presença'}
           onClickFunctionLeft={() => router.back()}
-          onClickFunctionRight={() => {}}
+          onClickFunctionRight={() => { }}
           buttonLeftDisabled={false}
           buttonRightDisabled={true}
           showDate={true}

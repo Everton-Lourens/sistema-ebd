@@ -1,3 +1,4 @@
+import { getToday } from '@/helpers/format';
 import { logger } from '@/helpers/logger';
 import { IStudentData } from '@/screens/Register/interfaces/IStudentData';
 import * as Crypto from 'expo-crypto';
@@ -115,6 +116,49 @@ export class SQLiteService {
         }
     };
 
+    static insertAttendance = async ({ studentId, present, bible, magazine }: any) => {
+        if (!studentId) {
+            throw new Error('Student ID is required');
+        }
+        try {
+            const date = getToday();
+            const existing = await db.getFirstAsync(
+                'SELECT id FROM attendance WHERE studentId = ? AND date = ?',
+                studentId,
+                date
+            );
+
+            if (existing) {
+                await db.runAsync(
+                    `UPDATE attendance
+                    SET present = ?, bible = ?, magazine = ?
+                    WHERE studentId = ? AND date = ?`,
+                    present,
+                    bible,
+                    magazine,
+                    studentId,
+                    date
+                );
+            } else {
+                const id = Crypto.randomUUID();
+                await db.runAsync(
+                    `INSERT INTO attendance (id, studentId, present, bible, magazine, date)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    id,
+                    studentId,
+                    present,
+                    bible,
+                    magazine,
+                    date
+                );
+            }
+            return true;
+        } catch (error) {
+            logger.error(error);
+            throw error;
+        }
+    };
+
     static getStudents = async () => {
         try {
             const result = await db.getAllAsync('SELECT * FROM students');
@@ -125,7 +169,6 @@ export class SQLiteService {
             throw error;
         }
     };
-
 
     static getStudentById = async (id: number) => {
         try {
@@ -159,6 +202,43 @@ export class SQLiteService {
                 WHERE s.classId = ?
                 ORDER BY s.name
             `, classId);
+            return result;
+        } catch (error) {
+            console.error('@@@ -- @@@ Erro ao buscar estudante por ClassId:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
+
+    static getAttendanceByClassId = async (classId: number) => {
+        if (!classId) {
+            throw new Error('Class ID is required');
+        }
+        const date = getToday();
+        try {
+            const result = await db.getAllSync(`
+                SELECT 
+                    s.id,
+                    CASE 
+                        WHEN instr(s.name, ' ') > 0 THEN substr(s.name, 1, instr(s.name, ' ') - 1)
+                        ELSE s.name
+                    END AS name,
+                    s.name AS fullName,
+                    strftime('%d/%m/%Y', s.date) AS date,
+                    s.classId,
+                    c.name AS className,
+                    a.present AS present,
+                    a.bible AS bible,
+                    a.magazine AS magazine
+                FROM students s
+                INNER JOIN classes c ON s.classId = c.id
+                LEFT JOIN attendance a ON s.id = a.studentId AND a.date = ?
+                WHERE s.classId = ?
+                ORDER BY s.name
+            `,
+                date,
+                classId,
+            );
             return result;
         } catch (error) {
             console.error('@@@ -- @@@ Erro ao buscar estudante por ClassId:', error);

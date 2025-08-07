@@ -3,7 +3,20 @@ import { IAttendanceData } from '../interfaces/IAttendanceData';
 
 export function useAttendance() {
   async function loadingAttendance(classId: number): Promise<[IAttendanceData] | void> {
-    return await SQLiteService.getStudentByClassId(classId)
+    return await SQLiteService.getAttendanceByClassId(classId)
+      .then((result: unknown) => {
+        if (Array.isArray(result) && result.length > 0) {
+          return result as [IAttendanceData];
+        }
+        return result as [IAttendanceData];
+      })
+      .catch((error) => {
+        console.log(error)
+        throw error
+      })
+  }
+  async function insertAttendance(item: any): Promise<[IAttendanceData] | void> {
+    return await SQLiteService.insertAttendance(item)
       .then((result: unknown) => {
         if (Array.isArray(result) && result.length > 0) {
           return result as [IAttendanceData];
@@ -28,6 +41,7 @@ export function useAttendance() {
 
   return {
     loadingAttendance,
+    insertAttendance,
     getAttendance
   }
 }

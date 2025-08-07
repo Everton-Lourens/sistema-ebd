@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -9,7 +9,8 @@ import {
   View
 } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { Loading } from '../Loading';
+import { Loading } from '../../../components/_ui/Loading';
+import { useAttendance } from '../hooks/useAttendance';
 
 type Field = {
   field: string;
@@ -42,14 +43,22 @@ export function Switch({
   emptyText = 'Nenhum item encontrado',
   loading = false,
 }: Props) {
+  const { insertAttendance } = useAttendance()
   const [itemOpened, setItemOpened] = useState<{ [id: string]: boolean }>({});
-  const [isChecked, setChecked] = useState(false);
+  const [arrayItems, setArrayItems] = useState<any[]>([]);
+  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
+
   function handleOpenItem(id: string) {
     setItemOpened((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   }
+
+  useEffect(() => {
+    setArrayItems(items);
+    console.log('@@@ -- @@@ Switch items:', JSON.stringify(items, null, 2));
+  }, [items]);
 
   if (loading) {
     return (
@@ -65,10 +74,66 @@ export function Switch({
     );
   }
 
+  const handleCheckboxChangePresent = (item: { id: string }, newValue: boolean) => {
+    setArrayItems(prev => {
+      const updatedItems = [...prev];
+      const itemIndex = updatedItems.findIndex(i => i.id === item.id);
+      if (itemIndex !== -1) {
+        updatedItems[itemIndex] = { ...updatedItems[itemIndex], present: newValue };
+        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
+        insertAttendance({
+          studentId: item.id,
+          present: newValue,
+          bible: updatedItems[itemIndex]?.bible,
+          magazine: updatedItems[itemIndex]?.magazine,
+        });
+      }
+      return updatedItems;
+    });
+  };
+
+  const handleCheckboxChangeBible = (item: { id: string }, newValue: boolean) => {
+    console.log(JSON.stringify(item, null, 2));
+    setArrayItems(prev => {
+      const updatedItems = [...prev];
+      const itemIndex = updatedItems.findIndex(i => i.id === item.id);
+      if (itemIndex !== -1) {
+        updatedItems[itemIndex] = { ...updatedItems[itemIndex], bible: newValue };
+        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
+        insertAttendance({
+          studentId: item.id,
+          present: updatedItems[itemIndex].present,
+          bible: newValue,
+          magazine: updatedItems[itemIndex]?.magazine,
+        });
+      }
+      return updatedItems;
+    });
+  };
+
+  const handleCheckboxChangeMagazine = (item: { id: string }, newValue: boolean) => {
+    console.log(JSON.stringify(item, null, 2));
+    setArrayItems(prev => {
+      const updatedItems = [...prev];
+      const itemIndex = updatedItems.findIndex(i => i.id === item.id);
+      if (itemIndex !== -1) {
+        updatedItems[itemIndex] = { ...updatedItems[itemIndex], magazine: newValue };
+        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
+        insertAttendance({
+          studentId: item.id,
+          present: updatedItems[itemIndex].present,
+          bible: updatedItems[itemIndex]?.bible,
+          magazine: newValue,
+        });
+      }
+      return updatedItems;
+    });
+  };
+
   return (
     <View style={{ padding: 20 }}>
       <FlatList
-        data={items}
+        data={arrayItems}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 12 }}
         renderItem={({ item }) => {
@@ -90,12 +155,12 @@ export function Switch({
               >
 
                 <ToggleSwitch
-                  isOn={false}
+                  isOn={item.present}
                   onColor="green"
                   offColor="red"
                   label=""
                   size="small"
-                  onToggle={isOn => console.log(isOn)}
+                  onToggle={change => handleCheckboxChangePresent(item, change)}
                 />
                 {itemFields.map((field, index) => (
                   <Text key={field.field} style={[styles.cell, index === 0 && { flex: 1 }]}>
@@ -117,9 +182,9 @@ export function Switch({
               <>
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Checkbox
-                    value={isChecked}
-                    onValueChange={setChecked}
-                    color={isChecked ? 'green' : undefined}
+                    value={item.bible}
+                    onValueChange={(newValue) => handleCheckboxChangeBible(item, newValue)}
+                    color={item.bible ? 'green' : undefined}
                     style={{ marginRight: 10 }}
                   />
                   <Text style={styles.collapseTitle}>Bíblia</Text>
@@ -127,9 +192,9 @@ export function Switch({
 
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Checkbox
-                    value={isChecked}
-                    onValueChange={setChecked}
-                    color={isChecked ? 'green' : undefined}
+                    value={item.magazine}
+                    onValueChange={(newValue) => handleCheckboxChangeMagazine(item, newValue)}
+                    color={item.magazine ? 'green' : undefined}
                     style={{ marginRight: 10 }}
                   />
                   <Text style={styles.collapseTitle}>Revista</Text>
