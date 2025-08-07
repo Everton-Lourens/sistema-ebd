@@ -57,7 +57,6 @@ export function Switch({
 
   useEffect(() => {
     setArrayItems(items);
-    console.log('@@@ -- @@@ Switch items:', JSON.stringify(items, null, 2));
   }, [items]);
 
   if (loading) {
@@ -92,7 +91,6 @@ export function Switch({
   };
 
   const handleCheckboxChangeBible = (item: { id: string }, newValue: boolean) => {
-    console.log(JSON.stringify(item, null, 2));
     setArrayItems(prev => {
       const updatedItems = [...prev];
       const itemIndex = updatedItems.findIndex(i => i.id === item.id);
@@ -110,7 +108,6 @@ export function Switch({
   };
 
   const handleCheckboxChangeMagazine = (item: { id: string }, newValue: boolean) => {
-    console.log(JSON.stringify(item, null, 2));
     setArrayItems(prev => {
       const updatedItems = [...prev];
       const itemIndex = updatedItems.findIndex(i => i.id === item.id);
@@ -182,7 +179,6 @@ export function Switch({
                 )}
               </TouchableOpacity>
 
-              <>
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Checkbox
                     value={item.present ? item.bible : false}
@@ -211,7 +207,6 @@ export function Switch({
                   />
                   <Text style={item.present ? styles.collapseTitle : null}>Revista</Text>
                 </View>
-              </>
 
               {isOpen && (
                 <View style={styles.collapse}>

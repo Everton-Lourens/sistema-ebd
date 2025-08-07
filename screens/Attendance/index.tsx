@@ -33,9 +33,7 @@ export default function Attendance() {
   const onRefresh = () => {
     setLoading(true);
     clearAttendanceData();
-    console.log(Number(id));
     loadingAttendance(Number(id)).then((data: any) => {
-      //console.log(JSON.stringify(data, null, 2));
       setClassName(data[0]?.className || null);
       setAttendanceData(data)
       setLoading(false);
@@ -70,7 +68,6 @@ export default function Attendance() {
             collapseItems={[
               { field: 'className', headerName: 'Classe', type: 'text' },
               { field: 'fullName', headerName: 'Nome Completo', type: 'text' },
-              { field: 'date', headerName: 'Data de Cadastro', type: 'text' },
             ]}
           />
         </View>
