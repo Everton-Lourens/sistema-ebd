@@ -259,6 +259,7 @@ export class SQLiteService {
 
     static getClassesReportData = async () => {
         try {
+            const date = getToday();
             const result = await db.getAllAsync(`
                 SELECT
                     s.classId as id,
@@ -276,10 +277,13 @@ export class SQLiteService {
                     CONCAT(ROUND((SUM(COALESCE(a.magazine, 0)) * 100.0) / COUNT(s.id), 2), '%') AS magazinePercentage
                 FROM students s
                 LEFT JOIN classes c ON c.id = s.classId
-                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
-                LEFT JOIN detailsClasses dc ON dc.classId = s.classId AND dc.date = CURRENT_DATE
+                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = ?
+                LEFT JOIN detailsClasses dc ON dc.classId = s.classId AND dc.date = ?
                 GROUP BY s.classId, c.name, dc.visitors;
-            `);
+            `,
+                date,
+                date
+            );
             //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
@@ -289,6 +293,7 @@ export class SQLiteService {
     };
 
     static getGeneralReportData = async () => {
+        const date = getToday();
         try {
             const result = await db.getAllAsync(`
         -- Totais gerais
@@ -300,14 +305,14 @@ export class SQLiteService {
                         SUM(COALESCE(a.bible, 0)) AS bible,
                         SUM(COALESCE(a.magazine, 0)) AS magazine
                     FROM students s
-                    LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+                    LEFT JOIN attendance a ON a.studentId = s.id AND a.date = ?
                 ),
                 details_data AS (
                     SELECT
                         SUM(visitors) AS visitors,
                         SUM(offer) AS offer
                     FROM detailsClasses
-                    WHERE date = CURRENT_DATE
+                    WHERE date = ?
                 )
                 SELECT
                     'total' AS id,
@@ -325,7 +330,10 @@ export class SQLiteService {
                     CONCAT(ROUND((sd.magazine * 100.0) / sd.enrolled, 2), '%') AS magazinePercentage
                 FROM student_data sd
                 CROSS JOIN details_data dd;
-            `);
+            `,
+                date,
+                date
+            );
             //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
@@ -335,6 +343,7 @@ export class SQLiteService {
     };
 
     static getRankingPresentData = async () => {
+        const date = getToday();
         try {
             const result = await db.getAllAsync(`
                 SELECT
@@ -349,11 +358,13 @@ export class SQLiteService {
                     ) AS attendancePercentage
                 FROM students s
                 LEFT JOIN classes c ON c.id = s.classId
-                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = CURRENT_DATE
+                LEFT JOIN attendance a ON a.studentId = s.id AND a.date = ?
                 GROUP BY c.id, c.name
                 ORDER BY
                     (SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) * 100.0) / COUNT(s.id) DESC;
-            `);
+            `,
+                date
+            );
             //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
@@ -363,6 +374,7 @@ export class SQLiteService {
     };
 
     static getRankingOfferData = async () => {
+        const date = getToday();
         try {
             const result = await db.getAllAsync(`
                 SELECT
@@ -370,10 +382,12 @@ export class SQLiteService {
                     'R$ ' || REPLACE(printf('%.2f', COALESCE(dc.offer, 0) / 100.0), '.', ',') AS offer
                 FROM detailsClasses dc
                 LEFT JOIN classes c ON c.id = dc.classId
-                WHERE dc.date = CURRENT_DATE
+                WHERE dc.date = ?
                 GROUP BY c.id, c.name, dc.offer
                 ORDER BY dc.offer DESC;
-            `);
+            `,
+                date
+            );
             //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
