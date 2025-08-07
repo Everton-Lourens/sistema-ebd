@@ -80,12 +80,11 @@ export function Switch({
       const itemIndex = updatedItems.findIndex(i => i.id === item.id);
       if (itemIndex !== -1) {
         updatedItems[itemIndex] = { ...updatedItems[itemIndex], present: newValue };
-        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
         insertAttendance({
           studentId: item.id,
           present: newValue,
-          bible: updatedItems[itemIndex]?.bible,
-          magazine: updatedItems[itemIndex]?.magazine,
+          bible: !newValue ? false : updatedItems[itemIndex]?.bible,
+          magazine: !newValue ? false : updatedItems[itemIndex]?.magazine,
         });
       }
       return updatedItems;
@@ -99,12 +98,11 @@ export function Switch({
       const itemIndex = updatedItems.findIndex(i => i.id === item.id);
       if (itemIndex !== -1) {
         updatedItems[itemIndex] = { ...updatedItems[itemIndex], bible: newValue };
-        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
         insertAttendance({
           studentId: item.id,
           present: updatedItems[itemIndex].present,
-          bible: newValue,
-          magazine: updatedItems[itemIndex]?.magazine,
+          bible: !updatedItems[itemIndex].present ? false : newValue,
+          magazine: !updatedItems[itemIndex].present ? false : updatedItems[itemIndex]?.magazine,
         });
       }
       return updatedItems;
@@ -118,12 +116,11 @@ export function Switch({
       const itemIndex = updatedItems.findIndex(i => i.id === item.id);
       if (itemIndex !== -1) {
         updatedItems[itemIndex] = { ...updatedItems[itemIndex], magazine: newValue };
-        console.log(JSON.stringify(updatedItems[itemIndex], null, 2));
         insertAttendance({
           studentId: item.id,
           present: updatedItems[itemIndex].present,
-          bible: updatedItems[itemIndex]?.bible,
-          magazine: newValue,
+          bible: !updatedItems[itemIndex].present ? false : updatedItems[itemIndex]?.bible,
+          magazine: !updatedItems[itemIndex].present ? false : newValue,
         });
       }
       return updatedItems;
@@ -160,7 +157,13 @@ export function Switch({
                   offColor="red"
                   label=""
                   size="small"
-                  onToggle={change => handleCheckboxChangePresent(item, change)}
+                  onToggle={change => {
+                    handleCheckboxChangePresent(item, change);
+                    if (!change) {
+                      handleCheckboxChangeBible(item, false);
+                      handleCheckboxChangeMagazine(item, false);
+                    }
+                  }}
                 />
                 {itemFields.map((field, index) => (
                   <Text key={field.field} style={[styles.cell, index === 0 && { flex: 1 }]}>
@@ -182,19 +185,28 @@ export function Switch({
               <>
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Checkbox
-                    value={item.bible}
-                    onValueChange={(newValue) => handleCheckboxChangeBible(item, newValue)}
-                    color={item.bible ? 'green' : undefined}
+                    value={item.present ? item.bible : false}
+                    onValueChange={(newValue) => {
+                      if (!item.present) return;
+                      handleCheckboxChangeBible(item, newValue);
+                    }}
+                    disabled={!item.present}
+                    color={item.present && item.bible ? 'green' : undefined}
                     style={{ marginRight: 10 }}
                   />
+
                   <Text style={styles.collapseTitle}>Bíblia</Text>
                 </View>
 
                 <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
                   <Checkbox
-                    value={item.magazine}
-                    onValueChange={(newValue) => handleCheckboxChangeMagazine(item, newValue)}
-                    color={item.magazine ? 'green' : undefined}
+                    value={item.present ? item.magazine : false}
+                    onValueChange={(newValue) => {
+                      if (!item.present) return;
+                      handleCheckboxChangeMagazine(item, newValue);
+                    }}
+                    disabled={!item.present}
+                    color={item.present && item.magazine ? 'green' : undefined}
                     style={{ marginRight: 10 }}
                   />
                   <Text style={styles.collapseTitle}>Revista</Text>
