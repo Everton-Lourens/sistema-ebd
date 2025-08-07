@@ -24,8 +24,10 @@ type CollapseItem = {
 type Props = {
   items: any[];
   itemFields: Field[];
-  onSubmit?: (item: any) => void | undefined;
-  textButton?: string;
+  onFirstSubmit?: (item: any) => void | undefined;
+  onSecondSubmit?: (item: any) => void | undefined;
+  textFirstButton?: string;
+  textSecondButton?: string;
   collapseItems: CollapseItem[];
   emptyText?: string;
   loading?: boolean;
@@ -34,8 +36,10 @@ type Props = {
 export function ListMobile({
   items,
   itemFields,
-  onSubmit,
-  textButton = 'Enviar',
+  onFirstSubmit,
+  onSecondSubmit,
+  textFirstButton = 'Enviar',
+  textSecondButton = 'Enviar',
   collapseItems,
   emptyText = 'Nenhum item encontrado',
   loading = false,
@@ -119,13 +123,21 @@ export function ListMobile({
                       </View>
                     </View>
                   ))}
-                  {onSubmit &&
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {onSubmit(item)}}
-                  >
-                    <Text style={styles.buttonText}>{textButton}</Text>
-                  </TouchableOpacity>}
+                  {onFirstSubmit &&
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => { onFirstSubmit(item) }}
+                    >
+                      <Text style={styles.buttonText}>{textFirstButton}</Text>
+                    </TouchableOpacity>}
+
+                  {onSecondSubmit &&
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => { onSecondSubmit(item) }}
+                    >
+                      <Text style={styles.buttonText}>{textSecondButton}</Text>
+                    </TouchableOpacity>}
                 </View>
               )}
             </View>

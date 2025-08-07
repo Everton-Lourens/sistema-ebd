@@ -4,7 +4,8 @@ import { Switch } from "@/components/_ui/Switch"
 import { useAttendanceStore } from "@/constants/attendance"
 import { styles } from "@/constants/styles"
 import { copyResumeToClipboard } from "@/helpers/clipboard"
-import { useFocusEffect } from "expo-router"
+import { useFocusEffect, useLocalSearchParams } from "expo-router"
+
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
 import {
@@ -17,6 +18,7 @@ export default function Attendance() {
   const { loadingAttendance } = useAttendance()
   const { arrayAttendanceData, setAttendanceData, clearAttendanceData } = useAttendanceStore();
   const [loading, setLoading] = useState(false);
+  const { id } = useLocalSearchParams();
 
   const focusEffectCallback = useCallback(() => {
     onRefresh();
@@ -30,8 +32,9 @@ export default function Attendance() {
   const onRefresh = () => {
     setLoading(true);
     clearAttendanceData();
-    loadingAttendance(1).then((data: any) => {
-      console.log(JSON.stringify(data, null, 2));
+    console.log(Number(id));
+    loadingAttendance(Number(id)).then((data: any) => {
+      //console.log(JSON.stringify(data, null, 2));
       setAttendanceData(data)
       setLoading(false);
     });
@@ -45,7 +48,8 @@ export default function Attendance() {
 
       <SafeAreaView style={styles.container}>
         <HeaderPage
-          HeaderText="Controle de Presença"
+          //HeaderText={item ? item.className : 'Controle de Presença'}
+          HeaderText={'Controle de Presença'}
           onClickFunctionLeft={() => { }}
           buttonLeftDisabled={true}
           buttonRightDisabled={true}

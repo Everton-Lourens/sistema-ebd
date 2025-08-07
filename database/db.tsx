@@ -120,7 +120,7 @@ export class SQLiteService {
             const result = await db.getAllAsync('SELECT * FROM students');
             return result;
         } catch (error) {
-            console.error('Erro ao buscar todos os estudantes:', error);
+            console.error('@@@ -- @@@ Erro ao buscar todos os estudantes:', error);
             logger.error(error);
             throw error;
         }
@@ -132,7 +132,7 @@ export class SQLiteService {
             const result = await db.getAllSync('SELECT * FROM students WHERE id = ?', id);
             return result;
         } catch (error) {
-            console.error('Erro ao buscar estudante por id:', error);
+            console.error('@@@ -- @@@ Erro ao buscar estudante por id:', error);
             logger.error(error);
             throw error;
         }
@@ -147,7 +147,7 @@ export class SQLiteService {
                 SELECT 
                     s.id,
                     CASE 
-                        WHEN instr(s.name, ' ') > 0 THEN substr(s.name, 1, instr(s.name, ' ', instr(s.name, ' ') + 1) - 1)
+                        WHEN instr(s.name, ' ') > 0 THEN substr(s.name, 1, instr(s.name, ' ') - 1)
                         ELSE s.name
                     END AS name,
                     s.name AS fullName,
@@ -161,7 +161,7 @@ export class SQLiteService {
             `, classId);
             return result;
         } catch (error) {
-            console.error('Erro ao buscar estudante por id:', error);
+            console.error('@@@ -- @@@ Erro ao buscar estudante por ClassId:', error);
             logger.error(error);
             throw error;
         }
@@ -200,7 +200,7 @@ export class SQLiteService {
                 LEFT JOIN detailsClasses dc ON dc.classId = s.classId AND dc.date = CURRENT_DATE
                 GROUP BY s.classId, c.name, dc.visitors;
             `);
-            console.log(JSON.stringify(result, null, 2));
+            //console.log(JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
             logger.error('Erro ao contar alunos por classe: ' + error);

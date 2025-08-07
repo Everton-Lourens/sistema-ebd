@@ -8,6 +8,7 @@ import { copyResumeToClipboard } from "@/helpers/clipboard"
 import { router, useFocusEffect } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
+
 import {
   SafeAreaView,
   View
@@ -37,6 +38,11 @@ export default function Classes() {
     });
   }
 
+  const handleGoToAttendance = (item: any) => {
+    router.push({ pathname: "/attendance/[id]", params: { id: String(item.id) } });
+  };
+
+
   return (
     <>
       <SafeAreaView style={styles.topSafeArea} />
@@ -58,8 +64,10 @@ export default function Classes() {
             loading={loading}
             emptyText="Carregando..."
             items={arrayClassesData}
-            onSubmit={copyResumeToClipboard}
-            textButton="Copiar"
+            onFirstSubmit={copyResumeToClipboard}
+            onSecondSubmit={handleGoToAttendance}
+            textFirstButton="Copiar"
+            textSecondButton="Fazer Chamada"
             itemFields={[
               { field: 'className', valueFormatter: undefined },
               { field: 'enrolled', valueFormatter: undefined },
