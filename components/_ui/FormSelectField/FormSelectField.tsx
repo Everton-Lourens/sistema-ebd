@@ -26,7 +26,11 @@ export default function FormSelectField({
                     onBlur={() => handleBlur(field)}
                     style={{ height: 60 }} // ou use styles.input
                 >
-                    <Picker.Item label={placeholder || "Selecione uma opção..."} value="" />
+                    <Picker.Item
+                    label={placeholder || "Selecione uma opção..."}
+                    value=""
+                    color="#999"
+                    />
                     {options.map((option) => (
                         <Picker.Item
                             key={option.value}

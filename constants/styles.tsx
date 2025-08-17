@@ -84,16 +84,16 @@ export const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
   },
-buttonAdd: {
-  position: "absolute",
-  bottom: 20,
-  right: 20,
-  backgroundColor: "#2980b9",
-  padding: 15,
-  borderRadius: 15,
-  zIndex: 999,
-  elevation: 10,
-},
+  buttonAdd: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#2980b9",
+    padding: 15,
+    borderRadius: 15,
+    zIndex: 999,
+    elevation: 10,
+  },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
@@ -208,4 +208,57 @@ buttonAdd: {
   icon: {
     marginRight: 10,
   },
+  openButton: {
+    backgroundColor: HEADER_BACKGROUND,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  openButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    width: '80%',
+    maxHeight: '70%',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    color: HEADER_BACKGROUND,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  sendButton: {
+    backgroundColor: HEADER_BACKGROUND,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  closeButton: {
+    backgroundColor: '#ff8585ff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+
+  modalInput: {
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    width: '100%', // Faz o TextInput ocupar toda a largura
+  },
+
 });

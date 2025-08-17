@@ -28,6 +28,19 @@ export function useAttendance() {
         throw error
       })
   }
+  async function insertDetailsClasses(item: { offer: number; visitors: number; classId: number }): Promise<[IAttendanceData] | void> {
+    return await SQLiteService.insertDetailsClasses(item)
+      .then((result: unknown) => {
+        if (Array.isArray(result) && result.length > 0) {
+          return result as [IAttendanceData];
+        }
+        return result as [IAttendanceData];
+      })
+      .catch((error) => {
+        console.log(error)
+        throw error
+      })
+  }
   async function getAttendance(): Promise<any> {
     return await SQLiteService.getClasses()
       .then((result: unknown) => {
@@ -42,6 +55,7 @@ export function useAttendance() {
   return {
     loadingAttendance,
     insertAttendance,
-    getAttendance
+    getAttendance,
+    insertDetailsClasses
   }
 }

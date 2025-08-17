@@ -179,34 +179,34 @@ export function Switch({
                 )}
               </TouchableOpacity>
 
-                <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
-                  <Checkbox
-                    value={item.present ? item.bible : false}
-                    onValueChange={(newValue) => {
-                      if (!item.present) return;
-                      handleCheckboxChangeBible(item, newValue);
-                    }}
-                    disabled={!item.present}
-                    color={item.present && item.bible ? 'green' : undefined}
-                    style={{ marginRight: 10 }}
-                  />
+              <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
+                <Checkbox
+                  value={item.present ? item.bible : false}
+                  onValueChange={(newValue) => {
+                    if (!item.present) return;
+                    handleCheckboxChangeBible(item, newValue);
+                  }}
+                  disabled={!item.present}
+                  color={item.present && item.bible ? 'green' : undefined}
+                  style={{ marginRight: 10 }}
+                />
 
-                  <Text style={item.present ? styles.collapseTitle : null}>Bíblia</Text>
-                </View>
+                <Text style={item.present ? styles.collapseTitle : null}>Bíblia</Text>
+              </View>
 
-                <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
-                  <Checkbox
-                    value={item.present ? item.magazine : false}
-                    onValueChange={(newValue) => {
-                      if (!item.present) return;
-                      handleCheckboxChangeMagazine(item, newValue);
-                    }}
-                    disabled={!item.present}
-                    color={item.present && item.magazine ? 'green' : undefined}
-                    style={{ marginRight: 10 }}
-                  />
-                  <Text style={item.present ? styles.collapseTitle : null}>Revista</Text>
-                </View>
+              <View style={[styles.collapse, { flexDirection: 'row', alignItems: 'center' }]}>
+                <Checkbox
+                  value={item.present ? item.magazine : false}
+                  onValueChange={(newValue) => {
+                    if (!item.present) return;
+                    handleCheckboxChangeMagazine(item, newValue);
+                  }}
+                  disabled={!item.present}
+                  color={item.present && item.magazine ? 'green' : undefined}
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={item.present ? styles.collapseTitle : null}>Revista</Text>
+              </View>
 
               {isOpen && (
                 <View style={styles.collapse}>
