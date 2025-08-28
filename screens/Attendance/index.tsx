@@ -7,6 +7,7 @@ import { Switch } from "@/screens/Attendance/Switch"
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router"
 
 import { FloatingButton } from "@/components/_ui/FloatingButton"
+import { IconSymbol } from "@/components/_ui/IconSymbol"
 import { formatToCurrency } from "@/helpers/format"
 import { StatusBar } from "expo-status-bar"
 import { useCallback, useState } from "react"
@@ -77,7 +78,10 @@ export default function Attendance() {
           showDate={true}
         />
 
-        <FloatingButton onClickFunction={() => { setPopUpVisible(true) }} />
+        <FloatingButton
+          onClickFunction={() => { setPopUpVisible(true) }}
+          iconFloatingButton={<IconSymbol size={30} name="dollarsign.square.fill" color="white" />}
+        />
 
         <View>
           <Modal

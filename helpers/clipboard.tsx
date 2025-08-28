@@ -1,10 +1,14 @@
+import { SQLiteService } from '@/database/db';
 import { IReportData } from '@/screens/Report/interfaces/IReportData';
 import * as Clipboard from 'expo-clipboard';
 import { getToday } from './format';
 
 export const copyResumeToClipboard = (data: IReportData) => {
   if (data === undefined) throw new Error('Erro ao copiar dados');
-  const formatted = `
+
+  SQLiteService.getAttendance(Number(data.id)).then((attendance: any) => {
+
+    const formatted = `
 *${data.className} - ${getToday()}*
 --------------
 Matriculados: *${data.enrolled}*
@@ -19,6 +23,14 @@ Oferta: *${Number(data.offer.replace(/[^\d]/g, '')) > 0 ? data.offer : 'Não hou
 Presença: *${data.attendancePercentage}*
 Bíblia: *${data.biblePercentage}*
 Revista: *${data.magazinePercentage}*
+--------------
+${attendance
+        .map((item: any) => {
+          return `${item.name}: ${item.present ? '*Presente*' : 'Falta'}\n`;
+        })
+        .join('')}
   `.trim();
-  Clipboard.setStringAsync(formatted);
+
+    Clipboard.setStringAsync(formatted);
+  });
 };

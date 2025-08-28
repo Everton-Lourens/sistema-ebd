@@ -122,7 +122,7 @@ export class SQLiteService {
                 ('s61', 'Lorenna', 4),
                 ('s62', 'Larissa Silva', 4),
                 ('s63', 'Marcelo (professor)', 4),
-                ('s64', 'Mateus Brito (professor)', 4),
+                ('s64', 'Mateus (professor)', 4),
                 ('s65', 'Marieta', 4),
                 ('s66', 'Milena (professora)', 4),
                 ('s67', 'Lucas', 4),
@@ -339,7 +339,6 @@ export class SQLiteService {
                 FROM students s
                 INNER JOIN classes c ON s.classId = c.id
                 WHERE s.classId = ?
-                ORDER BY s.name
             `, classId);
             return result;
         } catch (error) {
@@ -358,10 +357,17 @@ export class SQLiteService {
             const result = await db.getAllSync(`
                 SELECT 
                     s.id,
-                    CASE 
-                        WHEN instr(s.name, ' ') > 0 THEN substr(s.name, 1, instr(s.name, ' ') - 1)
-                        ELSE s.name
-                    END AS name,
+                CASE
+                    WHEN instr(substr(s.name, instr(s.name, ' ') + 1), ' ') > 0 
+                    THEN substr(
+                        s.name,
+                        1,
+                        instr(s.name, ' ') + instr(substr(s.name, instr(s.name, ' ') + 1), ' ')
+                    )
+                    WHEN instr(s.name, ' ') > 0
+                    THEN s.name
+                    ELSE s.name
+                END AS name,
                     s.name AS fullName,
                     strftime('%d/%m/%Y', s.date) AS date,
                     s.classId,
@@ -373,7 +379,6 @@ export class SQLiteService {
                 INNER JOIN classes c ON s.classId = c.id
                 LEFT JOIN attendance a ON s.id = a.studentId AND a.date = ?
                 WHERE s.classId = ?
-                ORDER BY s.name
             `,
                 date,
                 classId,
@@ -381,6 +386,32 @@ export class SQLiteService {
             return result;
         } catch (error) {
             console.error('@@@ -- @@@ Erro ao buscar estudante por ClassId:', error);
+            logger.error(error);
+            throw error;
+        }
+    };
+
+    static getAttendance = async (classId: number) => {
+        const date = getToday();
+        try {
+            const result = await db.getAllAsync(`
+                SELECT 
+                    a.id,
+                    a.studentId,
+                    s.name,
+                    a.present,
+                    a.bible,
+                    a.magazine
+                FROM attendance a
+                INNER JOIN students s ON a.studentId = s.id
+                WHERE s.classId = ? AND a.date = ?
+            `,
+                classId,
+                date
+            );
+            return result;
+        } catch (error) {
+            console.error('@@@ -- @@@ Erro ao buscar todos os estudantes:', error);
             logger.error(error);
             throw error;
         }
@@ -537,5 +568,4 @@ export class SQLiteService {
 }
 
 SQLiteService.init();
-
 

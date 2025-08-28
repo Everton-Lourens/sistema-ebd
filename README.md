@@ -72,12 +72,6 @@ Cada classe tem seu cálculo de presença, bíblia e revista etc.
 
 ---
 
-### Relatório geral (manual)  
-Antes feito na mão, com muito trabalho.  
-![Relatório manual](assets/images/exemple5.jpg)
-
----
-
 ## 🙌 Impacto social
 
 Este projeto vai além do código. Ele representa o uso da **tecnologia a serviço das pessoas**, proporcionando:
