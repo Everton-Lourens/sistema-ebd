@@ -50,25 +50,25 @@ Pensando nessa necessidade, desenvolvi este aplicativo com foco em **facilidade*
 
 ### Tela inicial  
 Rankings de presença e oferta das turmas.  
-![Tela inicial](assets/images/exemple1.jpg)
+![Tela inicial](assets/images/img1.jpg)
 
 ---
 
 ### Tela inicial
 Relatório geral somado de todas as turmas.  
-![Chamada digital](assets/images/exemple2.jpg)
+![Chamada digital](assets/images/img2.jpg)
 
 ---
 
 ### Tela de cadastro  
 Cadastro de alunos.  
-![Tela de cadastro](assets/images/exemple3.jpg)  
+![Tela de cadastro](assets/images/img3.jpg)  
 
 ---
 
 ### Calculo parcial de cada classe 
 Cada classe tem seu cálculo de presença, bíblia e revista etc.
-![Cálculo parcial](assets/images/exemple4.jpg)
+![Cálculo parcial](assets/images/img4.jpg)
 
 ---
 
