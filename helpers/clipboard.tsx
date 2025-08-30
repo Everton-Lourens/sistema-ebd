@@ -4,11 +4,19 @@ import * as Clipboard from 'expo-clipboard';
 import { getToday } from './format';
 
 export const copyResumeToClipboard = (data: IReportData) => {
-  if (data === undefined) throw new Error('Erro ao copiar dados');
+  try {
+    if (data === undefined) throw new Error('Erro ao copiar dados');
 
-  SQLiteService.getAttendance(Number(data.id)).then((attendance: any) => {
+    SQLiteService.getAttendance(Number(data.id)).then(async (attendance: any) => {
 
-    const formatted = `
+      let arrayPresentRankingData: any = [];
+      let arrayOfferRankingData: any = [];
+      if (data.id === 'total') {
+        arrayPresentRankingData = await SQLiteService.getRankingPresentData();
+        arrayOfferRankingData = await SQLiteService.getRankingOfferData();
+      }
+
+      const formatted = `
 *${data.className} - ${getToday()}*
 --------------
 Matriculados: *${data.enrolled}*
@@ -25,12 +33,26 @@ Bíblia: *${data.biblePercentage}*
 Revista: *${data.magazinePercentage}*
 --------------
 ${attendance
-        .map((item: any) => {
-          return `${item.name}: ${item.present ? '*Presente*' : 'Falta'}\n`;
-        })
-        .join('')}
+          .map((item: any) => {
+            return `${item.name}: ${item.present ? '*Presente*' : 'Falta'}\n`;
+          })
+          .join('')}
+
+${arrayPresentRankingData.length > 0 ? '*Em Presença:*' : ''}
+${arrayPresentRankingData.map((item: any, index: number) => {
+            return `${index + 1}. ${item.className} - ${item.attendancePercentage}\n`;
+          }).join('')}
+${arrayOfferRankingData.length > 0 ? '*Em Oferta:*' : ''}
+${arrayOfferRankingData.map((item: any, index: number) => {
+            return `${index + 1}. ${item.className} - ${item.offer}\n`;
+          }).join('')}
+
   `.trim();
 
-    Clipboard.setStringAsync(formatted);
-  });
+      Clipboard.setStringAsync(formatted);
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
 };

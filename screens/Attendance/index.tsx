@@ -26,8 +26,8 @@ export default function Attendance() {
   const { arrayAttendanceData, setAttendanceData, clearAttendanceData } = useAttendanceStore();
   const [loading, setLoading] = useState(false);
   const [popUpVisible, setPopUpVisible] = useState(false);
-  const [visitors, setVisitors] = useState<string>('');
-  const [offering, setOffering] = useState<string>('');
+  const [visitors, setVisitors] = useState<string>('0');
+  const [offering, setOffering] = useState<string>('R$ 0,00');
   const [className, setClassName] = useState<string | null>(null);
   const { id } = useLocalSearchParams();
 
@@ -50,16 +50,16 @@ export default function Attendance() {
     });
   }
 
-  const sendvisitorsAndOffering = () => {
-    if (!Number(visitors.replace(/[^0-9]/g, '')) || !Number(offering.replace(/[^0-9]/g, ''))) {
-      alert('Por favor, preencha os campos de Visitantes e Oferta.');
-      return;
+  const sendVisitorsAndOffering = () => {
+    if (Number(visitors.replace(/[^0-9]/g, '')) > 0 && Number(offering.replace(/[^0-9]/g, '')) > 0) {
+      insertDetailsClasses({
+        visitors: Number(visitors.replace(/[^0-9]/g, '')),
+        offer: Number(offering.replace(/[^0-9]/g, '')),
+        classId: Number(id)
+      });
+    } else {
+      console.log('Por favor, preencha os campos de Visitantes e Oferta.');
     }
-    insertDetailsClasses({
-      visitors: Number(visitors.replace(/[^0-9]/g, '')),
-      offer: Number(offering.replace(/[^0-9]/g, '')),
-      classId: Number(id)
-    });
   }
 
   return (
@@ -115,17 +115,17 @@ export default function Attendance() {
 
                   <TouchableOpacity onPress={() => {
                     setPopUpVisible(false)
-                    setVisitors('');
-                    setOffering('');
+                    setVisitors('0');
+                    setOffering('R$ 0,00');
                   }} style={styles.closeButton}>
                     <Text style={styles.buttonText}>Cancelar</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => {
                     setPopUpVisible(false)
-                    sendvisitorsAndOffering();
-                    setVisitors('');
-                    setOffering('');
+                    sendVisitorsAndOffering();
+                    setVisitors('0');
+                    setOffering('R$ 0,00');
                   }} style={styles.sendButton}>
                     <Text style={styles.buttonText}>Enviar</Text>
                   </TouchableOpacity>

@@ -93,8 +93,8 @@ export default function Report() {
             loading={loadingGeneral}
             emptyText="Nenhum registro disponível!"
             items={arrayReportGeneralData}
-            onSubmit={copyResumeToClipboard}
-            textButton="Copiar"
+            onFirstSubmit={copyResumeToClipboard}
+            textFirstButton="Copiar"
             itemFields={[
               { field: 'className', valueFormatter: undefined },
               { field: 'enrolled', valueFormatter: undefined },

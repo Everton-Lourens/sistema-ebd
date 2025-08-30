@@ -126,7 +126,7 @@ export class SQLiteService {
                 ('s65', 'Marieta', 4),
                 ('s66', 'Milena (professora)', 4),
                 ('s67', 'Lucas', 4),
-                ('s68', 'Calors Alan', 4),
+                ('s68', 'Carlos Alan', 4),
                 ('s69', 'Everton', 4),
                 ('s70', 'Cleverton (professor)', 4),
                 ('s71', 'Alaís', 4),
@@ -268,7 +268,6 @@ export class SQLiteService {
             );
 
             if (existing) {
-                console.log('Updating existing detailsClasses @@@@@@@@@@@ 1111111');
                 await db.runAsync(
                     `UPDATE detailsClasses
                     SET offer = ?, visitors = ?, date = ?

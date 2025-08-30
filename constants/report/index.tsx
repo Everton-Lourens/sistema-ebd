@@ -49,7 +49,7 @@ export interface ReportStore {
 
 export const columnsPresent: Column[] = [
     {
-        headerName: 'Presença',
+        headerName: 'Em presença',
         field: 'className',
         flex: 2,
     },
@@ -62,7 +62,7 @@ export const columnsPresent: Column[] = [
 
 export const columnsOffer: Column[] = [
     {
-        headerName: 'Oferta',
+        headerName: 'Em oferta',
         field: 'className',
         flex: 2,
     },

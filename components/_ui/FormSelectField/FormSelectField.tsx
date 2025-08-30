@@ -35,6 +35,7 @@ export default function FormSelectField({
                         <Picker.Item
                             key={option.value}
                             label={option.label}
+                            color="black"
                             value={option.value}
                         />
                     ))}
