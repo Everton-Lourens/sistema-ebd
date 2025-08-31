@@ -1,12 +1,22 @@
 import { create } from 'zustand';
 
+
+
 interface ClassStore {
   id: string;
   className: string;
-  allClassName: object[];
+  allClassName: {
+    id: string;
+    date: string;
+    name: string;
+  }[];
   setId: (id: string) => void;
   setClassName: (setClassName: string) => void;
-  setAllClassName: (allClassName: any[]) => void;
+  setAllClassName: (allClassName: {
+    id: string;
+    date: string;
+    name: string;
+  }[]) => void;
 }
 
 export const useClassStore = create<ClassStore>((set) => ({
@@ -15,6 +25,10 @@ export const useClassStore = create<ClassStore>((set) => ({
   allClassName: [],
   setId: (id: string) => set({ id }),
   setClassName: (className: string) => set({ className }),
-  setAllClassName: (allClassName: any[]) => set({ allClassName }),
+  setAllClassName: (allClassName: {
+    id: string;
+    date: string;
+    name: string;
+  }[]) => set({ allClassName }),
 }));
 

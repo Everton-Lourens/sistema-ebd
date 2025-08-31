@@ -47,7 +47,6 @@ export default function StudentFormScreen() {
   }
 
   function onSubmitHandler(values: IStudentData) {
-    console.log(JSON.stringify(values, null, 2));
     /*
     if (isEditing && id) {
       updateStudent(id, values); // lógica para editar
@@ -58,13 +57,14 @@ export default function StudentFormScreen() {
 */
     // https://reactnative.dev/docs/alert
     return onRegister(values).then(() => {
+      Keyboard.dismiss();
       Alert.alert(
         "Aluno Registrado!",
         "Nome: " + values.name +
-        "\nClasse: " + values.classId,
+        "\nClasse: " + allClassName.find((c: any) => c.id === values.classId)?.name,
       );
-      Keyboard.dismiss();
       handleCancel();
+      router.back()
     }).catch(() => {
       Alert.alert(
         "Falha ao registrar aluno!",
