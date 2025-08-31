@@ -51,7 +51,7 @@ export default function Attendance() {
   }
 
   const sendVisitorsAndOffering = () => {
-    if (Number(visitors.replace(/[^0-9]/g, '')) > 0 && Number(offering.replace(/[^0-9]/g, '')) > 0) {
+    if (Number(visitors.replace(/[^0-9]/g, '')) > 0 || Number(offering.replace(/[^0-9]/g, '')) > 0) {
       insertDetailsClasses({
         visitors: Number(visitors.replace(/[^0-9]/g, '')),
         offer: Number(offering.replace(/[^0-9]/g, '')),
