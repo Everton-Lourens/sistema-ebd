@@ -1,6 +1,9 @@
 # 📖 Sistema EBD – Aplicativo para Escola Bíblica Dominical
 
-🚧 **Projeto em desenvolvimento** 🚧
+- **Link para download do APK no android:**:
+```bash
+https://expo.dev/accounts/everton_lourens/projects/cadastro-classes/builds/efbd803c-4b57-4b3d-ade0-7a980ed040a1
+```
 
 Este repositório contém o desenvolvimento de um aplicativo criado com **Expo + React Native**, com o propósito de facilitar e otimizar a rotina da **Escola Bíblica Dominical (EBD)** da **Igreja Assembleia de Deus 2 de Julho**.
 
